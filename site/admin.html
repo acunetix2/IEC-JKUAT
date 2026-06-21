@@ -15,181 +15,104 @@
 <script>
 tailwind.config = {
   darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "secondary-fixed-dim": "#ffb953",
-        "primary-container": "#006838",
-        "tertiary-fixed": "#c6e7ff",
-        "on-tertiary": "#ffffff",
-        "on-secondary-container": "#6e4700",
-        "error": "#ba1a1a",
-        "on-primary-fixed": "#00210e",
-        "inverse-surface": "#2f3133",
-        "on-secondary": "#ffffff",
-        "on-background": "#1a1c1e",
-        "surface-container-highest": "#e2e2e5",
-        "inverse-on-surface": "#f0f0f3",
-        "surface-container-low": "#f3f3f6",
-        "on-error": "#ffffff",
-        "surface-variant": "#e2e2e5",
-        "secondary-fixed": "#ffddb4",
-        "surface-tint": "#0b6d3c",
-        "error-container": "#ffdad6",
-        "secondary": "#825500",
-        "secondary-container": "#feb23d",
-        "surface-container-lowest": "#ffffff",
-        "on-surface": "#1a1c1e",
-        "tertiary-container": "#006086",
-        "primary-fixed-dim": "#83d99d",
-        "inverse-primary": "#83d99d",
-        "background": "#f9f9fc",
-        "on-tertiary-container": "#9ed8ff",
-        "on-primary": "#ffffff",
-        "tertiary": "#004765",
-        "tertiary-fixed-dim": "#82cfff",
-        "on-error-container": "#93000a",
-        "primary": "#004d28",
-        "surface": "#f9f9fc",
-        "on-secondary-fixed-variant": "#633f00",
-        "outline-variant": "#bec9be",
-        "jkuat-gold": "#FBB03B",
-        "tech-blue": "#00AEEF",
-        "primary-fixed": "#9ef5b8",
-        "jkuat-green": "#006838",
-        "surface-bright": "#f9f9fc",
-        "on-tertiary-fixed-variant": "#004c6b",
-        "on-primary-container": "#8ee4a8",
-        "on-surface-variant": "#3f4940",
-        "surface-container-high": "#e8e8ea",
-        "surface-container": "#eeeef0",
-        "on-tertiary-fixed": "#001e2d",
-        "on-primary-fixed-variant": "#00522b",
-        "on-secondary-fixed": "#291800",
-        "surface-gray": "#F4F7F9",
-        "surface-dim": "#dadadc",
-        "outline": "#6f7a70",
-        "glass-border": "rgba(255, 255, 255, 0.2)"
-      },
-      borderRadius: {
-        DEFAULT: "0.25rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
-        full: "9999px"
-      },
-      spacing: {
-        "stack-sm": "0.5rem",
-        "stack-lg": "2rem",
-        "grid-margin": "2rem",
-        "grid-gutter": "1.5rem",
-        "section-padding": "5rem",
-        "stack-md": "1rem",
-        "bento-gap": "1rem"
-      },
-      fontFamily: {
-        "body-lg": ["Inter"],
-        "button-text": ["Inter"],
-        "headline-md": ["Plus Jakarta Sans"],
-        "body-md": ["Inter"],
-        "label-md": ["Inter"],
-        "headline-lg": ["Plus Jakarta Sans"],
-        "display-lg": ["Plus Jakarta Sans"]
-      }
+  theme: { extend: {
+    colors: {
+      "jkuat-gold": "#FBB03B", "jkuat-green": "#006838", "tech-blue": "#00AEEF",
+      "on-surface": "#1a1c1e", "on-surface-variant": "#3f4940",
+      "surface": "#f9f9fc", "surface-container-low": "#f3f3f6",
+      "surface-container": "#eeeef0", "surface-container-high": "#e8e8ea",
+      "surface-container-highest": "#e2e2e5","surface-variant": "#e2e2e5",
+      "outline-variant": "#bec9be","surface-container-lowest": "#ffffff",
+      "surface-bright": "#f9f9fc","surface-dim": "#dadadc",
+      "primary": "#004d28","primary-container": "#006838",
+      "on-primary": "#ffffff","glass-border": "rgba(255, 255, 255, 0.2)",
+      "secondary": "#825500","secondary-container": "#feb23d",
+      "secondary-fixed": "#ffddb4","secondary-fixed-dim": "#ffb953",
+      "on-secondary": "#ffffff","tertiary": "#004765",
+      "error": "#ba1a1a","error-container": "#ffdad6",
+      "surface-gray": "#F4F7F9"
+    },
+    borderRadius: { DEFAULT: "0.25rem", lg: "0.5rem", xl: "0.75rem", full: "9999px" },
+    spacing: { "grid-margin": "2rem", "bento-gap": "1rem", "section-padding": "5rem" },
+    fontFamily: { "headline-md": ["Plus Jakarta Sans"], "body-md": ["Inter"], "label-md": ["Inter"], "button-text": ["Inter"], "display-lg": ["Plus Jakarta Sans"] },
+    fontSize: {
+      "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "600"}],
+      "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800"}],
+      "button-text": ["16px", {lineHeight: "1.0", fontWeight: "600"}],
+      "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}],
+      "label-md": ["14px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600"}]
     }
-  }
+  }}
 }
 </script>
 <style>
-body { background-color: #f9f9fc; font-family: 'Inter', sans-serif; }
+body { background: #f9f9fc; font-family: 'Inter', sans-serif; }
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-.glass-panel {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(20px);
-  border: 1px solid #E1E4E8;
-}
-.bento-card {
-  background: #ffffff;
-  border: 1px solid #E1E4E8;
-  border-radius: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.bento-card:hover {
-  box-shadow: 0px 4px 20px rgba(0,0,0,0.04);
-  border-color: #00AEEF;
-  transform: translateY(-2px);
-}
+.bento-card { background: #fff; border: 1px solid #E1E4E8; border-radius: 1rem; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.bento-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.04); border-color: #00AEEF; transform: translateY(-2px); }
 .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
 .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e2e5; border-radius: 10px; }
-.pulse-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #00AEEF;
-  border-radius: 50%;
-  display: inline-block;
-  animation: pulse 2s infinite;
-}
+.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.pulse-dot { width: 8px; height: 8px; background: #00AEEF; border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
 @keyframes pulse {
   0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 174, 239, 0.7); }
   70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 174, 239, 0); }
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 174, 239, 0); }
 }
+.modal-overlay { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(4px); }
+.view-section { display: none; }
+.view-section.active { display: block; }
+.sidebar-link.active { color: #00AEEF; background: #f3f3f6; border-right: 4px solid #00AEEF; font-weight: 700; }
+.sidebar-link { border-right: 4px solid transparent; }
 </style>
 </head>
 <body class="text-on-surface">
 
-<!-- SideNavBar Anchor -->
+<!-- Sidebar -->
 <aside class="h-screen w-64 fixed left-0 top-0 bg-surface-container-lowest flex flex-col py-6 border-r border-outline-variant shadow-sm z-50">
 <div class="px-6 mb-10">
   <h1 class="font-headline-md text-headline-md font-bold text-jkuat-green tracking-tight">IEC JKUAT</h1>
   <p class="font-body-md text-body-md text-on-surface-variant opacity-60">Admin Console</p>
 </div>
-<nav class="flex-1 px-3 space-y-1">        <a class="flex items-center gap-3 px-4 py-3 text-tech-blue font-bold border-r-4 border-tech-blue bg-surface-container-low transition-all duration-200" href="admin.html">
-          <span class="material-symbols-outlined">dashboard</span>
-          <span class="font-body-md text-body-md">Dashboard</span>
-        </a>
-        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-tech-blue hover:bg-surface-container-high transition-all duration-200 rounded-lg group" href="#">
-          <span class="material-symbols-outlined">group</span>
-          <span class="font-body-md text-body-md">Members</span>
-        </a>
-        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-tech-blue hover:bg-surface-container-high transition-all duration-200 rounded-lg" href="#">
-          <span class="material-symbols-outlined">rocket_launch</span>
-          <span class="font-body-md text-body-md">Projects</span>
-        </a>
-        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-tech-blue hover:bg-surface-container-high transition-all duration-200 rounded-lg" href="#">
-          <span class="material-symbols-outlined">calendar_month</span>
-          <span class="font-body-md text-body-md">Events</span>
-        </a>
-        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-tech-blue hover:bg-surface-container-high transition-all duration-200 rounded-lg" href="#">
-          <span class="material-symbols-outlined">shopping_bag</span>
-          <span class="font-body-md text-body-md">Merch</span>
-        </a>
-        <a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:text-tech-blue hover:bg-surface-container-high transition-all duration-200 rounded-lg" href="index.html">
-          <span class="material-symbols-outlined">home</span>
-          <span class="font-body-md text-body-md">Back to Site</span>
-        </a>
+<nav class="flex-1 px-3 space-y-1" id="sidebar-nav">
+  <a class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="#" data-view="dashboard">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="font-body-md text-body-md">Dashboard</span>
+  </a>
+  <a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="#" data-view="members">
+    <span class="material-symbols-outlined">group</span>
+    <span class="font-body-md text-body-md">Members</span>
+  </a>
+  <a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="#" data-view="projects">
+    <span class="material-symbols-outlined">rocket_launch</span>
+    <span class="font-body-md text-body-md">Projects</span>
+  </a>
+  <a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="#" data-view="events">
+    <span class="material-symbols-outlined">calendar_month</span>
+    <span class="font-body-md text-body-md">Events</span>
+  </a>
+  <a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="index.html">
+    <span class="material-symbols-outlined">arrow_back</span>
+    <span class="font-body-md text-body-md">Back to Site</span>
+  </a>
 </nav>
 <div class="px-6 mt-auto">
-  <button class="w-full py-3 bg-jkuat-green text-white font-button-text text-button-text rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
+  <button onclick="clearAndOpenProjectModal()" class="w-full py-3 bg-jkuat-green text-white font-button-text text-button-text rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
     <span class="material-symbols-outlined text-[20px]">add</span>
     New Venture
   </button>
 </div>
 </aside>
 
-<!-- Main Content Area -->
+<!-- Main -->
 <main class="ml-64 min-h-screen">
 
-<!-- TopNavBar Anchor -->
+<!-- Top Bar -->
 <header class="fixed top-0 right-0 w-[calc(100%-16rem)] z-40 bg-surface/70 backdrop-blur-xl border-b border-outline-variant/30 flex justify-between items-center h-16 px-grid-margin">
 <div class="flex items-center gap-8">
-  <div class="relative group focus-within:ring-2 focus-within:ring-tech-blue/50 rounded-lg bg-surface-container-low px-3 py-1.5 flex items-center gap-2 min-w-[320px]">
+  <div class="relative rounded-lg bg-surface-container-low px-3 py-1.5 flex items-center gap-2 min-w-[320px]">
     <span class="material-symbols-outlined text-on-surface-variant">search</span>
-    <input class="bg-transparent border-none focus:ring-0 text-label-md font-label-md w-full" placeholder="Search analytics, projects..." type="text"/>
-  </div>
-  <div class="flex gap-6">
-    <a class="text-primary font-bold border-b-2 border-primary pb-1 font-label-md text-label-md" href="#">Overview</a>
-    <a class="text-on-surface-variant hover:text-tech-blue transition-colors font-label-md text-label-md" href="#">Analytics</a>
+    <input id="global-search" class="bg-transparent border-none focus:ring-0 text-label-md font-label-md w-full outline-none" placeholder="Search members, projects, events..." type="text"/>
   </div>
 </div>
 <div class="flex items-center gap-4">
@@ -197,14 +120,11 @@ body { background-color: #f9f9fc; font-family: 'Inter', sans-serif; }
     <span class="material-symbols-outlined">notifications</span>
     <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
   </button>
-  <button class="p-2 text-on-surface-variant hover:text-tech-blue transition-colors">
-    <span class="material-symbols-outlined">help_outline</span>
-  </button>
   <div class="h-8 w-px bg-outline-variant/50 mx-2"></div>
   <div class="flex items-center gap-3 pl-2">
     <div class="text-right">
       <p class="font-label-md text-label-md font-bold">Admin Portal</p>
-      <p class="text-[10px] text-on-surface-variant tracking-wider uppercase">JKUAT INCUBATOR</p>
+      <p class="text-[10px] text-on-surface-variant tracking-wider uppercase">IEC JKUAT</p>
     </div>
     <div class="w-10 h-10 rounded-full border-2 border-jkuat-green bg-jkuat-green/10 flex items-center justify-center">
       <span class="material-symbols-outlined text-jkuat-green">person</span>
@@ -213,371 +133,754 @@ body { background-color: #f9f9fc; font-family: 'Inter', sans-serif; }
 </div>
 </header>
 
-<!-- Canvas Content -->
+<!-- Content Area -->
 <div class="pt-24 pb-12 px-grid-margin">
 
-<!-- Hero Stats Grid -->
-<section class="grid grid-cols-1 md:grid-cols-4 gap-bento-gap mb-8">
-<div class="bento-card p-6 flex flex-col justify-between">
-  <div class="flex justify-between items-start">
-    <span class="p-2 bg-jkuat-green/10 text-jkuat-green rounded-lg material-symbols-outlined">group</span>
-    <span class="text-jkuat-green text-xs font-bold">+12% vs last month</span>
-  </div>
-  <div>
-    <p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Members</p>
-    <h2 id="stat-members" class="font-display-lg text-display-lg text-jkuat-green">0</h2>
-  </div>
-</div>
-<div class="bento-card p-6 flex flex-col justify-between">
-  <div class="flex justify-between items-start">
-    <span class="p-2 bg-tech-blue/10 text-tech-blue rounded-lg material-symbols-outlined">rocket_launch</span>
-    <div class="flex items-center gap-1.5"><div class="pulse-dot"></div><span class="text-xs font-bold text-tech-blue">Live Now</span></div>
-  </div>
-  <div>
-    <p class="font-label-md text-label-md text-on-surface-variant mb-1">Active Projects</p>
-    <h2 id="stat-projects" class="font-display-lg text-display-lg">0</h2>
-  </div>
-</div>
-<div class="bento-card p-6 flex flex-col justify-between">
-  <div class="flex justify-between items-start">
-    <span class="p-2 bg-jkuat-gold/10 text-secondary rounded-lg material-symbols-outlined">payments</span>
-    <span class="text-on-surface-variant text-xs font-bold">Annual Goal: 70%</span>
-  </div>
-  <div>
-    <p class="font-label-md text-label-md text-on-surface-variant mb-1">Revenue</p>
-    <h2 class="font-display-lg text-display-lg">2.4M <span class="text-body-md font-normal text-on-surface-variant">KES</span></h2>
-  </div>
-</div>
-<div class="bento-card p-6 flex flex-col justify-between">
-  <div class="flex justify-between items-start">
-    <span class="p-2 bg-primary/10 text-primary rounded-lg material-symbols-outlined">calendar_today</span>
-    <span class="text-primary text-xs font-bold">This Week</span>
-  </div>
-  <div>
-    <p class="font-label-md text-label-md text-on-surface-variant mb-1">Upcoming Events</p>
-    <h2 id="stat-events" class="font-display-lg text-display-lg text-jkuat-gold">0</h2>
-  </div>
-</div>
-</section>
+<!-- ===================== DASHBOARD VIEW ===================== -->
+<div id="view-dashboard" class="view-section active">
 
-<!-- Main Bento Grid -->
-<div class="grid grid-cols-12 gap-bento-gap">
+  <!-- Stats -->
+  <section class="grid grid-cols-1 md:grid-cols-4 gap-bento-gap mb-8">
+    <div class="bento-card p-6">
+      <div class="flex justify-between items-start mb-2">
+        <span class="p-2 bg-jkuat-green/10 text-jkuat-green rounded-lg material-symbols-outlined">group</span>
+        <span id="stat-members-change" class="text-jkuat-green text-xs font-bold">Loading...</span>
+      </div>
+      <p class="font-label-md text-label-md text-on-surface-variant mb-1">Total Members</p>
+      <h2 id="stat-members" class="font-display-lg text-display-lg text-jkuat-green">--</h2>
+    </div>
+    <div class="bento-card p-6">
+      <div class="flex justify-between items-start mb-2">
+        <span class="p-2 bg-tech-blue/10 text-tech-blue rounded-lg material-symbols-outlined">rocket_launch</span>
+        <div class="flex items-center gap-1.5"><div class="pulse-dot"></div><span class="text-xs font-bold text-tech-blue">Live</span></div>
+      </div>
+      <p class="font-label-md text-label-md text-on-surface-variant mb-1">Active Projects</p>
+      <h2 id="stat-projects" class="font-display-lg text-display-lg">--</h2>
+    </div>
+    <div class="bento-card p-6">
+      <div class="flex justify-between items-start mb-2">
+        <span class="p-2 bg-jkuat-gold/10 text-secondary rounded-lg material-symbols-outlined">payments</span>
+        <span id="stat-revenue-change" class="text-on-surface-variant text-xs font-bold">Annual Goal</span>
+      </div>
+      <p class="font-label-md text-label-md text-on-surface-variant mb-1">Revenue</p>
+      <h2 id="stat-revenue" class="font-display-lg text-display-lg">KES 0</h2>
+    </div>
+    <div class="bento-card p-6">
+      <div class="flex justify-between items-start mb-2">
+        <span class="p-2 bg-primary/10 text-primary rounded-lg material-symbols-outlined">calendar_today</span>
+        <span class="text-primary text-xs font-bold">Upcoming</span>
+      </div>
+      <p class="font-label-md text-label-md text-on-surface-variant mb-1">Upcoming Events</p>
+      <h2 id="stat-events" class="font-display-lg text-display-lg text-jkuat-gold">--</h2>
+    </div>
+  </section>
 
-<!-- Widget 1: Active Ventures Table (8 Columns) -->
-<div class="col-span-12 lg:col-span-8 bento-card overflow-hidden">
-  <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-lowest">
+  <!-- Main Grid -->
+  <div class="grid grid-cols-12 gap-bento-gap">
+
+    <!-- Projects Table -->
+    <div class="col-span-12 lg:col-span-8 bento-card overflow-hidden">
+      <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center bg-surface-container-lowest">
+        <div>
+          <h3 class="font-headline-md text-headline-md">Active Ventures</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">Ongoing incubation and development tracks</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="openModal('project-modal')" class="text-tech-blue hover:bg-tech-blue/5 px-4 py-2 rounded-lg transition-all font-label-md text-label-md flex items-center gap-1">
+            <span class="material-symbols-outlined text-[18px]">add</span> Add
+          </button>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-wider">
+            <tr>
+              <th class="px-6 py-4">Project Name</th>
+              <th class="px-6 py-4">Team Lead</th>
+              <th class="px-6 py-4">Status</th>
+              <th class="px-6 py-4">Progress</th>
+              <th class="px-6 py-4"></th>
+            </tr>
+          </thead>
+          <tbody id="dashboard-projects-tbody" class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+            <tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">Loading projects...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="col-span-12 lg:col-span-4 bento-card p-6">
+      <h3 class="font-headline-md text-headline-md mb-4">Quick Actions</h3>
+      <div class="grid grid-cols-1 gap-3">
+        <button onclick="clearAndOpenProjectModal()" class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant hover:border-jkuat-green hover:bg-jkuat-green/5 transition-all text-left group">
+          <span class="p-3 bg-jkuat-green/10 text-jkuat-green rounded-lg material-symbols-outlined group-hover:scale-110 transition-transform">add_box</span>
+          <div>
+            <p class="font-label-md text-label-md font-bold">Add New Project</p>
+            <p class="text-xs text-on-surface-variant">Launch a new incubation track</p>
+          </div>
+        </button>
+        <button onclick="openModal('event-modal')" class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant hover:border-tech-blue hover:bg-tech-blue/5 transition-all text-left group">
+          <span class="p-3 bg-tech-blue/10 text-tech-blue rounded-lg material-symbols-outlined group-hover:scale-110 transition-transform">event_available</span>
+          <div>
+            <p class="font-label-md text-label-md font-bold">Create Event</p>
+            <p class="text-xs text-on-surface-variant">Schedule workshops or pitches</p>
+          </div>
+        </button>
+        <button onclick="openModal('broadcast-modal')" class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant hover:border-primary-fixed-dim hover:bg-primary-container/5 transition-all text-left group">
+          <span class="p-3 bg-primary-fixed-dim/20 text-primary rounded-lg material-symbols-outlined group-hover:scale-110 transition-transform">campaign</span>
+          <div>
+            <p class="font-label-md text-label-md font-bold">Broadcast Message</p>
+            <p class="text-xs text-on-surface-variant">Alert all registered members</p>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Member Growth Chart -->
+    <div class="col-span-12 lg:col-span-7 bento-card p-6 h-[400px] flex flex-col">
+      <div class="flex justify-between items-start mb-6">
+        <div>
+          <h3 class="font-headline-md text-headline-md">Member Growth</h3>
+          <p class="font-body-md text-body-md text-on-surface-variant">New registrations by month</p>
+        </div>
+      </div>
+      <div id="growth-chart" class="flex-1 flex items-end gap-2 px-2 relative">
+        <div class="absolute inset-x-0 bottom-0 h-[250px] flex flex-col justify-between pointer-events-none border-l border-b border-outline-variant/30">
+          <div class="border-t border-outline-variant/10 w-full"></div>
+          <div class="border-t border-outline-variant/10 w-full"></div>
+          <div class="border-t border-outline-variant/10 w-full"></div>
+          <div class="border-t border-outline-variant/10 w-full"></div>
+        </div>
+        <div id="chart-bars" class="flex-1 flex items-end gap-2 h-full relative z-10">
+          <div class="flex-1 flex flex-col items-center justify-end gap-2">
+            <div class="w-full bg-surface-container-high rounded-t-lg" style="height: 30%;"></div>
+            <span class="text-[10px] font-bold text-on-surface-variant">Loading</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="col-span-12 lg:col-span-5 bento-card p-6 flex flex-col">
+      <h3 class="font-headline-md text-headline-md mb-6">Recent Activity</h3>
+      <div id="activity-feed" class="flex-1 space-y-6 overflow-y-auto custom-scrollbar pr-2">
+        <div class="flex items-center justify-center py-8 text-on-surface-variant font-body-md">Loading activity...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===================== MEMBERS VIEW ===================== -->
+<div id="view-members" class="view-section">
+  <div class="flex justify-between items-center mb-6">
     <div>
-      <h3 class="font-headline-md text-headline-md">Active Ventures</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant">Ongoing incubation and development tracks</p>
+      <h2 class="font-headline-md text-headline-md">Members</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Manage registered club members</p>
     </div>
-    <button class="text-tech-blue hover:bg-tech-blue/5 px-4 py-2 rounded-lg transition-all font-label-md text-label-md">View All Projects</button>
+    <span id="members-count" class="bg-surface-container-low px-4 py-2 rounded-full font-label-md text-label-md text-on-surface-variant"></span>
   </div>
-  <div class="overflow-x-auto">
-    <table class="w-full text-left">
-      <thead class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-wider">
-        <tr>
-          <th class="px-6 py-4">Project Name</th>
-          <th class="px-6 py-4">Team Lead</th>
-          <th class="px-6 py-4">Status</th>
-          <th class="px-6 py-4">Progress</th>
-          <th class="px-6 py-4"></th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-outline-variant/30 font-body-md text-body-md">
-        <tr class="hover:bg-surface-container-low transition-colors group">
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded bg-primary-container flex items-center justify-center text-white font-bold text-xs">EI</div>
-              <span class="font-bold">Eco-Irrigate</span>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-on-surface-variant">Cyrus Wanyonyi</td>
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 bg-jkuat-green/10 text-jkuat-green rounded-full text-xs font-bold">Incubating</span>
-          </td>
-          <td class="px-6 py-4">
-            <div class="w-24 h-2 bg-surface-container-high rounded-full overflow-hidden">
-              <div class="h-full bg-jkuat-green w-[65%]"></div>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <button class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-on-surface-variant">more_vert</button>
-          </td>
-        </tr>
-        <tr class="hover:bg-surface-container-low transition-colors group">
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded bg-tech-blue flex items-center justify-center text-white font-bold text-xs">SC</div>
-              <span class="font-bold">SolarCycle</span>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-on-surface-variant">Grace Njeri</td>
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 bg-tech-blue/10 text-tech-blue rounded-full text-xs font-bold">MVP Live</span>
-          </td>
-          <td class="px-6 py-4">
-            <div class="w-24 h-2 bg-surface-container-high rounded-full overflow-hidden">
-              <div class="h-full bg-tech-blue w-[90%]"></div>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <button class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-on-surface-variant">more_vert</button>
-          </td>
-        </tr>
-        <tr class="hover:bg-surface-container-low transition-colors group">
-          <td class="px-6 py-4">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded bg-jkuat-gold flex items-center justify-center text-white font-bold text-xs">BT</div>
-              <span class="font-bold">BioTrack</span>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-on-surface-variant">Kevin Omolo</td>
-          <td class="px-6 py-4">
-            <span class="px-3 py-1 bg-secondary-fixed/50 text-secondary rounded-full text-xs font-bold">Ideation</span>
-          </td>
-          <td class="px-6 py-4">
-            <div class="w-24 h-2 bg-surface-container-high rounded-full overflow-hidden">
-              <div class="h-full bg-jkuat-gold w-[20%]"></div>
-            </div>
-          </td>
-          <td class="px-6 py-4 text-right">
-            <button class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-on-surface-variant">more_vert</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="bento-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-wider">
+          <tr>
+            <th class="px-6 py-4">Name</th>
+            <th class="px-6 py-4">Reg No.</th>
+            <th class="px-6 py-4">College</th>
+            <th class="px-6 py-4">Course</th>
+            <th class="px-6 py-4">Year</th>
+            <th class="px-6 py-4">Phone</th>
+            <th class="px-6 py-4">Email</th>
+            <th class="px-6 py-4">Status</th>
+            <th class="px-6 py-4"></th>
+          </tr>
+        </thead>
+        <tbody id="members-tbody" class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+          <tr><td colspan="9" class="px-6 py-8 text-center text-on-surface-variant">Loading members...</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<!-- Widget 4: Quick Actions (4 Columns) -->
-<div class="col-span-12 lg:col-span-4 bento-card p-6">
-  <h3 class="font-headline-md text-headline-md mb-4">Quick Actions</h3>
-  <div class="grid grid-cols-1 gap-3">
-    <button class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant hover:border-jkuat-green hover:bg-jkuat-green/5 transition-all text-left group">
-      <span class="p-3 bg-jkuat-green/10 text-jkuat-green rounded-lg material-symbols-outlined group-hover:scale-110 transition-transform">add_box</span>
-      <div>
-        <p class="font-label-md text-label-md font-bold">Add New Project</p>
-        <p class="text-xs text-on-surface-variant">Launch a new incubation track</p>
-      </div>
-    </button>
-    <button class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant hover:border-tech-blue hover:bg-tech-blue/5 transition-all text-left group">
-      <span class="p-3 bg-tech-blue/10 text-tech-blue rounded-lg material-symbols-outlined group-hover:scale-110 transition-transform">event_available</span>
-      <div>
-        <p class="font-label-md text-label-md font-bold">Create Event</p>
-        <p class="text-xs text-on-surface-variant">Schedule workshops or pitches</p>
-      </div>
-    </button>
-    <button class="flex items-center gap-4 p-4 rounded-xl border border-outline-variant hover:border-primary-fixed-dim hover:bg-primary-container/5 transition-all text-left group">
-      <span class="p-3 bg-primary-fixed-dim/20 text-primary rounded-lg material-symbols-outlined group-hover:scale-110 transition-transform">campaign</span>
-      <div>
-        <p class="font-label-md text-label-md font-bold">Broadcast Message</p>
-        <p class="text-xs text-on-surface-variant">Alert all registered members</p>
-      </div>
-    </button>
-    <button class="mt-4 w-full py-4 bg-surface-container-low text-on-surface-variant font-bold rounded-xl border border-dashed border-outline-variant hover:bg-surface-container-high transition-colors text-center text-sm">
-      Manage Dashboards
-    </button>
-  </div>
-</div>
-
-<!-- Widget 2: Member Growth (7 Columns) -->
-<div class="col-span-12 lg:col-span-7 bento-card p-6 h-[400px] flex flex-col relative overflow-hidden">
-  <div class="flex justify-between items-start mb-6">
+<!-- ===================== PROJECTS VIEW ===================== -->
+<div id="view-projects" class="view-section">
+  <div class="flex justify-between items-center mb-6">
     <div>
-      <h3 class="font-headline-md text-headline-md">Member Growth</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant">New registrations trend (Jan - Jun)</p>
+      <h2 class="font-headline-md text-headline-md">Projects</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Manage incubation tracks</p>
     </div>
-    <select class="bg-surface-container-low border-none rounded-lg text-xs font-bold py-2 focus:ring-tech-blue">
-      <option>Last 6 Months</option>
-      <option>Last Year</option>
-    </select>
+    <button onclick="clearAndOpenProjectModal()" class="bg-jkuat-green text-white px-6 py-3 rounded-xl font-button-text text-button-text flex items-center gap-2 hover:scale-105 transition-transform">
+      <span class="material-symbols-outlined text-[18px]">add</span> New Project
+    </button>
   </div>
-  <!-- Simplified Visual Chart Placeholder -->
-  <div class="flex-1 flex items-end gap-2 px-2 relative">
-    <div class="absolute inset-x-0 bottom-0 h-[250px] flex flex-col justify-between pointer-events-none border-l border-b border-outline-variant/30">
-      <div class="border-t border-outline-variant/10 w-full"></div>
-      <div class="border-t border-outline-variant/10 w-full"></div>
-      <div class="border-t border-outline-variant/10 w-full"></div>
-      <div class="border-t border-outline-variant/10 w-full"></div>
-    </div>
-    <div class="flex-1 flex flex-col items-center gap-2 group">
-      <div class="w-full bg-tech-blue/20 rounded-t-lg transition-all group-hover:bg-tech-blue/40" style="height: 40%;"></div>
-      <span class="text-[10px] font-bold text-on-surface-variant">JAN</span>
-    </div>
-    <div class="flex-1 flex flex-col items-center gap-2 group">
-      <div class="w-full bg-tech-blue/20 rounded-t-lg transition-all group-hover:bg-tech-blue/40" style="height: 55%;"></div>
-      <span class="text-[10px] font-bold text-on-surface-variant">FEB</span>
-    </div>
-    <div class="flex-1 flex flex-col items-center gap-2 group">
-      <div class="w-full bg-tech-blue/20 rounded-t-lg transition-all group-hover:bg-tech-blue/40" style="height: 45%;"></div>
-      <span class="text-[10px] font-bold text-on-surface-variant">MAR</span>
-    </div>
-    <div class="flex-1 flex flex-col items-center gap-2 group">
-      <div class="w-full bg-tech-blue/20 rounded-t-lg transition-all group-hover:bg-tech-blue/40" style="height: 75%;"></div>
-      <span class="text-[10px] font-bold text-on-surface-variant">APR</span>
-    </div>
-    <div class="flex-1 flex flex-col items-center gap-2 group">
-      <div class="w-full bg-tech-blue/60 rounded-t-lg transition-all group-hover:bg-tech-blue/80" style="height: 85%;"></div>
-      <span class="text-[10px] font-bold text-tech-blue">MAY</span>
-    </div>
-    <div class="flex-1 flex flex-col items-center gap-2 group">
-      <div class="w-full bg-tech-blue/40 rounded-t-lg transition-all group-hover:bg-tech-blue/60" style="height: 65%;"></div>
-      <span class="text-[10px] font-bold text-on-surface-variant">JUN</span>
+  <div class="bento-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-wider">
+          <tr>
+            <th class="px-6 py-4">Name</th>
+            <th class="px-6 py-4">Team Lead</th>
+            <th class="px-6 py-4">Status</th>
+            <th class="px-6 py-4">Category</th>
+            <th class="px-6 py-4">Progress</th>
+            <th class="px-6 py-4"></th>
+          </tr>
+        </thead>
+        <tbody id="projects-tbody" class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+          <tr><td colspan="6" class="px-6 py-8 text-center text-on-surface-variant">Loading projects...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
-<!-- Widget 3: Recent Activity (5 Columns) -->
-<div class="col-span-12 lg:col-span-5 bento-card p-6 flex flex-col">
-  <h3 class="font-headline-md text-headline-md mb-6">Recent Activity</h3>
-  <div class="flex-1 space-y-6 overflow-y-auto custom-scrollbar pr-2">
-    <div class="flex gap-4 relative">
-      <div class="absolute left-[15px] top-8 bottom-[-24px] w-0.5 bg-outline-variant/30"></div>
-      <div class="w-8 h-8 rounded-full bg-jkuat-gold/10 text-secondary-fixed-dim flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-[18px]">shopping_cart</span>
-      </div>
-      <div>
-        <p class="font-body-md text-body-md font-bold">New merchandise order #1204</p>
-        <p class="text-xs text-on-surface-variant mt-1">Admin processed 4 club t-shirts for pick up.</p>
-        <span class="text-[10px] text-on-surface-variant/60 font-bold uppercase mt-2 block">10 mins ago</span>
-      </div>
+<!-- ===================== EVENTS VIEW ===================== -->
+<div id="view-events" class="view-section">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="font-headline-md text-headline-md">Events</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Manage club events</p>
     </div>
-    <div class="flex gap-4 relative">
-      <div class="absolute left-[15px] top-8 bottom-[-24px] w-0.5 bg-outline-variant/30"></div>
-      <div class="w-8 h-8 rounded-full bg-jkuat-green/10 text-jkuat-green flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-[18px]">verified</span>
-      </div>
-      <div>
-        <p class="font-body-md text-body-md font-bold">Project 'Eco-Irrigate' moved</p>
-        <p class="text-xs text-on-surface-variant mt-1">Successfully transitioned to <span class="text-jkuat-green font-bold">Incubating</span> phase.</p>
-        <span class="text-[10px] text-on-surface-variant/60 font-bold uppercase mt-2 block">2 hours ago</span>
-      </div>
-    </div>
-    <div class="flex gap-4 relative">
-      <div class="absolute left-[15px] top-8 bottom-[-24px] w-0.5 bg-outline-variant/30"></div>
-      <div class="w-8 h-8 rounded-full bg-tech-blue/10 text-tech-blue flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-[18px]">person_add</span>
-      </div>
-      <div>
-        <p class="font-body-md text-body-md font-bold">New Member Registered</p>
-        <p class="text-xs text-on-surface-variant mt-1">Sarah Muthoni (Computer Science Y3) joined the club.</p>
-        <span class="text-[10px] text-on-surface-variant/60 font-bold uppercase mt-2 block">4 hours ago</span>
-      </div>
-    </div>
-    <div class="flex gap-4">
-      <div class="w-8 h-8 rounded-full bg-surface-container-high text-on-surface-variant flex items-center justify-center shrink-0">
-        <span class="material-symbols-outlined text-[18px]">campaign</span>
-      </div>
-      <div>
-        <p class="font-body-md text-body-md font-bold">Broadcast Sent</p>
-        <p class="text-xs text-on-surface-variant mt-1">Meeting reminder for 'Pitch Deck Workshop' sent to 120 members.</p>
-        <span class="text-[10px] text-on-surface-variant/60 font-bold uppercase mt-2 block">Yesterday</span>
-      </div>
+    <button onclick="openModal('event-modal')" class="bg-tech-blue text-white px-6 py-3 rounded-xl font-button-text text-button-text flex items-center gap-2 hover:scale-105 transition-transform">
+      <span class="material-symbols-outlined text-[18px]">add</span> New Event
+    </button>
+  </div>
+  <div class="bento-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-wider">
+          <tr>
+            <th class="px-6 py-4">Title</th>
+            <th class="px-6 py-4">Description</th>
+            <th class="px-6 py-4">Date</th>
+            <th class="px-6 py-4">Category</th>
+            <th class="px-6 py-4"></th>
+          </tr>
+        </thead>
+        <tbody id="events-tbody" class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+          <tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">Loading events...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
 
 </div>
-</div>
-
 </main>
 
+<!-- ===== MODALS ===== -->
+
+<!-- Add/Edit Project Modal -->
+<div id="project-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" onclick="closeModal(event, 'project-modal')">
+  <div class="bg-white rounded-2xl p-8 w-full max-w-lg mx-4 shadow-2xl" onclick="event.stopPropagation()">
+    <div class="flex justify-between items-center mb-6">
+      <h3 id="project-modal-title" class="font-headline-md text-headline-md">Add New Project</h3>
+      <button onclick="closeModal(null, 'project-modal')" class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form id="project-form" class="space-y-4" onsubmit="handleProjectForm(event)">
+      <input id="project-id" type="hidden"/>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Project Name *</label>
+        <input id="project-name" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" required/>
+      </div>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Team Lead *</label>
+        <input id="project-lead" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" required/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-label-md mb-1 text-on-surface">Status *</label>
+          <select id="project-status" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" required>
+            <option value="Ideation">Ideation</option>
+            <option value="Incubating">Incubating</option>
+            <option value="MVP Live">MVP Live</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-label-md mb-1 text-on-surface">Progress (%)</label>
+          <input id="project-progress" type="number" min="0" max="100" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" value="0"/>
+        </div>
+      </div>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Category</label>
+        <input id="project-category" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" placeholder="e.g., Fintech, AgTech"/>
+      </div>
+      <button type="submit" class="w-full py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:brightness-110 active:scale-95 transition-all">Save Project</button>
+    </form>
+  </div>
+</div>
+
+<!-- Event Modal -->
+<div id="event-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" onclick="closeModal(event, 'event-modal')">
+  <div class="bg-white rounded-2xl p-8 w-full max-w-lg mx-4 shadow-2xl" onclick="event.stopPropagation()">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="font-headline-md text-headline-md">Create Event</h3>
+      <button onclick="closeModal(null, 'event-modal')" class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form id="event-form" class="space-y-4" onsubmit="handleEventForm(event)">
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Title *</label>
+        <input id="event-title" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" required/>
+      </div>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Description</label>
+        <textarea id="event-desc" class="w-full h-24 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4 py-3 resize-none"></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-label-md mb-1 text-on-surface">Date *</label>
+          <input id="event-date" type="date" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" required/>
+        </div>
+        <div>
+          <label class="block text-label-md mb-1 text-on-surface">Category</label>
+          <select id="event-category" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4">
+            <option value="">Select</option>
+            <option value="Featured">Featured</option>
+            <option value="Hackathon">Hackathon</option>
+            <option value="Leadership">Leadership</option>
+            <option value="AgTech">AgTech</option>
+            <option value="Networking">Networking</option>
+            <option value="Workshop">Workshop</option>
+          </select>
+        </div>
+      </div>
+      <button type="submit" class="w-full py-4 bg-tech-blue text-white font-button-text text-button-text rounded-2xl hover:brightness-110 active:scale-95 transition-all">Create Event</button>
+    </form>
+  </div>
+</div>
+
+<!-- Broadcast Modal -->
+<div id="broadcast-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" onclick="closeModal(event, 'broadcast-modal')">
+  <div class="bg-white rounded-2xl p-8 w-full max-w-lg mx-4 shadow-2xl" onclick="event.stopPropagation()">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="font-headline-md text-headline-md">Broadcast Message</h3>
+      <button onclick="closeModal(null, 'broadcast-modal')" class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form id="broadcast-form" class="space-y-4" onsubmit="handleBroadcast(event)">
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Subject *</label>
+        <input id="broadcast-subject" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" required/>
+      </div>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Message *</label>
+        <textarea id="broadcast-message" class="w-full h-32 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4 py-3 resize-none" required></textarea>
+      </div>
+      <button type="submit" class="w-full py-4 bg-jkuat-gold text-on-secondary-fixed font-button-text text-button-text rounded-2xl hover:brightness-110 active:scale-95 transition-all">Send Preview (log only)</button>
+    </form>
+    <div id="broadcast-success" class="hidden mt-4 p-4 bg-jkuat-green/10 border border-jkuat-green/20 rounded-xl text-center">
+      <p class="text-jkuat-green font-semibold">Message broadcasted! (logged to console)</p>
+      <p class="text-xs text-on-surface-variant mt-1">Full email integration coming soon</p>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div id="confirm-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" onclick="closeModal(event, 'confirm-modal')">
+  <div class="bg-white rounded-2xl p-8 w-full max-w-sm mx-4 shadow-2xl text-center" onclick="event.stopPropagation()">
+    <span class="material-symbols-outlined text-5xl text-red-500 mb-4" style="font-variation-settings: 'FILL' 1;">warning</span>
+    <h3 class="font-headline-md text-headline-md mb-2">Confirm Delete</h3>
+    <p id="confirm-msg" class="font-body-md text-body-md text-on-surface-variant mb-6">Are you sure you want to delete this item?</p>
+    <div class="flex gap-3 justify-center">
+      <button onclick="closeModal(null, 'confirm-modal')" class="px-6 py-3 border border-outline-variant rounded-xl font-button-text">Cancel</button>
+      <button id="confirm-delete-btn" class="px-6 py-3 bg-red-500 text-white rounded-xl font-button-text hover:bg-red-600 transition-colors">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-8 right-8 z-50 hidden bg-surface-container-highest border border-outline-variant rounded-xl px-6 py-4 shadow-2xl flex items-center gap-3 animate-bounce">
+  <span id="toast-icon" class="material-symbols-outlined text-jkuat-green">check_circle</span>
+  <span id="toast-msg" class="font-body-md text-body-md">Done!</span>
+</div>
+
 <script>
-// Load admin dashboard data from Supabase
-async function loadAdminData() {
+// ===== VIEW SWITCHING =====
+let currentView = 'dashboard';
+
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  document.getElementById(`view-${view}`).classList.add('active');
+  document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+  document.querySelector(`.sidebar-link[data-view="${view}"]`)?.classList.add('active');
+  
+  // Load data for the view
+  if (view === 'members') loadMembers();
+  if (view === 'projects') loadProjectsView();
+  if (view === 'events') loadEventsView();
+}
+
+document.querySelectorAll('.sidebar-link[data-view]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    switchView(link.dataset.view);
+  });
+});
+
+// ===== MODALS =====
+function openModal(id) {
+  document.getElementById(id).classList.remove('hidden');
+  document.getElementById(id).classList.add('flex');
+}
+function closeModal(event, id) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById(id).classList.add('hidden');
+  document.getElementById(id).classList.remove('flex');
+}
+function clearAndOpenProjectModal() {
+  document.getElementById('project-id').value = '';
+  document.getElementById('project-form').reset();
+  document.getElementById('project-modal-title').textContent = 'Add New Project';
+  openModal('project-modal');
+}
+
+// ===== TOAST =====
+function showToast(msg, icon = 'check_circle', color = 'text-jkuat-green') {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-icon').className = `material-symbols-outlined ${color}`;
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.remove('hidden');
+  setTimeout(() => toast.classList.add('hidden'), 3000);
+}
+
+// ===== DASHBOARD =====
+async function loadDashboard() {
   try {
     const sb = initSupabase();
     if (!sb) return;
 
-    // Fetch member count
-    const { count: memberCount } = await sb.from('members').select('*', { count: 'exact', head: true });
-    if (memberCount !== null) {
-      document.getElementById('stat-members').textContent = memberCount + '+';
-    }
+    // Member count
+    const { count: mCount } = await sb.from('members').select('*', { count: 'exact', head: true });
+    if (mCount !== null) document.getElementById('stat-members').textContent = mCount + '+';
+    document.getElementById('stat-members-change').textContent = `Total: ${mCount || 0}`;
 
-    // Fetch project count
-    const { count: projectCount } = await sb.from('projects').select('*', { count: 'exact', head: true });
-    if (projectCount !== null) {
-      document.getElementById('stat-projects').textContent = projectCount + '+';
-    }
+    // Project count
+    const { count: pCount } = await sb.from('projects').select('*', { count: 'exact', head: true });
+    if (pCount !== null) document.getElementById('stat-projects').textContent = pCount + '+';
 
-    // Fetch event count (upcoming)
-    const { count: eventCount } = await sb.from('events')
-      .select('*', { count: 'exact', head: true })
+    // Event count (upcoming)
+    const { count: eCount } = await sb.from('events').select('*', { count: 'exact', head: true })
       .gte('event_date', new Date().toISOString().split('T')[0]);
-    if (eventCount !== null) {
-      document.getElementById('stat-events').textContent = eventCount;
-    }
+    if (eCount !== null) document.getElementById('stat-events').textContent = eCount;
 
-    // Fetch recent members for activity feed
-    const { data: recentMembers } = await sb.from('members')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(3);
-    
-    // Fetch projects for table
-    const { data: projects } = await sb.from('projects')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(5);
-    
-    if (projects && projects.length > 0) {
-      renderProjectsTable(projects);
-    }
+    // Revenue from payments
+    const { data: payments } = await sb.from('payments').select('amount').eq('payment_status', 'completed');
+    const totalRev = (payments || []).reduce((sum, p) => sum + (p.amount || 0), 0);
+    document.getElementById('stat-revenue').textContent = `KES ${totalRev.toLocaleString()}`;
+
+    // Projects table
+    const { data: projects } = await sb.from('projects').select('*').order('created_at', { ascending: false }).limit(8);
+    renderProjectsTable(projects, 'dashboard-projects-tbody');
+
+    // Growth chart
+    const growthData = await getMemberGrowth();
+    renderGrowthChart(growthData);
+
+    // Activity feed
+    const activities = await getRecentActivity(6);
+    renderActivityFeed(activities);
 
   } catch (err) {
-    console.log('Could not load live data (using defaults):', err.message);
+    console.log('Dashboard load error:', err.message);
   }
 }
 
-function renderProjectsTable(projects) {
-  const tbody = document.querySelector('tbody');
+function renderProjectsTable(projects, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
   if (!tbody) return;
-  
+  if (!projects || projects.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">No projects yet. Add one!</td></tr>`;
+    return;
+  }
   tbody.innerHTML = projects.map(p => {
     const initials = p.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-    const bgColor = p.status === 'Incubating' ? 'bg-jkuat-green' : 
-                    p.status === 'MVP Live' ? 'bg-tech-blue' : 'bg-jkuat-gold';
-    const statusColor = p.status === 'Incubating' ? 'bg-jkuat-green/10 text-jkuat-green' :
-                        p.status === 'MVP Live' ? 'bg-tech-blue/10 text-tech-blue' :
-                        'bg-secondary-fixed/50 text-secondary';
-
-    return `
-      <tr class="hover:bg-surface-container-low transition-colors group">
-        <td class="px-6 py-4">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded ${bgColor} flex items-center justify-center text-white font-bold text-xs">${initials}</div>
-            <span class="font-bold">${p.name}</span>
-          </div>
-        </td>
-        <td class="px-6 py-4 text-on-surface-variant">${p.team_lead}</td>
-        <td class="px-6 py-4">
-          <span class="px-3 py-1 ${statusColor} rounded-full text-xs font-bold">${p.status}</span>
-        </td>
-        <td class="px-6 py-4">
-          <div class="w-24 h-2 bg-surface-container-high rounded-full overflow-hidden">
-            <div class="h-full ${bgColor} w-[${p.progress}%]"></div>
-          </div>
-        </td>
-        <td class="px-6 py-4 text-right">
-          <button class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-on-surface-variant">more_vert</button>
-        </td>
-      </tr>
-    `;
+    const colors = projectStatusColors(p.status);
+    return `<tr class="hover:bg-surface-container-low transition-colors group">
+      <td class="px-6 py-4"><div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded ${colors.bg} flex items-center justify-center text-white font-bold text-xs">${initials}</div>
+        <span class="font-bold">${p.name}</span>
+      </div></td>
+      <td class="px-6 py-4 text-on-surface-variant">${p.team_lead}</td>
+      <td class="px-6 py-4"><span class="px-3 py-1 ${colors.text} rounded-full text-xs font-bold">${p.status}</span></td>
+      <td class="px-6 py-4"><div class="w-24 h-2 bg-surface-container-high rounded-full overflow-hidden"><div class="h-full ${colors.bg} w-[${p.progress}%]"></div></div></td>
+      <td class="px-6 py-4 text-right"><button class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-on-surface-variant">more_vert</button></td>
+    </tr>`;
   }).join('');
 }
 
-// Initialize
-document.addEventListener('DOMContentLoaded', () => {
-  loadAdminData();
-  
-  // Search bar focus effect
-  const searchInput = document.querySelector('input[type="text"]');
-  const searchContainer = searchInput?.parentElement;
-  if (searchInput && searchContainer) {
-    searchInput.addEventListener('focus', () => searchContainer.classList.add('shadow-md'));
-    searchInput.addEventListener('blur', () => searchContainer.classList.remove('shadow-md'));
+function renderGrowthChart(data) {
+  const container = document.getElementById('chart-bars');
+  if (!data || data.length === 0) {
+    container.innerHTML = '<div class="flex items-center justify-center w-full h-full text-on-surface-variant">No data yet</div>';
+    return;
   }
+  container.innerHTML = data.map(m => `
+    <div class="flex-1 flex flex-col items-center justify-end gap-1 group">
+      <div class="w-full bg-tech-blue/20 rounded-t-lg transition-all group-hover:bg-tech-blue/40 relative" style="height: ${m.height}%;">
+        <span class="absolute -top-5 left-1/2 -translate-x-1/2 text-[9px] font-bold text-tech-blue opacity-0 group-hover:opacity-100 transition-opacity">${m.count}</span>
+      </div>
+      <span class="text-[10px] font-bold text-on-surface-variant">${m.label}</span>
+    </div>
+  `).join('');
+}
+
+function renderActivityFeed(activities) {
+  const feed = document.getElementById('activity-feed');
+  if (!activities || activities.length === 0) {
+    feed.innerHTML = '<div class="flex items-center justify-center py-8 text-on-surface-variant">No activity yet</div>';
+    return;
+  }
+  feed.innerHTML = activities.map((a, i) => `
+    <div class="flex gap-4 relative">
+      ${i < activities.length - 1 ? '<div class="absolute left-[15px] top-8 bottom-[-24px] w-0.5 bg-outline-variant/30"></div>' : ''}
+      <div class="w-8 h-8 rounded-full ${a.iconBg} ${a.iconColor} flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-[18px]">${a.icon}</span>
+      </div>
+      <div>
+        <p class="font-body-md text-body-md font-bold">${a.title}</p>
+        <p class="text-xs text-on-surface-variant mt-1">${a.desc}</p>
+        <span class="text-[10px] text-on-surface-variant/60 font-bold uppercase mt-2 block">${a.time}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== MEMBERS =====
+async function loadMembers(search = '') {
+  try {
+    document.getElementById('members-tbody').innerHTML = `<tr><td colspan="9" class="px-6 py-8 text-center text-on-surface-variant">Loading...</td></tr>`;
+    const data = await getMembers(search);
+    const tbody = document.getElementById('members-tbody');
+    document.getElementById('members-count').textContent = `${data.length} member${data.length !== 1 ? 's' : ''}`;
+    
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="9" class="px-6 py-8 text-center text-on-surface-variant">No members found</td></tr>`;
+      return;
+    }
+    
+    tbody.innerHTML = data.map(m => `
+      <tr class="hover:bg-surface-container-low transition-colors group">
+        <td class="px-6 py-4 font-bold">${m.full_name}</td>
+        <td class="px-6 py-4 text-on-surface-variant">${m.reg_number}</td>
+        <td class="px-6 py-4 text-on-surface-variant">${m.college}</td>
+        <td class="px-6 py-4 text-on-surface-variant">${m.course}</td>
+        <td class="px-6 py-4">Yr ${m.year_of_study}</td>
+        <td class="px-6 py-4 text-on-surface-variant">${m.phone}</td>
+        <td class="px-6 py-4 text-on-surface-variant text-sm">${m.email}</td>
+        <td class="px-6 py-4"><span class="px-3 py-1 bg-jkuat-green/10 text-jkuat-green rounded-full text-xs font-bold">${m.membership_status}</span></td>
+        <td class="px-6 py-4 text-right">
+          <button onclick="confirmDelete('member', '${m.id}', '${m.full_name}')" class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-red-400 hover:text-red-600 transition-all">delete</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.log('Members load error:', err.message);
+  }
+}
+
+// ===== HELPERS =====
+function projectStatusColors(status) {
+  if (status === 'Incubating') return { bg: 'bg-jkuat-green', text: 'bg-jkuat-green/10 text-jkuat-green' };
+  if (status === 'MVP Live') return { bg: 'bg-tech-blue', text: 'bg-tech-blue/10 text-tech-blue' };
+  return { bg: 'bg-jkuat-gold', text: 'bg-secondary-fixed/50 text-secondary' };
+}
+
+function renderEventsTable(data, tbodyId) {
+  const tbody = document.getElementById(tbodyId);
+  if (!tbody) return;
+  if (!data || data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">No events found</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = data.map(e => {
+    const date = new Date(e.event_date);
+    const isPast = date < new Date();
+    return `<tr class="hover:bg-surface-container-low transition-colors group ${isPast ? 'opacity-60' : ''}">
+      <td class="px-6 py-4 font-bold">${e.title}</td>
+      <td class="px-6 py-4 text-on-surface-variant text-sm max-w-xs truncate">${e.description || '—'}</td>
+      <td class="px-6 py-4">${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}${isPast ? ' <span class="text-xs text-on-surface-variant">(past)</span>' : ''}</td>
+      <td class="px-6 py-4">${e.category ? `<span class="px-3 py-1 bg-tech-blue/10 text-tech-blue rounded-full text-xs font-bold">${e.category}</span>` : '—'}</td>
+      <td class="px-6 py-4 text-right">
+        <button onclick="confirmDelete('event', '${e.id}', '${e.title.replace(/'/g, "\\'")}')" class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-red-400 hover:text-red-600 transition-all">delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+// ===== PROJECTS CRUD =====
+async function loadProjectsView() {
+  try {
+    document.getElementById('projects-tbody').innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-on-surface-variant">Loading...</td></tr>`;
+    const data = await getProjects();
+    const tbody = document.getElementById('projects-tbody');
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-on-surface-variant">No projects yet</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(p => {
+      const colors = projectStatusColors(p.status);
+      return `<tr class="hover:bg-surface-container-low transition-colors group">
+        <td class="px-6 py-4 font-bold">${p.name}</td>
+        <td class="px-6 py-4 text-on-surface-variant">${p.team_lead}</td>
+        <td class="px-6 py-4"><span class="px-3 py-1 ${colors.text} rounded-full text-xs font-bold">${p.status}</span></td>
+        <td class="px-6 py-4 text-on-surface-variant">${p.category || '—'}</td>
+        <td class="px-6 py-4"><div class="w-24 h-2 bg-surface-container-high rounded-full overflow-hidden"><div class="h-full ${colors.bg} w-[${p.progress}%]"></div></div></td>
+        <td class="px-6 py-4 text-right">
+          <button onclick="confirmDelete('project', '${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-red-400 hover:text-red-600 transition-all">delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    console.log('Projects load error:', err.message);
+  }
+}
+
+async function handleProjectForm(e) {
+  e.preventDefault();
+  const id = document.getElementById('project-id').value;
+  const project = {
+    name: document.getElementById('project-name').value,
+    team_lead: document.getElementById('project-lead').value,
+    status: document.getElementById('project-status').value,
+    progress: parseInt(document.getElementById('project-progress').value) || 0,
+    category: document.getElementById('project-category').value || null
+  };
+  
+  try {
+    if (id) {
+      await updateProject(id, project);
+      showToast('Project updated!');
+    } else {
+      await addProject(project);
+      showToast('Project created!');
+    }
+    closeModal(null, 'project-modal');
+    document.getElementById('project-form').reset();
+    document.getElementById('project-id').value = '';
+    loadDashboard();
+    if (currentView === 'projects') loadProjectsView();
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error', 'text-red-500');
+  }
+}
+
+// ===== EVENTS CRUD =====
+async function loadEventsView() {
+  try {
+    document.getElementById('events-tbody').innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">Loading...</td></tr>`;
+    const data = await getEvents();
+    renderEventsTable(data, 'events-tbody');
+  } catch (err) {
+    console.log('Events load error:', err.message);
+  }
+}
+
+async function handleEventForm(e) {
+  e.preventDefault();
+  const event = {
+    title: document.getElementById('event-title').value,
+    description: document.getElementById('event-desc').value || null,
+    event_date: document.getElementById('event-date').value,
+    category: document.getElementById('event-category').value || null
+  };
+  
+  try {
+    await addEvent(event);
+    showToast('Event created!');
+    closeModal(null, 'event-modal');
+    document.getElementById('event-form').reset();
+    loadDashboard();
+    if (currentView === 'events') loadEventsView();
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error', 'text-red-500');
+  }
+}
+
+// ===== DELETE CONFIRMATION =====
+let pendingDelete = null;
+
+function confirmDelete(type, id, name) {
+  document.getElementById('confirm-msg').textContent = `Delete "${name}"? This cannot be undone.`;
+  document.getElementById('confirm-delete-btn').onclick = async () => {
+    try {
+      if (type === 'member') await deleteMember(id);
+      else if (type === 'project') await deleteProject(id);
+      else if (type === 'event') await deleteEvent(id);
+      showToast(`${type} deleted!`);
+      closeModal(null, 'confirm-modal');
+      loadDashboard();
+      if (currentView === type + 's') {
+        if (type === 'member') loadMembers();
+        else if (type === 'project') loadProjectsView();
+        else if (type === 'event') loadEventsView();
+      }
+    } catch (err) {
+      showToast('Error: ' + err.message, 'error', 'text-red-500');
+    }
+  };
+  openModal('confirm-modal');
+}
+
+// ===== BROADCAST =====
+function handleBroadcast(e) {
+  e.preventDefault();
+  const subject = document.getElementById('broadcast-subject').value;
+  const message = document.getElementById('broadcast-message').value;
+  console.log('Broadcast:', { subject, message });
+  document.getElementById('broadcast-success').classList.remove('hidden');
+  document.getElementById('broadcast-form').reset();
+  setTimeout(() => {
+    document.getElementById('broadcast-success').classList.add('hidden');
+    closeModal(null, 'broadcast-modal');
+  }, 2500);
+}
+
+// ===== SEARCH =====
+let searchTimeout = null;
+document.getElementById('global-search').addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    const q = e.target.value.trim();
+    if (currentView === 'dashboard') return;
+    
+    // Show loading state
+    const tbodyId = currentView === 'members' ? 'members-tbody' : currentView === 'projects' ? 'projects-tbody' : 'events-tbody';
+    document.getElementById(tbodyId).innerHTML = `<tr><td colspan="9" class="px-6 py-8 text-center text-on-surface-variant">Searching...</td></tr>`;
+    
+    if (currentView === 'members') loadMembers(q);
+    else if (currentView === 'projects') {
+      getProjects(q).then(data => {
+        const tbody = document.getElementById('projects-tbody');
+        if (data.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-on-surface-variant">No results for "${q}"</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = data.map(p => {
+          const colors = projectStatusColors(p.status);
+          return `<tr class="hover:bg-surface-container-low transition-colors group">
+          <td class="px-6 py-4 font-bold">${p.name}</td>
+          <td class="px-6 py-4 text-on-surface-variant">${p.team_lead}</td>
+          <td class="px-6 py-4"><span class="px-3 py-1 ${colors.text} rounded-full text-xs font-bold">${p.status}</span></td>
+          <td class="px-6 py-4 text-on-surface-variant">${p.category || '—'}</td>
+          <td class="px-6 py-4"><div class="w-24 h-2 bg-surface-container-high rounded-full overflow-hidden"><div class="h-full ${colors.bg} w-[${p.progress}%]"></div></div></td>
+          <td class="px-6 py-4 text-right"><button onclick="confirmDelete('project', '${p.id}', '${p.name.replace(/'/g, "\\'")}')" class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-red-400 hover:text-red-600 transition-all">delete</button></td>
+        </tr>`;
+        }).join('');
+      }).catch(() => {});
+    } else if (currentView === 'events') {
+      getEvents(q).then(data => {
+        renderEventsTable(data, 'events-tbody');
+      }).catch(() => {});
+    }
+  }, 300);
+});
+
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  loadDashboard();
 });
 </script>
 </body>

@@ -68,6 +68,173 @@ async function initiatePayment(phone, amount, memberId) {
   return data;
 }
 
+// ===== Admin CRUD Operations =====
+
+// Fetch all members
+async function getMembers(search = '') {
+  const sb = initSupabase();
+  let query = sb.from('members').select('*').order('created_at', { ascending: false });
+  if (search) {
+    query = query.or(`full_name.ilike.%${search}%,reg_number.ilike.%${search}%,email.ilike.%${search}%,phone.ilike.%${search}%`);
+  }
+  const { data, error } = await query.limit(100);
+  if (error) throw error;
+  return data;
+}
+
+// Delete a member
+async function deleteMember(id) {
+  const sb = initSupabase();
+  const { error } = await sb.from('members').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// Fetch all projects
+async function getProjects(search = '') {
+  const sb = initSupabase();
+  let query = sb.from('projects').select('*').order('created_at', { ascending: false });
+  if (search) {
+    query = query.or(`name.ilike.%${search}%,team_lead.ilike.%${search}%`);
+  }
+  const { data, error } = await query.limit(100);
+  if (error) throw error;
+  return data;
+}
+
+// Add a project
+async function addProject(project) {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('projects').insert([project]).select();
+  if (error) throw error;
+  return data;
+}
+
+// Update a project
+async function updateProject(id, updates) {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('projects').update(updates).eq('id', id).select();
+  if (error) throw error;
+  return data;
+}
+
+// Delete a project
+async function deleteProject(id) {
+  const sb = initSupabase();
+  const { error } = await sb.from('projects').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// Fetch all events
+async function getEvents(search = '') {
+  const sb = initSupabase();
+  let query = sb.from('events').select('*').order('event_date', { ascending: true });
+  if (search) {
+    query = query.or(`title.ilike.%${search}%,description.ilike.%${search}%`);
+  }
+  const { data, error } = await query.limit(100);
+  if (error) throw error;
+  return data;
+}
+
+// Add an event
+async function addEvent(event) {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('events').insert([event]).select();
+  if (error) throw error;
+  return data;
+}
+
+// Delete an event
+async function deleteEvent(id) {
+  const sb = initSupabase();
+  const { error } = await sb.from('events').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// Get member signup stats by month (for growth chart)
+async function getMemberGrowth() {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('members').select('created_at');
+  if (error) throw error;
+  
+  // Group by month
+  const months = {};
+  const monthNames = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  data.forEach(m => {
+    const d = new Date(m.created_at);
+    const key = d.getMonth();
+    months[key] = (months[key] || 0) + 1;
+  });
+  
+  const maxVal = Math.max(...Object.values(months), 1);
+  return monthNames.map((name, i) => ({
+    label: name,
+    count: months[i] || 0,
+    height: Math.max(5, ((months[i] || 0) / maxVal) * 100)
+  }));
+}
+
+// Get recent activity (combines recent members + projects)
+async function getRecentActivity(limit = 5) {
+  const sb = initSupabase();
+  const { data: recentMembers } = await sb.from('members')
+    .select('id, full_name, college, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  
+  const { data: recentProjects } = await sb.from('projects')
+    .select('id, name, status, created_at')
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  
+  const activities = [];
+  
+  (recentMembers || []).forEach(m => {
+    activities.push({
+      type: 'member',
+      icon: 'person_add',
+      iconBg: 'bg-tech-blue/10',
+      iconColor: 'text-tech-blue',
+      title: 'New Member Registered',
+      desc: `${m.full_name} joined the club`,
+      time: formatTimeAgo(m.created_at)
+    });
+  });
+  
+  (recentProjects || []).forEach(p => {
+    activities.push({
+      type: 'project',
+      icon: p.status === 'Incubating' ? 'verified' : 'rocket_launch',
+      iconBg: 'bg-jkuat-green/10',
+      iconColor: 'text-jkuat-green',
+      title: `Project: ${p.name}`,
+      desc: `Status changed to ${p.status}`,
+      time: formatTimeAgo(p.created_at)
+    });
+  });
+  
+  activities.sort((a, b) => new Date(b.rawTime || 0) - new Date(a.rawTime || 0));
+  return activities.slice(0, limit);
+}
+
+function formatTimeAgo(dateStr) {
+  const now = new Date();
+  const date = new Date(dateStr);
+  const diffMs = now - date;
+  const diffMins = Math.floor(diffMs / 60000);
+  const diffHours = Math.floor(diffMs / 3600000);
+  const diffDays = Math.floor(diffMs / 86400000);
+  
+  if (diffMins < 1) return 'Just now';
+  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
+  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+  if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  return date.toLocaleDateString();
+}
+
 // ===== Navigation & UI Utilities =====
 
 // Toggle mobile menu
