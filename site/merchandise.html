@@ -183,92 +183,72 @@ tailwind.config = {
   </div>
 </div>
 <!-- Product Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-bento-gap">
-  <!-- Product Card 1 -->
-  <div class="glass-card rounded-3xl p-4 flex flex-col group hover:border-tech-blue transition-all duration-300">
-    <div class="relative aspect-square rounded-2xl overflow-hidden mb-4 bg-surface-container-low">
-      <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop" alt="IEC Tech Hoodie"/>
-      <div class="absolute top-3 left-3 bg-jkuat-green text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">New Arrival</div>
-    </div>
-    <div class="px-2 flex-grow">
-      <div class="flex justify-between items-start mb-1">
-        <h3 class="font-headline-md text-headline-md text-on-surface leading-tight">IEC Tech Hoodie</h3>
-        <span class="font-label-md text-label-md text-tech-blue">KES 3,500</span>
-      </div>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Heavyweight cotton, embroidered logo, built for deep-work sessions.</p>
-      <div class="flex gap-2 mb-6">
-        <button class="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue">S</button>
-        <button class="w-8 h-8 rounded-lg border border-tech-blue bg-tech-blue/5 flex items-center justify-center text-xs font-bold text-tech-blue">M</button>
-        <button class="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue">L</button>
-        <button class="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue">XL</button>
-      </div>
-    </div>
-    <button class="w-full py-4 bg-on-surface text-white rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 scale-98 hover:bg-on-surface-variant transition-all">
-      <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span> Add to Bag
-    </button>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-bento-gap" id="product-grid">
+  <div id="products-loading" class="lg:col-span-4 py-16 text-center text-on-surface-variant">
+    <span class="material-symbols-outlined animate-spin inline-block text-3xl mb-4">sync</span>
+    <p>Loading products...</p>
   </div>
-  <!-- Product Card 2 (Member Exclusive) -->
-  <div class="glass-card rounded-3xl p-4 flex flex-col group border-primary-container/20 border hover:border-jkuat-green transition-all duration-300">
-    <div class="relative aspect-square rounded-2xl overflow-hidden mb-4 bg-surface-container-low">
-      <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=400&h=400&fit=crop" alt="Founder's Track Tee"/>
-      <div class="absolute top-3 right-3 bg-jkuat-gold text-on-secondary-fixed text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
-        <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span> Member Exclusive
-      </div>
-    </div>
-    <div class="px-2 flex-grow">
-      <div class="flex justify-between items-start mb-1">
-        <h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Founder's Track Tee</h3>
-        <span class="font-label-md text-label-md text-tech-blue">KES 1,800</span>
-      </div>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Limited edition oversized fit. Only available to registered club members.</p>
-      <div class="flex gap-2 mb-6">
-        <button class="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue">S</button>
-        <button class="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue">M</button>
-        <button class="w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue">L</button>
-      </div>
-    </div>
-    <button class="w-full py-4 bg-surface-container text-on-surface-variant rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 opacity-50 cursor-not-allowed">
-      <span class="material-symbols-outlined text-[20px]">lock</span> Members Only
-    </button>
-  </div>
-  <!-- Product Card 3 -->
-  <div class="glass-card rounded-3xl p-4 flex flex-col group hover:border-tech-blue transition-all duration-300">
-    <div class="relative aspect-square rounded-2xl overflow-hidden mb-4 bg-surface-container-low">
-      <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1544816155-12df9643f363?w=400&h=400&fit=crop" alt="Innovation Hub Tote"/>
-    </div>
-    <div class="px-2 flex-grow">
-      <div class="flex justify-between items-start mb-1">
-        <h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Innovation Hub Tote</h3>
-        <span class="font-label-md text-label-md text-tech-blue">KES 1,200</span>
-      </div>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Premium canvas bag with internal pocket. Perfect for your laptop and gear.</p>
-    </div>
-    <div class="mt-auto">
-      <button class="w-full py-4 bg-on-surface text-white rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 scale-98 hover:bg-on-surface-variant transition-all">
-        <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span> Add to Bag
+</div>
+</section>
+
+<!-- Cart/Checkout Modal -->
+<div id="cart-modal" class="fixed inset-0 z-[100] hidden items-center justify-center" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px)" onclick="closeCart()">
+  <div class="bg-white dark:bg-[#1e1e1e] rounded-3xl w-full max-w-lg mx-4 max-h-[85vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+    <div class="p-6 border-b border-outline-variant/30 flex justify-between items-center">
+      <h3 class="font-headline-md text-headline-md">Your Bag (<span id="cart-count">0</span>)</h3>
+      <button onclick="closeCart()" class="w-8 h-8 flex items-center justify-center text-on-surface-variant hover:text-on-surface rounded-full hover:bg-surface-container-low transition-all">
+        <span class="material-symbols-outlined">close</span>
       </button>
     </div>
-  </div>
-  <!-- Product Card 4 -->
-  <div class="glass-card rounded-3xl p-4 flex flex-col group hover:border-tech-blue transition-all duration-300">
-    <div class="relative aspect-square rounded-2xl overflow-hidden mb-4 bg-surface-container-low">
-      <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1588850561407-ed78c334e67a?w=400&h=400&fit=crop" alt="Silicon Savannah Cap"/>
-    </div>
-    <div class="px-2 flex-grow">
-      <div class="flex justify-between items-start mb-1">
-        <h3 class="font-headline-md text-headline-md text-on-surface leading-tight">Silicon Savannah Cap</h3>
-        <span class="font-label-md text-label-md text-tech-blue">KES 1,500</span>
+    <div id="cart-items" class="p-6 space-y-4">
+      <div class="text-center text-on-surface-variant py-8">
+        <span class="material-symbols-outlined text-4xl mb-2 block">shopping_bag</span>
+        <p>Your bag is empty</p>
       </div>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Structured 5-panel cap with premium 3D embroidery. Adjustable strap.</p>
     </div>
-    <div class="mt-auto">
-      <button class="w-full py-4 bg-on-surface text-white rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 scale-98 hover:bg-on-surface-variant transition-all">
-        <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span> Add to Bag
+    <div id="cart-footer" class="hidden p-6 border-t border-outline-variant/30">
+      <div class="flex justify-between items-center mb-4">
+        <span class="font-label-md text-label-md text-on-surface-variant">Total</span>
+        <span id="cart-total" class="font-headline-md text-headline-md text-tech-blue">KES 0</span>
+      </div>
+      <button onclick="openCheckout()" class="w-full py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
+        <span class="material-symbols-outlined">lock</span> Checkout with M-Pesa
       </button>
     </div>
   </div>
 </div>
-</section>
+
+<!-- Checkout Phone Input -->
+<div id="checkout-modal" class="fixed inset-0 z-[110] hidden items-center justify-center" style="background:rgba(0,0,0,0.5);backdrop-filter:blur(4px)" onclick="closeCheckout()">
+  <div class="bg-white dark:bg-[#1e1e1e] rounded-3xl w-full max-w-sm mx-4 shadow-2xl" onclick="event.stopPropagation()">
+    <div class="p-6">
+      <div class="text-center mb-6">
+        <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <span class="material-symbols-outlined text-green-600 text-3xl">phone_android</span>
+        </div>
+        <h3 class="font-headline-md text-headline-md mb-2">M-Pesa Checkout</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">Enter your M-Pesa phone number to receive the STK push prompt.</p>
+      </div>
+      <form onsubmit="handleCheckout(event)" class="space-y-4">
+        <div>
+          <label class="block text-label-md text-on-surface mb-1">Phone Number</label>
+          <input id="checkout-phone" type="tel" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-jkuat-green px-4 text-center text-lg" placeholder="0712345678" required/>
+          <p class="text-xs text-on-surface-variant/60 mt-1">Format: 07XX XXX XXX (Safaricom lines only)</p>
+        </div>
+        <div id="checkout-summary" class="bg-surface-container-low rounded-xl p-4 text-sm">
+          <span class="text-on-surface-variant">Total Payment:</span>
+          <span id="checkout-amount" class="font-bold text-jkuat-green float-right">KES 0</span>
+        </div>
+        <button type="submit" id="checkout-btn" class="w-full py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2">
+          <span class="material-symbols-outlined">send_money</span> Pay with M-Pesa
+        </button>
+      </form>
+      <button onclick="closeCheckout()" class="w-full mt-3 py-3 text-on-surface-variant font-button-text text-button-text hover:text-on-surface transition-colors">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
 
 <!-- Payment & Info Bento -->
 <section class="grid grid-cols-1 md:grid-cols-3 gap-bento-gap">
@@ -308,24 +288,256 @@ tailwind.config = {
   <p class="text-on-surface-variant/60 font-body-md text-body-md">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club.</p>
 </footer>
 
+<script src="js/supabase-storage.js"></script>
 <script>
-document.querySelectorAll('button').forEach(button => {
-  if (button.textContent.includes('Add to Bag')) {
-    button.addEventListener('click', () => {
-      const btnContent = button.innerHTML;
-      button.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Adding...';
-      button.classList.add('bg-tech-blue');
-      setTimeout(() => {
-        button.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Added to Bag';
-        button.classList.remove('bg-on-surface');
-        button.classList.add('bg-jkuat-green');
-        setTimeout(() => {
-          button.innerHTML = btnContent;
-          button.classList.remove('bg-jkuat-green', 'bg-tech-blue');
-          button.classList.add('bg-on-surface');
-        }, 2000);
-      }, 800);
+let allProducts = [];
+let cart = JSON.parse(localStorage.getItem('iec-cart') || '[]');
+
+// Load products from Supabase
+async function loadProducts() {
+  try {
+    const sb = initSupabase();
+    if (!sb) {
+      document.getElementById('products-loading').innerHTML = '<p>Unable to connect.</p>';
+      return;
+    }
+    
+    const { data, error } = await sb.from('products').select('*').order('created_at', { ascending: true });
+    if (error) throw error;
+    
+    allProducts = data || [];
+    renderProducts(allProducts);
+    updateCartDisplay();
+  } catch (err) {
+    console.error('Products load error:', err);
+    document.getElementById('products-loading').innerHTML = '<p class="text-red-500">Failed to load products</p>';
+  }
+}
+
+// Render products into grid
+function renderProducts(products) {
+  const grid = document.getElementById('product-grid');
+  
+  if (!products || products.length === 0) {
+    grid.innerHTML = '<div class="lg:col-span-4 py-16 text-center text-on-surface-variant"><span class="material-symbols-outlined text-4xl mb-4 block">inventory_2</span><p>No products available yet. Check back soon!</p></div>';
+    return;
+  }
+  
+  grid.innerHTML = products.map(product => {
+    let sizes = [];
+    try { sizes = JSON.parse(product.sizes || '[]'); } catch(e) {}
+    
+    const imgUrl = product.image_url || 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=400&fit=crop';
+    
+    return `<div class="glass-card rounded-3xl p-4 flex flex-col group hover:border-tech-blue transition-all duration-300">
+      <div class="relative aspect-square rounded-2xl overflow-hidden mb-4 bg-surface-container-low">
+        <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="${imgUrl}" alt="${product.name}"/>
+        ${product.is_member_exclusive ? `
+        <div class="absolute top-3 right-3 bg-jkuat-gold text-on-secondary-fixed text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider flex items-center gap-1">
+          <span class="material-symbols-outlined text-[12px]" style="font-variation-settings: 'FILL' 1;">star</span> Member Exclusive
+        </div>
+        ` : `<div class="absolute top-3 left-3 bg-jkuat-green text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">New Arrival</div>`}
+      </div>
+      <div class="px-2 flex-grow">
+        <div class="flex justify-between items-start mb-1">
+          <h3 class="font-headline-md text-headline-md text-on-surface leading-tight">${product.name}</h3>
+          <span class="font-label-md text-label-md text-tech-blue">KES ${product.price.toLocaleString()}</span>
+        </div>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-4">${product.description || ''}</p>
+        ${sizes.length > 0 ? `
+        <div class="flex gap-2 mb-6">
+          ${sizes.map(s => `
+            <button class="size-btn w-8 h-8 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue" data-size="${s}">${s}</button>
+          `).join('')}
+        </div>
+        ` : ''}
+      </div>
+      ${product.is_member_exclusive 
+        ? `<button class="w-full py-4 bg-surface-container text-on-surface-variant rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"><span class="material-symbols-outlined text-[20px]">lock</span> Members Only</button>`
+        : `<button onclick="addToCart('${product.id}', '${product.name.replace(/'/g, "\\'")}', ${product.price}, this)" class="w-full py-4 bg-on-surface text-white rounded-xl font-button-text text-button-text flex items-center justify-center gap-2 scale-98 hover:bg-on-surface-variant transition-all add-to-cart-btn" data-product-id="${product.id}">
+            <span class="material-symbols-outlined text-[20px]">add_shopping_cart</span> Add to Bag
+          </button>`
+      }
+    </div>`;
+  }).join('');
+}
+
+// ===== CART SYSTEM =====
+
+function addToCart(productId, productName, price, btnElement) {
+  // Get selected size if available
+  const productCard = (btnElement || event?.target)?.closest('.glass-card');
+  const selectedSize = productCard?.querySelector('.size-btn.border-tech-blue')?.dataset.size;
+  
+  const existingIndex = cart.findIndex(item => item.id === productId && item.size === selectedSize);
+  
+  if (existingIndex >= 0) {
+    cart[existingIndex].quantity += 1;
+  } else {
+    cart.push({
+      id: productId,
+      name: productName,
+      price: price,
+      size: selectedSize || null,
+      quantity: 1
     });
+  }
+  
+  saveCart();
+  updateCartDisplay();
+  
+  // Visual feedback
+  const btn = productCard?.querySelector('.add-to-cart-btn');
+  if (btn) {
+    const originalHTML = btn.innerHTML;
+    btn.innerHTML = '<span class="material-symbols-outlined">check_circle</span> Added!';
+    btn.style.backgroundColor = '#006838';
+    setTimeout(() => {
+      btn.innerHTML = originalHTML;
+      btn.style.backgroundColor = '';
+    }, 1500);
+  }
+}
+
+function removeFromCart(index) {
+  cart.splice(index, 1);
+  saveCart();
+  updateCartDisplay();
+}
+
+function updateQuantity(index, delta) {
+  cart[index].quantity = Math.max(1, cart[index].quantity + delta);
+  saveCart();
+  updateCartDisplay();
+}
+
+function saveCart() {
+  localStorage.setItem('iec-cart', JSON.stringify(cart));
+}
+
+function getCartTotal() {
+  return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+}
+
+function getCartCount() {
+  return cart.reduce((count, item) => count + item.quantity, 0);
+}
+
+function updateCartDisplay() {
+  document.querySelectorAll('.cart-count-badge').forEach(el => {
+    el.textContent = getCartCount();
+  });
+}
+
+// Cart UI
+function openCart() {
+  const modal = document.getElementById('cart-modal');
+  const items = document.getElementById('cart-items');
+  const footer = document.getElementById('cart-footer');
+  
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+  
+  document.getElementById('cart-count').textContent = getCartCount();
+  
+  if (cart.length === 0) {
+    items.innerHTML = '<div class="text-center text-on-surface-variant py-8"><span class="material-symbols-outlined text-4xl mb-2 block">shopping_bag</span><p>Your bag is empty</p></div>';
+    footer.classList.add('hidden');
+    return;
+  }
+  
+  footer.classList.remove('hidden');
+  document.getElementById('cart-total').textContent = `KES ${getCartTotal().toLocaleString()}`;
+  
+  items.innerHTML = cart.map((item, index) => `
+    <div class="flex items-center gap-4 p-3 bg-surface-container-low rounded-xl">
+      <div class="flex-1 min-w-0">
+        <p class="font-label-md text-label-md font-bold truncate">${item.name}</p>
+        <p class="text-xs text-on-surface-variant">KES ${item.price.toLocaleString()}${item.size ? ' · Size ' + item.size : ''}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="updateQuantity(${index}, -1)" class="w-7 h-7 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue transition-colors">−</button>
+        <span class="w-6 text-center font-bold text-sm">${item.quantity}</span>
+        <button onclick="updateQuantity(${index}, 1)" class="w-7 h-7 rounded-lg border border-outline-variant flex items-center justify-center text-xs font-bold hover:border-tech-blue transition-colors">+</button>
+      </div>
+      <span class="font-bold text-sm w-16 text-right">KES ${(item.price * item.quantity).toLocaleString()}</span>
+      <button onclick="removeFromCart(${index})" class="text-red-400 hover:text-red-600 transition-colors">
+        <span class="material-symbols-outlined text-[18px]">delete</span>
+      </button>
+    </div>
+  `).join('');
+}
+
+function closeCart() {
+  document.getElementById('cart-modal').classList.add('hidden');
+  document.getElementById('cart-modal').classList.remove('flex');
+  document.body.style.overflow = '';
+}
+
+function openCheckout() {
+  document.getElementById('checkout-amount').textContent = `KES ${getCartTotal().toLocaleString()}`;
+  document.getElementById('checkout-modal').classList.remove('hidden');
+  document.getElementById('checkout-modal').classList.add('flex');
+}
+
+function closeCheckout() {
+  document.getElementById('checkout-modal').classList.add('hidden');
+  document.getElementById('checkout-modal').classList.remove('flex');
+}
+
+async function handleCheckout(e) {
+  e.preventDefault();
+  const btn = document.getElementById('checkout-btn');
+  const phone = document.getElementById('checkout-phone').value;
+  const amount = getCartTotal();
+  
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-symbols-outlined animate-spin">sync</span> Processing...';
+  
+  try {
+    const data = await initiatePayment(phone, amount, null);
+    showToast('STK Push sent! Check your phone.', 'success');
+    closeCheckout();
+    closeCart();
+    // Clear cart after successful payment
+    cart = [];
+    saveCart();
+    updateCartDisplay();
+  } catch (err) {
+    showToast('Payment failed: ' + err.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-symbols-outlined">send_money</span> Pay with M-Pesa';
+  }
+}
+
+// Size selection
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('size-btn')) {
+    const parent = e.target.closest('.flex.gap-2');
+    parent.querySelectorAll('.size-btn').forEach(btn => {
+      btn.classList.remove('border-tech-blue', 'bg-tech-blue/5', 'text-tech-blue');
+    });
+    e.target.classList.add('border-tech-blue', 'bg-tech-blue/5', 'text-tech-blue');
+  }
+});
+
+// Update the bag button to open cart
+document.addEventListener('DOMContentLoaded', () => {
+  const bagButtons = document.querySelectorAll('button');
+  bagButtons.forEach(btn => {
+    if (btn.textContent.includes('Bag')) {
+      btn.onclick = openCart;
+    }
+  });
+  loadProducts();
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeCart();
+    closeCheckout();
   }
 });
 </script>

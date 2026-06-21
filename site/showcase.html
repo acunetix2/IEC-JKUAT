@@ -221,85 +221,11 @@ tailwind.config = {
   </div>
 </div>
 <!-- Bento Grid -->
-<div class="grid grid-cols-1 md:grid-cols-12 gap-bento-gap">
-  <!-- Card 1 (Large) -->
-  <div class="bento-card project-card md:col-span-8 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="fintech">
-    <div class="relative h-64 overflow-hidden">
-      <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=400&fit=crop" alt="Tech meeting flatlay"/>
-      <div class="absolute top-4 right-4">
-        <span class="bg-jkuat-green text-white font-label-md text-label-md px-4 py-1 rounded-full">Incubating</span>
-      </div>
-    </div>
-    <div class="p-6 flex flex-col flex-grow">
-      <h3 class="font-headline-md text-headline-md mb-2">SmartCampus Wallet</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-6 flex-grow">A closed-loop payment ecosystem for university campuses to streamline student transactions and meal plans.</p>
-      <div class="flex gap-2">
-        <span class="bg-surface-container-low text-on-surface-variant text-[12px] font-bold px-3 py-1 rounded-md">Fintech</span>
-        <span class="bg-surface-container-low text-on-surface-variant text-[12px] font-bold px-3 py-1 rounded-md">Innovation</span>
-      </div>
-    </div>
-  </div>
-  <!-- Card 2 (Small) -->
-  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="healthtech">
-    <div class="relative h-48 bg-tech-blue/10 flex items-center justify-center">
-      <span class="material-symbols-outlined text-tech-blue text-6xl">health_and_safety</span>
-      <div class="absolute top-4 right-4">
-        <span class="bg-outline text-white font-label-md text-label-md px-4 py-1 rounded-full">MVP Live</span>
-      </div>
-    </div>
-    <div class="p-6">
-      <h3 class="font-headline-md text-headline-md mb-2">M-Daktari</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Remote diagnostic tool for maternal health in rural clinics.</p>
-      <div class="flex flex-wrap gap-2">
-        <span class="bg-surface-container-low text-on-surface-variant text-[12px] font-bold px-3 py-1 rounded-md">HealthTech</span>
-      </div>
-    </div>
-  </div>
-  <!-- Card 3 (Small) -->
-  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="agtech">
-    <div class="relative h-48 overflow-hidden">
-      <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=300&fit=crop" alt="Electric motorcycle"/>
-      <div class="absolute top-4 right-4">
-        <span class="bg-jkuat-green text-white font-label-md text-label-md px-4 py-1 rounded-full">Incubating</span>
-      </div>
-    </div>
-    <div class="p-6">
-      <h3 class="font-headline-md text-headline-md mb-2">E-Boda</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Affordable electric bike conversion kits for urban logistics.</p>
-      <div class="flex flex-wrap gap-2">
-        <span class="bg-surface-container-low text-on-surface-variant text-[12px] font-bold px-3 py-1 rounded-md">Technology</span>
-      </div>
-    </div>
-  </div>
-  <!-- Card 4 (Medium) -->
-  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="social">
-    <div class="p-8 bg-jkuat-gold/5 flex-grow">
-      <div class="flex items-center gap-3 mb-6">
-        <span class="material-symbols-outlined text-jkuat-gold text-4xl">energy_savings_leaf</span>
-        <span class="font-label-md text-label-md text-on-secondary-fixed-variant bg-secondary-fixed px-3 py-1 rounded-md">Social Impact</span>
-      </div>
-      <h3 class="font-headline-md text-headline-md mb-2">SolarStream</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-6">Micro-utility platform for pay-as-you-go irrigation pumps.</p>
-      <div class="flex gap-2">
-        <span class="bg-white/80 border border-outline-variant/20 text-on-surface-variant text-[12px] font-bold px-3 py-1 rounded-md">Entrepreneurship</span>
-      </div>
-    </div>
-  </div>
-  <!-- Card 5 (Small) -->
-  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="healthtech">
-    <div class="relative h-48 overflow-hidden">
-      <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=300&fit=crop" alt="Education app UI"/>
-      <div class="absolute top-4 right-4">
-        <span class="bg-outline text-white font-label-md text-label-md px-4 py-1 rounded-full">MVP Live</span>
-      </div>
-    </div>
-    <div class="p-6">
-      <h3 class="font-headline-md text-headline-md mb-2">ElimuCloud</h3>
-      <p class="font-body-md text-body-md text-on-surface-variant mb-4">Gamified curriculum delivery for low-bandwidth environments.</p>
-      <div class="flex flex-wrap gap-2">
-        <span class="bg-surface-container-low text-on-surface-variant text-[12px] font-bold px-3 py-1 rounded-md">Education</span>
-      </div>
-    </div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-bento-gap" id="project-grid">
+  <!-- Projects loaded dynamically from Supabase -->
+  <div id="project-loading" class="md:col-span-12 py-16 text-center text-on-surface-variant font-body-lg">
+    <span class="material-symbols-outlined animate-spin inline-block text-3xl mb-4">sync</span>
+    <p>Loading projects...</p>
   </div>
 </div>
 </section>
@@ -324,12 +250,258 @@ tailwind.config = {
 
 </main>
 
+<!-- Project Detail Modal -->
+<div id="project-detail-modal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-overlay" onclick="closeProjectModal()">
+  <div class="bg-white dark:bg-[#1e1e1e] rounded-3xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+    <div id="project-modal-content" class="p-0 relative">
+      <div class="flex items-center justify-center py-20 text-on-surface-variant">
+        <span class="material-symbols-outlined animate-spin mr-3">sync</span>
+        Loading project details...
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+</style>
+
 <!-- Footer -->
 <footer class="border-t border-outline-variant/30 py-section-padding text-center">
   <p class="text-on-surface-variant/60 font-body-md text-body-md">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club.</p>
 </footer>
 
+<script src="js/supabase-storage.js"></script>
 <script>
+let allProjects = [];
+let projectFilter = 'all';
+
+// Load projects from Supabase
+async function loadProjects() {
+  try {
+    const sb = initSupabase();
+    if (!sb) {
+      document.getElementById('project-loading').innerHTML = '<p>Unable to connect. Check Supabase config.</p>';
+      return;
+    }
+    
+    const { data, error } = await sb.from('projects')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) throw error;
+    
+    allProjects = data || [];
+    renderProjects(allProjects);
+    
+    // Update featured hero with first project
+    if (allProjects.length > 0) {
+      // updateFeaturedProject(allProjects[0]);
+    }
+  } catch (err) {
+    console.error('Projects load error:', err);
+    document.getElementById('project-loading').innerHTML = '<p class="text-red-500">Failed to load projects: ' + err.message + '</p>';
+  }
+}
+
+// Render projects into grid
+function renderProjects(projects) {
+  const grid = document.getElementById('project-grid');
+  
+  if (!projects || projects.length === 0) {
+    grid.innerHTML = '<div class="md:col-span-12 py-16 text-center text-on-surface-variant"><span class="material-symbols-outlined text-4xl mb-4 block">rocket</span><p class="font-body-lg">No projects yet. Be the first to incubate!</p></div>';
+    return;
+  }
+  
+  grid.innerHTML = projects.map((project, index) => {
+    const cat = (project.category || '').toLowerCase().replace(/\s+/g, '');
+    const isLarge = index === 0 || index % 4 === 0;
+    const spans = isLarge ? 'md:col-span-8' : 'md:col-span-4';
+    
+    let mediaUrls = [];
+    try { mediaUrls = JSON.parse(project.media_urls || '[]'); } catch(e) {}
+    const previewImg = mediaUrls.find(u => isImageUrl(u));
+    const previewVideo = mediaUrls.find(u => isVideoUrl(u));
+    
+    const statusColors = {
+      'Incubating': 'bg-jkuat-green text-white',
+      'MVP Live': 'bg-tech-blue text-white',
+      'Ideation': 'bg-jkuat-gold text-on-secondary-fixed'
+    };
+    const sc = statusColors[project.status] || 'bg-outline text-white';
+    
+    return `<div class="bento-card project-card ${spans} bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col cursor-pointer" data-category="${cat}" onclick="openProjectModal('${project.id}')">
+      <div class="relative h-48 ${previewImg ? 'overflow-hidden' : 'bg-tech-blue/10 flex items-center justify-center'}">
+        ${previewImg 
+          ? `<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="${previewImg}" alt="${project.name}"/>`
+          : previewVideo 
+            ? `<video class="w-full h-full object-cover" src="${previewVideo}"></video>`
+            : `<span class="material-symbols-outlined text-tech-blue text-6xl">rocket_launch</span>`
+        }
+        <div class="absolute top-4 right-4">
+          <span class="${sc} font-label-md text-label-md px-4 py-1 rounded-full shadow-sm">${project.status}</span>
+        </div>
+      </div>
+      <div class="p-6 flex flex-col flex-grow">
+        <h3 class="font-headline-md text-headline-md mb-2">${project.name}</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-4 flex-grow line-clamp-2">${project.description || 'No description yet.'}</p>
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-on-surface-variant">${project.team_lead || '—'}</span>
+          ${project.progress > 0 ? `<div class="w-20 h-1.5 bg-surface-container-high rounded-full overflow-hidden"><div class="h-full bg-jkuat-green" style="width:${project.progress}%"></div></div>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Open project detail modal
+async function openProjectModal(projectId) {
+  const modal = document.getElementById('project-detail-modal');
+  const content = document.getElementById('project-modal-content');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+  
+  content.innerHTML = '<div class="flex items-center justify-center py-20 text-on-surface-variant"><span class="material-symbols-outlined animate-spin mr-3">sync</span>Loading project details...</div>';
+  
+  try {
+    const sb = initSupabase();
+    const { data, error } = await sb.from('projects').select('*').eq('id', projectId).single();
+    if (error) throw error;
+    if (!data) throw new Error('Project not found');
+    
+    renderProjectModalContent(data);
+  } catch (err) {
+    content.innerHTML = `<div class="p-8 text-center text-red-500"><span class="material-symbols-outlined text-4xl mb-4">error</span><p>${err.message}</p><button onclick="closeProjectModal()" class="mt-6 px-6 py-3 bg-tech-blue text-white rounded-xl">Close</button></div>`;
+  }
+}
+
+function renderProjectModalContent(project) {
+  const content = document.getElementById('project-modal-content');
+  
+  let mediaUrls = [];
+  try { mediaUrls = JSON.parse(project.media_urls || '[]'); } catch(e) {}
+  
+  const images = mediaUrls.filter(u => isImageUrl(u));
+  const videos = mediaUrls.filter(u => isVideoUrl(u));
+  
+  const statusColors = {
+    'Incubating': 'bg-jkuat-green/10 text-jkuat-green',
+    'MVP Live': 'bg-tech-blue/10 text-tech-blue',
+    'Ideation': 'bg-jkuat-gold/10 text-secondary'
+  };
+  const sc = statusColors[project.status] || 'bg-outline/10 text-outline';
+  
+  content.innerHTML = `
+    <div>
+      <button onclick="closeProjectModal()" class="absolute top-4 right-4 z-20 w-10 h-10 bg-black/40 text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-all">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      
+      <!-- Image Gallery -->
+      ${images.length > 0 ? `
+      <div class="relative h-64 md:h-80 overflow-hidden bg-surface-container-high">
+        <div class="flex h-full" id="project-gallery-track">
+          ${images.map((img, i) => `
+            <div class="min-w-full h-full flex-shrink-0 ${i === 0 ? '' : 'hidden'}" data-p-gallery-index="${i}">
+              <img class="w-full h-full object-cover" src="${img}" alt="${project.name} photo ${i+1}"/>
+            </div>
+          `).join('')}
+        </div>
+        ${images.length > 1 ? `
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          ${images.map((_, i) => `
+            <button class="w-2 h-2 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/40'} transition-all" onclick="showProjectImage(${i})"></button>
+          `).join('')}
+        </div>
+        ` : ''}
+      </div>
+      ` : `
+      <div class="h-48 bg-gradient-to-br from-tech-blue/10 to-jkuat-green/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-6xl text-tech-blue/30">rocket_launch</span>
+      </div>
+      `}
+      
+      <!-- Content -->
+      <div class="p-8">
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <span class="${sc} px-4 py-1.5 rounded-full font-label-md text-label-md">${project.status}</span>
+          ${project.category ? `<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full font-label-md text-label-md">${project.category}</span>` : ''}
+          ${project.team_lead ? `<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full font-label-md text-label-md flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">person</span>${project.team_lead}
+          </span>` : ''}
+        </div>
+        
+        <h2 class="font-headline-lg text-headline-lg mb-4">${project.name}</h2>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-6 leading-relaxed whitespace-pre-line">${project.description || 'No description available.'}</p>
+        
+        <!-- Progress bar -->
+        ${project.progress > 0 ? `
+        <div class="mb-6">
+          <div class="flex justify-between text-sm mb-2">
+            <span class="font-label-md text-label-md">Progress</span>
+            <span class="font-label-md text-label-md text-tech-blue">${project.progress}%</span>
+          </div>
+          <div class="h-2.5 bg-surface-container-high rounded-full overflow-hidden">
+            <div class="h-full bg-tech-blue rounded-full transition-all" style="width:${project.progress}%"></div>
+          </div>
+        </div>
+        ` : ''}
+        
+        <!-- Videos -->
+        ${videos.length > 0 ? `
+        <div class="mb-8">
+          <h3 class="font-headline-md text-headline-md mb-4">Videos</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${videos.map(v => `
+              <div class="aspect-video rounded-xl overflow-hidden bg-black">
+                <video class="w-full h-full" controls src="${v}"></video>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+        
+        <!-- CTAs -->
+        <div class="flex flex-wrap gap-4 pt-6 border-t border-outline-variant/30">
+          <button class="bg-tech-blue text-white px-8 py-4 rounded-xl font-button-text text-button-text hover:scale-105 transition-all shadow-lg flex items-center gap-2">
+            Connect with Founders <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+          <button class="border border-outline-variant text-on-surface px-8 py-4 rounded-xl font-button-text text-button-text hover:bg-surface-container-low transition-all flex items-center gap-2">
+            <span class="material-symbols-outlined">favorite</span> Support Project
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Gallery navigation
+function showProjectImage(index) {
+  const track = document.getElementById('project-gallery-track');
+  if (!track) return;
+  track.querySelectorAll('[data-p-gallery-index]').forEach(el => el.classList.add('hidden'));
+  const selected = track.querySelector(`[data-p-gallery-index="${index}"]`);
+  if (selected) selected.classList.remove('hidden');
+  
+  const dots = track.closest('.relative.h-64')?.querySelectorAll('.rounded-full');
+  dots?.forEach((dot, i) => {
+    dot.className = `w-2 h-2 rounded-full ${i === index ? 'bg-white' : 'bg-white/40'} transition-all`;
+  });
+}
+
+// Close modal
+function closeProjectModal() {
+  const modal = document.getElementById('project-detail-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeProjectModal();
+});
+
 // Project filter logic
 document.querySelectorAll('.filter-btn').forEach(button => {
   button.addEventListener('click', () => {
@@ -339,14 +511,19 @@ document.querySelectorAll('.filter-btn').forEach(button => {
     setTimeout(() => button.classList.remove('scale-95'), 100);
     
     const category = button.dataset.category;
-    document.querySelectorAll('.project-card').forEach(card => {
-      if (category === 'all' || card.dataset.category === category) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    });
+    projectFilter = category;
+    if (category === 'all') {
+      renderProjects(allProjects);
+    } else {
+      const filtered = allProjects.filter(p => (p.category || '').toLowerCase().replace(/\s+/g, '') === category);
+      renderProjects(filtered);
+    }
   });
+});
+
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  loadProjects();
 });
 
 let lastScroll = 0;

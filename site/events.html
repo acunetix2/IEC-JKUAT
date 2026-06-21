@@ -203,78 +203,10 @@ tailwind.config = {
     </div>
   </div>
   <div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gutter" id="event-grid">
-    <!-- Event 1: Hackathon (Wide) -->
-  </div>
-  <div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gutter">
-    <!-- Event 1: Hackathon (Wide) -->
-    <div class="event-card md:col-span-8 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-blue relative overflow-hidden group" data-track="fintech">
-      <div class="absolute -right-16 -top-16 w-64 h-64 bg-tech-blue/5 rounded-full blur-3xl group-hover:bg-tech-blue/10 transition-colors"></div>
-      <div class="relative z-10">
-        <div class="flex justify-between items-start mb-12">
-          <span class="bg-tech-blue/10 text-tech-blue px-3 py-1 rounded-full font-label-md text-label-md">HACKATHON</span>
-          <div class="text-right">
-            <div class="font-headline-md text-headline-md leading-none">24</div>
-            <div class="font-label-md text-label-md opacity-60">OCT</div>
-          </div>
-        </div>
-        <h3 class="font-headline-lg text-headline-lg mb-4">Code-X JKUAT: Build for Africa</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-8 max-w-xl">A 48-hour sprint focusing on cross-border payment solutions for SME merchants. Prizes include seed funding and incubation space.</p>
-        <div class="flex items-center justify-between">
-          <div class="flex -space-x-3">
-            <div class="w-10 h-10 rounded-full border-2 border-white bg-surface-variant overflow-hidden">
-              <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop" alt="Team member"/>
-            </div>
-            <div class="w-10 h-10 rounded-full border-2 border-white bg-surface-variant overflow-hidden">
-              <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop" alt="Team member"/>
-            </div>
-            <div class="w-10 h-10 rounded-full border-2 border-white bg-surface-variant overflow-hidden flex items-center justify-center bg-surface-container font-label-md text-label-md">
-              +42
-            </div>
-          </div>
-          <button class="bg-surface text-tech-blue border border-tech-blue/30 px-6 py-2 rounded-xl font-button-text text-button-text hover:bg-tech-blue hover:text-white transition-all">Register Team</button>
-        </div>
-      </div>
-    </div>
-    <!-- Event 2: Speaker Session -->
-    <div class="event-card md:col-span-4 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-gold relative overflow-hidden" data-track="leadership">
-      <div class="flex flex-col h-full">
-        <span class="bg-jkuat-gold/10 text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md self-start mb-8">LEADERSHIP</span>
-        <h3 class="font-headline-md text-headline-md mb-4">Founder's Fireside: Scaling from JKUAT</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-auto">Guest session with Dr. Kevin Mwangi, JKUAT Alumni and CEO of TechPillar.</p>
-        <div class="mt-8 pt-6 border-t border-surface-variant/30">
-          <div class="flex items-center gap-3">
-            <span class="material-symbols-outlined text-jkuat-gold">location_on</span>
-            <span class="font-label-md text-label-md">Innovation Hub Lab 2</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Event 3: Track Intro -->
-    <div class="event-card md:col-span-4 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-green relative overflow-hidden" data-track="agtech">
-      <div class="flex flex-col h-full">
-        <span class="bg-jkuat-green/10 text-jkuat-green px-3 py-1 rounded-full font-label-md text-label-md self-start mb-8">AGTECH TRACK</span>
-        <h3 class="font-headline-md text-headline-md mb-4">Precision Farming Workshop</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-auto">Exploring IoT and AI in sustainable agriculture with hands-on drone demonstrations.</p>
-        <button class="mt-8 text-jkuat-green font-button-text text-button-text flex items-center gap-2 group">
-          Learn More <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">chevron_right</span>
-        </button>
-      </div>
-    </div>
-    <!-- Event 4: Networking (Wide) -->
-    <div class="event-card md:col-span-8 bg-on-tertiary-fixed-variant text-white p-8 rounded-3xl bento-card border-none relative overflow-hidden" data-track="networking">
-      <div class="absolute inset-0 opacity-20">
-        <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop')"></div>
-      </div>
-      <div class="relative z-10 flex flex-col md:flex-row items-center justify-between h-full gap-8">
-        <div class="max-w-md">
-          <h3 class="font-headline-lg text-headline-lg mb-4 text-tertiary-fixed">Monthly Mixer: Founders &amp; Funders</h3>
-          <p class="font-body-md text-body-md text-tertiary-fixed/80">Connect with local angel investors in a relaxed environment. No pitches, just conversations and community.</p>
-        </div>
-        <div class="flex flex-col items-center justify-center p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 min-w-[140px]">
-          <div class="font-display-lg text-display-lg text-tertiary-fixed">05</div>
-          <div class="font-label-md text-label-md">NOV</div>
-        </div>
-      </div>
+    <!-- Events loaded dynamically from Supabase -->
+    <div id="events-loading" class="md:col-span-12 py-16 text-center text-on-surface-variant font-body-lg">
+      <span class="material-symbols-outlined animate-spin inline-block text-3xl mb-4">sync</span>
+      <p>Loading events...</p>
     </div>
   </div>
 </div>
@@ -323,12 +255,296 @@ tailwind.config = {
 
 </main>
 
+<!-- Event Detail Modal -->
+<div id="event-detail-modal" class="fixed inset-0 z-[100] hidden items-center justify-center modal-overlay" onclick="closeEventModal()">
+  <div class="bg-white dark:bg-[#1e1e1e] rounded-3xl w-full max-w-4xl mx-4 max-h-[90vh] overflow-y-auto shadow-2xl" onclick="event.stopPropagation()">
+    <div id="event-modal-content" class="p-0">
+      <!-- Loading state -->
+      <div class="flex items-center justify-center py-20 text-on-surface-variant">
+        <span class="material-symbols-outlined animate-spin mr-3">sync</span>
+        Loading event details...
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.modal-overlay { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+</style>
+
 <!-- Footer Shell -->
 <footer class="border-t border-outline-variant/30 py-section-padding text-center">
   <p class="text-on-surface-variant/60 font-body-md text-body-md">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club.</p>
 </footer>
 
+<script src="js/supabase-storage.js"></script>
 <script>
+let allEvents = [];
+let eventFilter = 'all';
+
+// Load events from Supabase
+async function loadEvents() {
+  try {
+    const sb = initSupabase();
+    if (!sb) {
+      document.getElementById('events-loading').innerHTML = '<p>Unable to connect. Check Supabase config.</p>';
+      return;
+    }
+    
+    const { data, error } = await sb.from('events')
+      .select('*')
+      .order('event_date', { ascending: true });
+    
+    if (error) throw error;
+    
+    allEvents = data || [];
+    renderEvents(allEvents);
+    
+    // Update featured event hero with first upcoming event
+    if (allEvents.length > 0) {
+      updateFeaturedEvent(allEvents[0]);
+    }
+  } catch (err) {
+    console.error('Events load error:', err);
+    document.getElementById('events-loading').innerHTML = '<p class="text-red-500">Failed to load events: ' + err.message + '</p>';
+  }
+}
+
+// Renders events into the grid
+function renderEvents(events) {
+  const grid = document.getElementById('event-grid');
+  
+  if (!events || events.length === 0) {
+    grid.innerHTML = '<div class="md:col-span-12 py-16 text-center text-on-surface-variant"><span class="material-symbols-outlined text-4xl mb-4 block">event_busy</span><p class="font-body-lg">No events scheduled yet. Check back soon!</p></div>';
+    return;
+  }
+  
+  grid.innerHTML = events.map((event, index) => {
+    const date = new Date(event.event_date);
+    const day = date.getDate();
+    const month = date.toLocaleString('en', { month: 'short' }).toUpperCase();
+    const isPast = date < new Date();
+    const track = (event.category || '').toLowerCase();
+    
+    // Parse media for image gallery
+    let mediaUrls = [];
+    try { mediaUrls = JSON.parse(event.media_urls || '[]'); } catch(e) {}
+    
+    // Assign bento sizes and styles
+    const isLarge = index === 0 || index % 3 === 0;
+    const spans = isLarge ? 'md:col-span-8' : 'md:col-span-4';
+    
+    // Track colors
+    const trackColors = {
+      fintech: { border: 'pulse-track-blue', accent: 'bg-tech-blue/10 text-tech-blue' },
+      agtech: { border: 'pulse-track-green', accent: 'bg-jkuat-green/10 text-jkuat-green' },
+      featured: { border: 'pulse-track-blue', accent: 'bg-tech-blue/10 text-tech-blue' },
+      hackathon: { border: 'pulse-track-blue', accent: 'bg-tech-blue/10 text-tech-blue' },
+      leadership: { border: 'pulse-track-gold', accent: 'bg-jkuat-gold/10 text-on-secondary-container' },
+      networking: { border: 'pulse-track-red', accent: 'bg-red-500/10 text-red-600' },
+      workshop: { border: 'pulse-track-green', accent: 'bg-jkuat-green/10 text-jkuat-green' }
+    };
+    const tc = trackColors[track] || { border: 'pulse-track-blue', accent: 'bg-tech-blue/10 text-tech-blue' };
+    
+    // Background image for networking/dark cards
+    const hasBgImage = track === 'networking' || track === 'featured';
+    const bgStyle = hasBgImage && mediaUrls.length > 0 
+      ? `style="background-image: url('${mediaUrls[0]}'); background-size: cover; background-position: center;"` 
+      : '';
+    const textClass = hasBgImage ? 'text-white' : '';
+    const isDarkCard = hasBgImage;
+    
+    // Get first image for card preview
+    const previewImg = mediaUrls.find(u => isImageUrl(u));
+    
+    return `<div class="event-card ${spans} bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 ${tc.border} relative overflow-hidden group ${isPast ? 'opacity-60' : ''} cursor-pointer" data-track="${track}" onclick="openEventModal('${event.id}')">
+      ${!isDarkCard ? `<div class="absolute -right-16 -top-16 w-64 h-64 bg-tech-blue/5 rounded-full blur-3xl group-hover:bg-tech-blue/10 transition-colors"></div>` : ''}
+      <div class="relative z-10 ${textClass}">
+        <div class="flex justify-between items-start mb-8">
+          <span class="${tc.accent} px-3 py-1 rounded-full font-label-md text-label-md">${(event.category || 'Event').toUpperCase()}</span>
+          <div class="text-right">
+            <div class="font-headline-md text-headline-md leading-none">${day}</div>
+            <div class="font-label-md text-label-md opacity-60">${month}</div>
+          </div>
+        </div>
+        ${previewImg ? `<div class="mb-4 rounded-xl overflow-hidden h-40"><img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="${previewImg}" alt="${event.title}"/></div>` : ''}
+        <h3 class="font-headline-lg text-headline-lg mb-3">${event.title}</h3>
+        <p class="font-body-md text-body-md ${isDarkCard ? 'text-white/80' : 'text-on-surface-variant'} mb-6 line-clamp-3">${event.description || 'No description available.'}</p>
+        ${event.location ? `<div class="flex items-center gap-2 ${isDarkCard ? 'text-white/60' : 'text-on-surface-variant'} font-label-md text-label-md"><span class="material-symbols-outlined text-[18px]">location_on</span>${event.location}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Update featured hero
+function updateFeaturedEvent(event) {
+  const heroSection = document.querySelector('.relative.rounded-3xl.overflow-hidden.bg-white.shadow-xl');
+  if (!heroSection) return;
+  
+  let mediaUrls = [];
+  try { mediaUrls = JSON.parse(event.media_urls || '[]'); } catch(e) {}
+  const heroImg = mediaUrls.find(u => isImageUrl(u)) || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&h=600&fit=crop';
+  
+  const date = new Date(event.event_date);
+  const dateStr = date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+  
+  // Update the featured section
+  const img = heroSection.querySelector('img');
+  if (img) img.src = heroImg;
+  
+  const dateBadge = heroSection.querySelector('.bg-white\\/90');
+  if (dateBadge) dateBadge.textContent = dateStr;
+  
+  const title = heroSection.querySelector('h1');
+  if (title) title.innerHTML = event.title.replace(/\n/g, '<br/>');
+  
+  const desc = heroSection.querySelector('.font-body-lg.text-body-lg');
+  if (desc) desc.textContent = event.description || '';
+}
+
+// Open event detail modal
+async function openEventModal(eventId) {
+  const modal = document.getElementById('event-detail-modal');
+  const content = document.getElementById('event-modal-content');
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+  document.body.style.overflow = 'hidden';
+  
+  content.innerHTML = '<div class="flex items-center justify-center py-20 text-on-surface-variant"><span class="material-symbols-outlined animate-spin mr-3">sync</span>Loading event details...</div>';
+  
+  try {
+    const sb = initSupabase();
+    const { data, error } = await sb.from('events').select('*').eq('id', eventId).single();
+    if (error) throw error;
+    if (!data) throw new Error('Event not found');
+    
+    renderEventModalContent(data);
+  } catch (err) {
+    content.innerHTML = `<div class="p-8 text-center text-red-500"><span class="material-symbols-outlined text-4xl mb-4">error</span><p>${err.message}</p><button onclick="closeEventModal()" class="mt-6 px-6 py-3 bg-tech-blue text-white rounded-xl">Close</button></div>`;
+  }
+}
+
+function renderEventModalContent(event) {
+  const content = document.getElementById('event-modal-content');
+  const date = new Date(event.event_date);
+  
+  let mediaUrls = [];
+  try { mediaUrls = JSON.parse(event.media_urls || '[]'); } catch(e) {}
+  
+  const images = mediaUrls.filter(u => isImageUrl(u));
+  const videos = mediaUrls.filter(u => isVideoUrl(u));
+  
+  content.innerHTML = `
+    <div class="relative">
+      <!-- Close button -->
+      <button onclick="closeEventModal()" class="absolute top-4 right-4 z-20 w-10 h-10 bg-black/40 text-white rounded-full flex items-center justify-center hover:bg-black/60 transition-all">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+      
+      <!-- Image Gallery -->
+      ${images.length > 0 ? `
+      <div class="relative h-64 md:h-80 overflow-hidden bg-surface-container-high">
+        <div class="flex h-full transition-transform duration-500" id="event-gallery-track">
+          ${images.map((img, i) => `
+            <div class="min-w-full h-full flex-shrink-0 ${i === 0 ? '' : 'hidden'}" data-gallery-index="${i}">
+              <img class="w-full h-full object-cover" src="${img}" alt="${event.title} photo ${i+1}"/>
+            </div>
+          `).join('')}
+        </div>
+        ${images.length > 1 ? `
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+          ${images.map((_, i) => `
+            <button class="w-2 h-2 rounded-full ${i === 0 ? 'bg-white' : 'bg-white/40'} transition-all" onclick="showGalleryImage(${i})"></button>
+          `).join('')}
+        </div>
+        ` : ''}
+      </div>
+      ` : `
+      <div class="h-48 bg-gradient-to-br from-tech-blue/10 to-jkuat-green/10 flex items-center justify-center">
+        <span class="material-symbols-outlined text-6xl text-tech-blue/30">event</span>
+      </div>
+      `}
+      
+      <!-- Content -->
+      <div class="p-8">
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <span class="px-4 py-1.5 bg-tech-blue/10 text-tech-blue rounded-full font-label-md text-label-md">${(event.category || 'Event').toUpperCase()}</span>
+          <span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full font-label-md text-label-md flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+            ${date.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+          </span>
+          ${event.location ? `<span class="px-4 py-1.5 bg-surface-container-low text-on-surface-variant rounded-full font-label-md text-label-md flex items-center gap-1">
+            <span class="material-symbols-outlined text-[16px]">location_on</span>
+            ${event.location}
+          </span>` : ''}
+        </div>
+        
+        <h2 class="font-headline-lg text-headline-lg mb-4">${event.title}</h2>
+        <p class="font-body-lg text-body-lg text-on-surface-variant mb-8 leading-relaxed whitespace-pre-line">${event.description || 'No description available.'}</p>
+        
+        <!-- Videos -->
+        ${videos.length > 0 ? `
+        <div class="mb-8">
+          <h3 class="font-headline-md text-headline-md mb-4">Videos</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${videos.map(v => `
+              <div class="aspect-video rounded-xl overflow-hidden bg-black">
+                <video class="w-full h-full" controls src="${v}"></video>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+        ` : ''}
+        
+        <!-- CTAs -->
+        <div class="flex flex-wrap gap-4 pt-6 border-t border-outline-variant/30">
+          <button class="bg-tech-blue text-white px-8 py-4 rounded-xl font-button-text text-button-text hover:scale-105 transition-all shadow-lg flex items-center gap-2">
+            Reserve Seat <span class="material-symbols-outlined">arrow_forward</span>
+          </button>
+          <button class="border border-outline-variant text-on-surface px-8 py-4 rounded-xl font-button-text text-button-text hover:bg-surface-container-low transition-all flex items-center gap-2">
+            Sync to Calendar <span class="material-symbols-outlined">calendar_today</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// Gallery navigation
+let currentGalleryIndex = 0;
+function showGalleryImage(index) {
+  const track = document.getElementById('event-gallery-track');
+  if (!track) return;
+  
+  // Hide all, show selected
+  track.querySelectorAll('[data-gallery-index]').forEach(el => {
+    el.classList.add('hidden');
+  });
+  const selected = track.querySelector(`[data-gallery-index="${index}"]`);
+  if (selected) selected.classList.remove('hidden');
+  
+  // Update dots
+  const dots = track.closest('.relative.h-64')?.querySelectorAll('.rounded-full');
+  dots?.forEach((dot, i) => {
+    dot.className = `w-2 h-2 rounded-full ${i === index ? 'bg-white' : 'bg-white/40'} transition-all`;
+  });
+  
+  currentGalleryIndex = index;
+}
+
+// Close event modal
+function closeEventModal() {
+  const modal = document.getElementById('event-detail-modal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+  document.body.style.overflow = '';
+}
+
+// Close modal on Escape key
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeEventModal();
+});
+
 // Event filter logic
 document.querySelectorAll('.filter-btn-events').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -340,26 +556,21 @@ document.querySelectorAll('.filter-btn-events').forEach(btn => {
     btn.classList.add('bg-white', 'rounded-lg', 'shadow-sm', 'text-tech-blue');
     
     const track = btn.dataset.track;
-    document.querySelectorAll('.event-card').forEach(card => {
-      if (track === 'all' || card.dataset.track === track) {
-        card.style.display = '';
-      } else {
-        card.style.display = 'none';
-      }
-    });
+    eventFilter = track;
+    if (track === 'all') {
+      renderEvents(allEvents);
+    } else {
+      const filtered = allEvents.filter(e => (e.category || '').toLowerCase() === track);
+      renderEvents(filtered);
+    }
   });
 });
 
-document.querySelectorAll('.bento-card').forEach(card => {
-  card.addEventListener('mouseenter', () => {
-    const icon = card.querySelector('.material-symbols-outlined');
-    if (icon) icon.style.fontVariationSettings = "'FILL' 1";
-  });
-  card.addEventListener('mouseleave', () => {
-    const icon = card.querySelector('.material-symbols-outlined');
-    if (icon) icon.style.fontVariationSettings = "'FILL' 0";
-  });
+// Init
+document.addEventListener('DOMContentLoaded', () => {
+  loadEvents();
 });
+
 window.addEventListener('scroll', () => {
   const header = document.querySelector('header');
   if (window.scrollY > 50) { header.classList.add('shadow-md'); }
