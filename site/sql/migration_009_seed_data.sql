@@ -3,6 +3,15 @@
 -- Run this in Supabase SQL Editor to populate the database
 -- ================================================
 
+-- ===== SCHEMA FIXES (for databases created from older schema.sql) =====
+
+-- Add location column to events if missing
+ALTER TABLE events ADD COLUMN IF NOT EXISTS location TEXT;
+
+-- Ensure media_urls column exists
+ALTER TABLE events ADD COLUMN IF NOT EXISTS media_urls JSONB DEFAULT '[]'::jsonb;
+ALTER TABLE projects ADD COLUMN IF NOT EXISTS media_urls JSONB DEFAULT '[]'::jsonb;
+
 -- ===== EVENTS (with rich media galleries) =====
 
 -- First clear existing seed data to avoid duplicates
