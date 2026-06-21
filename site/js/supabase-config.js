@@ -656,6 +656,14 @@ const MOBILE_MENU_HTML = `
       <span class="material-symbols-outlined text-tech-blue text-xl">groups</span>
       Community
     </a>
+    <a href="blog.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container-low text-on-surface font-body-md transition-colors">
+      <span class="material-symbols-outlined text-tech-blue text-xl">article</span>
+      Blog
+    </a>
+    <a href="contact.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container-low text-on-surface font-body-md transition-colors">
+      <span class="material-symbols-outlined text-tech-blue text-xl">mail</span>
+      Contact
+    </a>
     <a href="merchandise.html" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-surface-container-low text-on-surface font-body-md transition-colors">
       <span class="material-symbols-outlined text-tech-blue text-xl">shopping_bag</span>
       Merchandise
