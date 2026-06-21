@@ -17,7 +17,7 @@ DROP TABLE IF EXISTS events CASCADE;
 -- ===== STEP 2: CREATE FRESH TABLES =====
 
 -- Members (registration form)
-CREATE TABLE members (
+CREATE TABLE IF NOT EXISTS members (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   full_name TEXT NOT NULL,
   reg_number TEXT NOT NULL,
@@ -32,14 +32,14 @@ CREATE TABLE members (
 );
 
 -- Newsletter subscribers
-CREATE TABLE newsletter (
+CREATE TABLE IF NOT EXISTS newsletter (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   email TEXT NOT NULL UNIQUE,
   subscribed_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 -- Payment transactions (M-Pesa via lipana.dev)
-CREATE TABLE payments (
+CREATE TABLE IF NOT EXISTS payments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   member_id UUID REFERENCES members(id) ON DELETE SET NULL,
   amount INTEGER NOT NULL,
@@ -51,7 +51,7 @@ CREATE TABLE payments (
 );
 
 -- Projects (for admin dashboard)
-CREATE TABLE projects (
+CREATE TABLE IF NOT EXISTS projects (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   team_lead TEXT NOT NULL,
@@ -62,7 +62,7 @@ CREATE TABLE projects (
 );
 
 -- Events (for admin dashboard)
-CREATE TABLE events (
+CREATE TABLE IF NOT EXISTS events (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   description TEXT,
@@ -72,7 +72,7 @@ CREATE TABLE events (
 );
 
 -- Blog posts (for public blog + admin)
-CREATE TABLE blog_posts (
+CREATE TABLE IF NOT EXISTS blog_posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title TEXT NOT NULL,
   content TEXT NOT NULL,
@@ -84,7 +84,7 @@ CREATE TABLE blog_posts (
 );
 
 -- Contact messages (from contact.html form)
-CREATE TABLE contact_messages (
+CREATE TABLE IF NOT EXISTS contact_messages (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   name TEXT NOT NULL,
   email TEXT NOT NULL,
