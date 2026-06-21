@@ -91,6 +91,15 @@ body { background: #f9f9fc; font-family: 'Inter', sans-serif; }
     <span class="material-symbols-outlined">calendar_month</span>
     <span class="font-body-md text-body-md">Events</span>
   </a>
+  <a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="#" data-view="blog">
+    <span class="material-symbols-outlined">article</span>
+    <span class="font-body-md text-body-md">Blog</span>
+  </a>
+  <a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="#" data-view="messages">
+    <span class="material-symbols-outlined">mail</span>
+    <span class="font-body-md text-body-md">Messages</span>
+  </a>
+  <div class="my-2 border-t border-outline-variant/20"></div>
   <a class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200" href="index.html">
     <span class="material-symbols-outlined">arrow_back</span>
     <span class="font-body-md text-body-md">Back to Site</span>
@@ -368,6 +377,67 @@ body { background: #f9f9fc; font-family: 'Inter', sans-serif; }
   </div>
 </div>
 
+<!-- ===================== BLOG VIEW ===================== -->
+<div id="view-blog" class="view-section">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="font-headline-md text-headline-md">Blog Posts</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Manage blog posts and announcements</p>
+    </div>
+    <button onclick="openModal('blog-modal')" class="bg-jkuat-green text-white px-6 py-3 rounded-xl font-button-text text-button-text flex items-center gap-2 hover:scale-105 transition-transform">
+      <span class="material-symbols-outlined text-[18px]">add</span> New Post
+    </button>
+  </div>
+  <div class="bento-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-wider">
+          <tr>
+            <th class="px-6 py-4">Title</th>
+            <th class="px-6 py-4">Author</th>
+            <th class="px-6 py-4">Category</th>
+            <th class="px-6 py-4">Published</th>
+            <th class="px-6 py-4"></th>
+          </tr>
+        </thead>
+        <tbody id="blog-tbody" class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+          <tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">Loading posts...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== MESSAGES VIEW ===================== -->
+<div id="view-messages" class="view-section">
+  <div class="flex justify-between items-center mb-6">
+    <div>
+      <h2 class="font-headline-md text-headline-md">Contact Messages</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">Messages from the contact form</p>
+    </div>
+    <span id="messages-count" class="bg-surface-container-low px-4 py-2 rounded-full font-label-md text-label-md text-on-surface-variant"></span>
+  </div>
+  <div class="bento-card overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead class="bg-surface-container-low text-on-surface-variant text-xs font-bold uppercase tracking-wider">
+          <tr>
+            <th class="px-6 py-4">Name</th>
+            <th class="px-6 py-4">Email</th>
+            <th class="px-6 py-4">Subject</th>
+            <th class="px-6 py-4">Date</th>
+            <th class="px-6 py-4">Status</th>
+            <th class="px-6 py-4"></th>
+          </tr>
+        </thead>
+        <tbody id="messages-tbody" class="divide-y divide-outline-variant/30 font-body-md text-body-md">
+          <tr><td colspan="6" class="px-6 py-8 text-center text-on-surface-variant">Loading messages...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
 </div>
 </main>
 
@@ -409,6 +479,49 @@ body { background: #f9f9fc; font-family: 'Inter', sans-serif; }
         <input id="project-category" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" placeholder="e.g., Fintech, AgTech"/>
       </div>
       <button type="submit" class="w-full py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:brightness-110 active:scale-95 transition-all">Save Project</button>
+    </form>
+  </div>
+</div>
+
+<!-- Blog Modal -->
+<div id="blog-modal" class="fixed inset-0 z-50 hidden items-center justify-center modal-overlay" onclick="closeModal(event, 'blog-modal')">
+  <div class="bg-white rounded-2xl p-8 w-full max-w-lg mx-4 shadow-2xl" onclick="event.stopPropagation()">
+    <div class="flex justify-between items-center mb-6">
+      <h3 id="blog-modal-title" class="font-headline-md text-headline-md">New Blog Post</h3>
+      <button onclick="closeModal(null, 'blog-modal')" class="text-on-surface-variant hover:text-on-surface"><span class="material-symbols-outlined">close</span></button>
+    </div>
+    <form id="blog-form" class="space-y-4" onsubmit="handleBlogForm(event)">
+      <input id="blog-id" type="hidden"/>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Title *</label>
+        <input id="blog-title" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" required/>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-label-md mb-1 text-on-surface">Author</label>
+          <input id="blog-author" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" placeholder="IEC JKUAT"/>
+        </div>
+        <div>
+          <label class="block text-label-md mb-1 text-on-surface">Category</label>
+          <select id="blog-category" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4">
+            <option value="">Select</option>
+            <option value="News">News</option>
+            <option value="Events">Events</option>
+            <option value="Spotlight">Spotlight</option>
+            <option value="Tech">Tech</option>
+            <option value="Community">Community</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Content *</label>
+        <textarea id="blog-content" class="w-full h-40 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4 py-3 resize-none" required></textarea>
+      </div>
+      <div>
+        <label class="block text-label-md mb-1 text-on-surface">Image URL (optional)</label>
+        <input id="blog-image" class="w-full h-12 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue px-4" placeholder="https://..."/>
+      </div>
+      <button type="submit" class="w-full py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:brightness-110 active:scale-95 transition-all">Publish Post</button>
     </form>
   </div>
 </div>
@@ -511,6 +624,8 @@ function switchView(view) {
   if (view === 'members') loadMembers();
   if (view === 'projects') loadProjectsView();
   if (view === 'events') loadEventsView();
+  if (view === 'blog') loadBlogView();
+  if (view === 'messages') loadMessagesView();
 }
 
 document.querySelectorAll('.sidebar-link[data-view]').forEach(link => {
@@ -537,14 +652,7 @@ function clearAndOpenProjectModal() {
   openModal('project-modal');
 }
 
-// ===== TOAST =====
-function showToast(msg, icon = 'check_circle', color = 'text-jkuat-green') {
-  const toast = document.getElementById('toast');
-  document.getElementById('toast-icon').className = `material-symbols-outlined ${color}`;
-  document.getElementById('toast-msg').textContent = msg;
-  toast.classList.remove('hidden');
-  setTimeout(() => toast.classList.add('hidden'), 3000);
-}
+// Toast uses shared showToast from supabase-config.js
 
 // ===== DASHBOARD =====
 async function loadDashboard() {
@@ -809,13 +917,17 @@ function confirmDelete(type, id, name) {
       if (type === 'member') await deleteMember(id);
       else if (type === 'project') await deleteProject(id);
       else if (type === 'event') await deleteEvent(id);
-      showToast(`${type} deleted!`);
+      else if (type === 'blog_post') await deleteBlogPost(id);
+      else if (type === 'contact_message') await deleteContactMessage(id);
+      showToast(`${type.replace('_', ' ')} deleted!`);
       closeModal(null, 'confirm-modal');
       loadDashboard();
-      if (currentView === type + 's') {
+      if (currentView === type + 's' || (type === 'blog_post' && currentView === 'blog') || (type === 'contact_message' && currentView === 'messages')) {
         if (type === 'member') loadMembers();
         else if (type === 'project') loadProjectsView();
         else if (type === 'event') loadEventsView();
+        else if (type === 'blog_post') loadBlogView();
+        else if (type === 'contact_message') loadMessagesView();
       }
     } catch (err) {
       showToast('Error: ' + err.message, 'error', 'text-red-500');
@@ -838,6 +950,92 @@ function handleBroadcast(e) {
   }, 2500);
 }
 
+// ===== BLOG CRUD =====
+async function loadBlogView() {
+  try {
+    document.getElementById('blog-tbody').innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">Loading...</td></tr>`;
+    const data = await getBlogPosts();
+    const tbody = document.getElementById('blog-tbody');
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">No blog posts yet</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(p => {
+      const date = new Date(p.published_at);
+      return `<tr class="hover:bg-surface-container-low transition-colors group">
+        <td class="px-6 py-4 font-bold max-w-xs truncate">${p.title}</td>
+        <td class="px-6 py-4 text-on-surface-variant">${p.author || '—'}</td>
+        <td class="px-6 py-4">${p.category ? `<span class="px-3 py-1 bg-tech-blue/10 text-tech-blue rounded-full text-xs font-bold">${p.category}</span>` : '—'}</td>
+        <td class="px-6 py-4 text-on-surface-variant">${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+        <td class="px-6 py-4 text-right">
+          <button onclick="confirmDelete('blog_post', '${p.id}', '${p.title.replace(/'/g, "\\'")}')" class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-red-400 hover:text-red-600 transition-all">delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    console.log('Blog load error:', err.message);
+  }
+}
+
+async function handleBlogForm(e) {
+  e.preventDefault();
+  const id = document.getElementById('blog-id').value;
+  const post = {
+    title: document.getElementById('blog-title').value,
+    content: document.getElementById('blog-content').value,
+    author: document.getElementById('blog-author').value || 'IEC JKUAT',
+    category: document.getElementById('blog-category').value || null,
+    image_url: document.getElementById('blog-image').value || null
+  };
+  
+  try {
+    if (id) {
+      await updateBlogPost(id, post);
+      showToast('Post updated!');
+    } else {
+      await addBlogPost(post);
+      showToast('Post published!');
+    }
+    closeModal(null, 'blog-modal');
+    document.getElementById('blog-form').reset();
+    document.getElementById('blog-id').value = '';
+    loadBlogView();
+  } catch (err) {
+    showToast('Error: ' + err.message, 'error', 'text-red-500');
+  }
+}
+
+// ===== CONTACT MESSAGES =====
+async function loadMessagesView() {
+  try {
+    document.getElementById('messages-tbody').innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-on-surface-variant">Loading...</td></tr>`;
+    const data = await getContactMessages();
+    const tbody = document.getElementById('messages-tbody');
+    const unread = data.filter(m => !m.is_read).length;
+    document.getElementById('messages-count').textContent = `${unread} unread / ${data.length} total`;
+    
+    if (data.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="6" class="px-6 py-8 text-center text-on-surface-variant">No messages yet</td></tr>`;
+      return;
+    }
+    tbody.innerHTML = data.map(m => {
+      const date = new Date(m.created_at);
+      return `<tr class="hover:bg-surface-container-low transition-colors group ${!m.is_read ? 'font-bold bg-tech-blue/5' : ''}">
+        <td class="px-6 py-4">${m.name}</td>
+        <td class="px-6 py-4 text-on-surface-variant text-sm">${m.email}</td>
+        <td class="px-6 py-4 max-w-xs truncate">${m.subject}</td>
+        <td class="px-6 py-4 text-on-surface-variant text-sm">${date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</td>
+        <td class="px-6 py-4">${m.is_read ? '<span class="text-xs text-on-surface-variant/60">Read</span>' : '<span class="px-3 py-1 bg-tech-blue/10 text-tech-blue rounded-full text-xs font-bold">New</span>'}</td>
+        <td class="px-6 py-4 text-right">
+          <button onclick="confirmDelete('contact_message', '${m.id}', '${m.subject.replace(/'/g, "\\'")}')" class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-red-400 hover:text-red-600 transition-all">delete</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (err) {
+    console.log('Messages load error:', err.message);
+  }
+}
+
 // ===== SEARCH =====
 let searchTimeout = null;
 document.getElementById('global-search').addEventListener('input', (e) => {
@@ -847,8 +1045,10 @@ document.getElementById('global-search').addEventListener('input', (e) => {
     if (currentView === 'dashboard') return;
     
     // Show loading state
-    const tbodyId = currentView === 'members' ? 'members-tbody' : currentView === 'projects' ? 'projects-tbody' : 'events-tbody';
-    document.getElementById(tbodyId).innerHTML = `<tr><td colspan="9" class="px-6 py-8 text-center text-on-surface-variant">Searching...</td></tr>`;
+    const tbodyMap = { members: 'members-tbody', projects: 'projects-tbody', events: 'events-tbody', blog: 'blog-tbody', messages: 'messages-tbody' };
+    const tbodyId = tbodyMap[currentView] || 'events-tbody';
+    const el = document.getElementById(tbodyId);
+    if (el) el.innerHTML = `<tr><td colspan="9" class="px-6 py-8 text-center text-on-surface-variant">Searching...</td></tr>`;
     
     if (currentView === 'members') loadMembers(q);
     else if (currentView === 'projects') {
@@ -873,6 +1073,25 @@ document.getElementById('global-search').addEventListener('input', (e) => {
     } else if (currentView === 'events') {
       getEvents(q).then(data => {
         renderEventsTable(data, 'events-tbody');
+      }).catch(() => {});
+    } else if (currentView === 'blog') {
+      getBlogPosts().then(data => {
+        const filtered = data.filter(p => p.title.toLowerCase().includes(q.toLowerCase()));
+        const tbody = document.getElementById('blog-tbody');
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-on-surface-variant">No results for "${q}"</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = filtered.map(p => {
+          const date = new Date(p.published_at);
+          return `<tr class="hover:bg-surface-container-low transition-colors group">
+            <td class="px-6 py-4 font-bold max-w-xs truncate">${p.title}</td>
+            <td class="px-6 py-4 text-on-surface-variant">${p.author || '—'}</td>
+            <td class="px-6 py-4">${p.category ? `<span class="px-3 py-1 bg-tech-blue/10 text-tech-blue rounded-full text-xs font-bold">${p.category}</span>` : '—'}</td>
+            <td class="px-6 py-4 text-on-surface-variant">${date.toLocaleDateString()}</td>
+            <td class="px-6 py-4 text-right"><button onclick="confirmDelete('blog_post', '${p.id}', '${p.title.replace(/'/g, "\\'")}')" class="opacity-0 group-hover:opacity-100 material-symbols-outlined text-red-400 hover:text-red-600 transition-all">delete</button></td>
+          </tr>`;
+        }).join('');
       }).catch(() => {});
     }
   }, 300);

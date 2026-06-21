@@ -154,6 +154,59 @@ async function deleteEvent(id) {
   return true;
 }
 
+// ===== Blog CRUD =====
+
+async function getBlogPosts() {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('blog_posts').select('*').order('published_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+async function addBlogPost(post) {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('blog_posts').insert([post]).select();
+  if (error) throw error;
+  return data;
+}
+
+async function updateBlogPost(id, updates) {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('blog_posts').update(updates).eq('id', id).select();
+  if (error) throw error;
+  return data;
+}
+
+async function deleteBlogPost(id) {
+  const sb = initSupabase();
+  const { error } = await sb.from('blog_posts').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+// ===== Contact Messages =====
+
+async function getContactMessages() {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('contact_messages').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
+async function markMessageRead(id) {
+  const sb = initSupabase();
+  const { error } = await sb.from('contact_messages').update({ is_read: true }).eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
+async function deleteContactMessage(id) {
+  const sb = initSupabase();
+  const { error } = await sb.from('contact_messages').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
 // Get member signup stats by month (for growth chart)
 async function getMemberGrowth() {
   const sb = initSupabase();
@@ -233,6 +286,70 @@ function formatTimeAgo(dateStr) {
   if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
   if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
   return date.toLocaleDateString();
+}
+
+// ===== Dark Mode Toggle =====
+
+function initDarkMode() {
+  const stored = localStorage.getItem('iec-dark-mode');
+  if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    document.documentElement.classList.add('dark');
+  } else {
+    document.documentElement.classList.remove('dark');
+  }
+}
+
+function toggleDarkMode() {
+  const html = document.documentElement;
+  if (html.classList.contains('dark')) {
+    html.classList.remove('dark');
+    localStorage.setItem('iec-dark-mode', 'light');
+  } else {
+    html.classList.add('dark');
+    localStorage.setItem('iec-dark-mode', 'dark');
+  }
+}
+
+// Dark mode toggle button HTML fragment
+const DARK_MODE_BUTTON = `
+<button onclick="toggleDarkMode()" class="p-2 text-on-surface-variant hover:text-tech-blue transition-colors" title="Toggle dark mode">
+  <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+  <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+</button>
+`;
+
+// Auto-init dark mode
+initDarkMode();
+
+// ===== Toast Notification =====
+
+function showToast(message, type = 'success') {
+  const colors = {
+    success: 'bg-jkuat-green text-white',
+    error: 'bg-red-500 text-white',
+    info: 'bg-tech-blue text-white'
+  };
+  const icons = {
+    success: 'check_circle',
+    error: 'error',
+    info: 'info'
+  };
+  
+  // Remove existing toast
+  const existing = document.getElementById('iec-toast');
+  if (existing) existing.remove();
+  
+  const toast = document.createElement('div');
+  toast.id = 'iec-toast';
+  toast.className = `fixed bottom-8 right-8 z-[100] ${colors[type] || colors.success} rounded-xl px-6 py-4 shadow-2xl flex items-center gap-3 font-body-md text-body-md transition-all duration-300 translate-y-0 opacity-100`;
+  toast.innerHTML = `<span class="material-symbols-outlined">${icons[type] || icons.success}</span><span>${message}</span>`;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.style.transform = 'translateY(20px)';
+    toast.style.opacity = '0';
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }
 
 // ===== Navigation & UI Utilities =====

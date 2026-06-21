@@ -139,6 +139,10 @@ tailwind.config = {
     <a href="merchandise.html" class="hidden md:flex items-center px-6 py-2.5 bg-jkuat-green text-white font-button-text text-button-text rounded-full scale-95 active:scale-90 transition-transform">
       Merchandise
     </a>
+    <button onclick="toggleDarkMode()" class="hidden md:flex p-2 text-on-surface-variant hover:text-tech-blue transition-colors" title="Toggle dark mode">
+      <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+      <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+    </button>
     <button class="md:hidden p-2 text-on-surface-variant" onclick="toggleMobileMenu()">
       <span class="material-symbols-outlined">menu</span>
     </button>
@@ -206,18 +210,18 @@ tailwind.config = {
     <h2 class="font-headline-lg text-headline-lg mb-2">Project Library</h2>
     <p class="font-body-md text-body-md text-on-surface-variant">Explore the next generation of African innovation.</p>
   </div>
-  <div class="flex flex-wrap gap-2 overflow-x-auto pb-2 w-full md:w-auto">
-    <button class="filter-btn active px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md transition-all">All</button>
-    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all">Fintech</button>
-    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all">AgTech</button>
-    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all">HealthTech</button>
-    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all">Social Impact</button>
+  <div class="flex flex-wrap gap-2 overflow-x-auto pb-2 w-full md:w-auto" id="project-filters">
+    <button class="filter-btn active px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md transition-all" data-category="all">All</button>
+    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all" data-category="fintech">Fintech</button>
+    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all" data-category="agtech">AgTech</button>
+    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all" data-category="healthtech">HealthTech</button>
+    <button class="filter-btn px-6 py-2 rounded-full border border-outline-variant font-label-md text-label-md hover:border-tech-blue transition-all" data-category="social">Social Impact</button>
   </div>
 </div>
 <!-- Bento Grid -->
 <div class="grid grid-cols-1 md:grid-cols-12 gap-bento-gap">
   <!-- Card 1 (Large) -->
-  <div class="bento-card md:col-span-8 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col">
+  <div class="bento-card project-card md:col-span-8 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="fintech">
     <div class="relative h-64 overflow-hidden">
       <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=400&fit=crop" alt="Tech meeting flatlay"/>
       <div class="absolute top-4 right-4">
@@ -234,7 +238,7 @@ tailwind.config = {
     </div>
   </div>
   <!-- Card 2 (Small) -->
-  <div class="bento-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col">
+  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="healthtech">
     <div class="relative h-48 bg-tech-blue/10 flex items-center justify-center">
       <span class="material-symbols-outlined text-tech-blue text-6xl">health_and_safety</span>
       <div class="absolute top-4 right-4">
@@ -250,7 +254,7 @@ tailwind.config = {
     </div>
   </div>
   <!-- Card 3 (Small) -->
-  <div class="bento-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col">
+  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="agtech">
     <div class="relative h-48 overflow-hidden">
       <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=300&fit=crop" alt="Electric motorcycle"/>
       <div class="absolute top-4 right-4">
@@ -266,7 +270,7 @@ tailwind.config = {
     </div>
   </div>
   <!-- Card 4 (Medium) -->
-  <div class="bento-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col">
+  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="social">
     <div class="p-8 bg-jkuat-gold/5 flex-grow">
       <div class="flex items-center gap-3 mb-6">
         <span class="material-symbols-outlined text-jkuat-gold text-4xl">energy_savings_leaf</span>
@@ -280,7 +284,7 @@ tailwind.config = {
     </div>
   </div>
   <!-- Card 5 (Small) -->
-  <div class="bento-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col">
+  <div class="bento-card project-card md:col-span-4 bg-white rounded-3xl border border-outline-variant/30 overflow-hidden flex flex-col" data-category="healthtech">
     <div class="relative h-48 overflow-hidden">
       <img class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=600&h=300&fit=crop" alt="Education app UI"/>
       <div class="absolute top-4 right-4">
@@ -330,6 +334,8 @@ tailwind.config = {
   <div class="flex flex-col gap-4">
     <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase">Explore</h4>
     <a class="font-body-md text-body-md text-on-surface-variant hover:text-jkuat-gold transition-colors" href="community.html">Community</a>
+    <a class="font-body-md text-body-md text-on-surface-variant hover:text-jkuat-gold transition-colors" href="blog.html">Blog</a>
+    <a class="font-body-md text-body-md text-on-surface-variant hover:text-jkuat-gold transition-colors" href="contact.html">Contact</a>
     <a class="font-body-md text-body-md text-on-surface-variant hover:text-jkuat-gold transition-colors" href="privacy.html">Privacy Policy</a>
     <a class="font-body-md text-body-md text-on-surface-variant hover:text-jkuat-gold transition-colors" href="terms.html">Terms of Service</a>
     <a class="font-body-md text-body-md text-on-surface-variant hover:text-jkuat-gold transition-colors" href="merchandise.html">Merchandise</a>
@@ -344,9 +350,9 @@ tailwind.config = {
   <div class="flex flex-col gap-4">
     <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase">Follow Us</h4>
     <div class="flex gap-4">
-      <a class="text-on-surface-variant hover:text-tech-blue" href="#"><span class="material-symbols-outlined">public</span></a>
-      <a class="text-on-surface-variant hover:text-tech-blue" href="#"><span class="material-symbols-outlined">alternate_email</span></a>
-      <a class="text-on-surface-variant hover:text-tech-blue" href="#"><span class="material-symbols-outlined">share</span></a>
+      <a class="text-on-surface-variant hover:text-tech-blue hover:scale-110 transition-all" href="https://twitter.com/iecjkuat" target="_blank" rel="noopener"><span class="material-symbols-outlined">alternate_email</span></a>
+      <a class="text-on-surface-variant hover:text-tech-blue hover:scale-110 transition-all" href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener"><span class="material-symbols-outlined">work</span></a>
+      <a class="text-on-surface-variant hover:text-tech-blue hover:scale-110 transition-all" href="https://instagram.com/iecjkuat" target="_blank" rel="noopener"><span class="material-symbols-outlined">photo_camera</span></a>
     </div>
   </div>
 </div>
@@ -357,14 +363,25 @@ tailwind.config = {
 </footer>
 
 <script>
+// Project filter logic
 document.querySelectorAll('.filter-btn').forEach(button => {
   button.addEventListener('click', () => {
     document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
     button.classList.add('active');
     button.classList.add('scale-95');
     setTimeout(() => button.classList.remove('scale-95'), 100);
+    
+    const category = button.dataset.category;
+    document.querySelectorAll('.project-card').forEach(card => {
+      if (category === 'all' || card.dataset.category === category) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
   });
 });
+
 let lastScroll = 0;
 const nav = document.querySelector('header');
 window.addEventListener('scroll', () => {

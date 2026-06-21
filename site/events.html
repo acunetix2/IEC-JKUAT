@@ -139,6 +139,10 @@ tailwind.config = {
   <div class="flex items-center gap-4">
     <a href="merchandise.html" class="hidden lg:block text-tech-blue hover:scale-105 transition-transform font-button-text text-button-text">Merchandise</a>
     <a href="index.html#join" class="bg-jkuat-green text-white px-6 py-3 rounded-xl font-button-text text-button-text scale-98 hover:scale-100 transition-all shadow-md">Join Club</a>
+    <button onclick="toggleDarkMode()" class="hidden md:flex p-2 text-on-surface-variant hover:text-tech-blue transition-colors" title="Toggle dark mode">
+      <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+      <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+    </button>
     <button class="md:hidden p-2 text-on-surface-variant" onclick="toggleMobileMenu()">
       <span class="material-symbols-outlined">menu</span>
     </button>
@@ -187,16 +191,21 @@ tailwind.config = {
       <h2 class="font-headline-lg text-headline-lg mb-2">The Venture <span class="text-tech-blue">Pulse</span> Calendar</h2>
       <p class="font-body-md text-body-md text-on-surface-variant">Stay updated with tracks, hackathons, and growth sessions.</p>
     </div>
-    <div class="flex gap-2 p-1 bg-surface-container rounded-xl">
-      <button class="px-4 py-2 bg-white rounded-lg shadow-sm font-label-md text-label-md text-tech-blue">All Tracks</button>
-      <button class="px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md">Fintech</button>
-      <button class="px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md">AgTech</button>
-      <button class="px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md">EdTech</button>
+    <div class="flex gap-2 p-1 bg-surface-container rounded-xl" id="event-filters">
+      <button class="filter-btn-events px-4 py-2 bg-white rounded-lg shadow-sm font-label-md text-label-md text-tech-blue" data-track="all">All Tracks</button>
+      <button class="filter-btn-events px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md" data-track="fintech">Fintech</button>
+      <button class="filter-btn-events px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md" data-track="agtech">AgTech</button>
+      <button class="filter-btn-events px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md" data-track="edtech">EdTech</button>
+      <button class="filter-btn-events px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md" data-track="leadership">Leadership</button>
+      <button class="filter-btn-events px-4 py-2 hover:bg-white/50 rounded-lg transition-all font-label-md text-label-md" data-track="networking">Networking</button>
     </div>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gutter" id="event-grid">
+    <!-- Event 1: Hackathon (Wide) -->
   </div>
   <div class="grid grid-cols-1 md:grid-cols-12 gap-grid-gutter">
     <!-- Event 1: Hackathon (Wide) -->
-    <div class="md:col-span-8 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-blue relative overflow-hidden group">
+    <div class="event-card md:col-span-8 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-blue relative overflow-hidden group" data-track="fintech">
       <div class="absolute -right-16 -top-16 w-64 h-64 bg-tech-blue/5 rounded-full blur-3xl group-hover:bg-tech-blue/10 transition-colors"></div>
       <div class="relative z-10">
         <div class="flex justify-between items-start mb-12">
@@ -225,7 +234,7 @@ tailwind.config = {
       </div>
     </div>
     <!-- Event 2: Speaker Session -->
-    <div class="md:col-span-4 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-gold relative overflow-hidden">
+    <div class="event-card md:col-span-4 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-gold relative overflow-hidden" data-track="leadership">
       <div class="flex flex-col h-full">
         <span class="bg-jkuat-gold/10 text-on-secondary-container px-3 py-1 rounded-full font-label-md text-label-md self-start mb-8">LEADERSHIP</span>
         <h3 class="font-headline-md text-headline-md mb-4">Founder's Fireside: Scaling from JKUAT</h3>
@@ -239,7 +248,7 @@ tailwind.config = {
       </div>
     </div>
     <!-- Event 3: Track Intro -->
-    <div class="md:col-span-4 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-green relative overflow-hidden">
+    <div class="event-card md:col-span-4 bg-white p-8 rounded-3xl bento-card border border-surface-variant/30 pulse-track-green relative overflow-hidden" data-track="agtech">
       <div class="flex flex-col h-full">
         <span class="bg-jkuat-green/10 text-jkuat-green px-3 py-1 rounded-full font-label-md text-label-md self-start mb-8">AGTECH TRACK</span>
         <h3 class="font-headline-md text-headline-md mb-4">Precision Farming Workshop</h3>
@@ -250,7 +259,7 @@ tailwind.config = {
       </div>
     </div>
     <!-- Event 4: Networking (Wide) -->
-    <div class="md:col-span-8 bg-on-tertiary-fixed-variant text-white p-8 rounded-3xl bento-card border-none relative overflow-hidden">
+    <div class="event-card md:col-span-8 bg-on-tertiary-fixed-variant text-white p-8 rounded-3xl bento-card border-none relative overflow-hidden" data-track="networking">
       <div class="absolute inset-0 opacity-20">
         <div class="w-full h-full bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=400&fit=crop')"></div>
       </div>
@@ -316,10 +325,22 @@ tailwind.config = {
 <footer class="bg-surface-container dark:bg-surface-container-lowest border-t border-surface-variant/30 py-section-padding">
 <div class="flex flex-col items-center justify-center w-full px-grid-margin max-w-7xl mx-auto">
   <div class="font-headline-md text-headline-md font-bold text-jkuat-green mb-8">IEC JKUAT</div>
+  <div class="flex gap-4 mb-8">
+    <a href="https://twitter.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all">
+      <span class="material-symbols-outlined text-xl">alternate_email</span>
+    </a>
+    <a href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all">
+      <span class="material-symbols-outlined text-xl">work</span>
+    </a>
+    <a href="https://instagram.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all">
+      <span class="material-symbols-outlined text-xl">photo_camera</span>
+    </a>
+  </div>
   <div class="flex flex-wrap justify-center gap-8 mb-12">
     <a class="text-on-surface-variant hover:text-jkuat-gold transition-colors font-body-md text-body-md" href="events.html">Events</a>
     <a class="text-on-surface-variant hover:text-jkuat-gold transition-colors font-body-md text-body-md" href="merchandise.html">Merchandise</a>
     <a class="text-on-surface-variant hover:text-jkuat-gold transition-colors font-body-md text-body-md" href="community.html">Community</a>
+    <a class="text-on-surface-variant hover:text-jkuat-gold transition-colors font-body-md text-body-md" href="contact.html">Contact</a>
     <a class="text-on-surface-variant hover:text-jkuat-gold transition-colors font-body-md text-body-md" href="privacy.html">Privacy Policy</a>
   </div>
   <p class="text-on-surface-variant font-body-md text-body-md text-center opacity-60">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club. Venture First.</p>
@@ -327,6 +348,27 @@ tailwind.config = {
 </footer>
 
 <script>
+// Event filter logic
+document.querySelectorAll('.filter-btn-events').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.filter-btn-events').forEach(b => {
+      b.classList.remove('bg-white', 'rounded-lg', 'shadow-sm', 'text-tech-blue');
+      b.classList.add('hover:bg-white/50');
+    });
+    btn.classList.remove('hover:bg-white/50');
+    btn.classList.add('bg-white', 'rounded-lg', 'shadow-sm', 'text-tech-blue');
+    
+    const track = btn.dataset.track;
+    document.querySelectorAll('.event-card').forEach(card => {
+      if (track === 'all' || card.dataset.track === track) {
+        card.style.display = '';
+      } else {
+        card.style.display = 'none';
+      }
+    });
+  });
+});
+
 document.querySelectorAll('.bento-card').forEach(card => {
   card.addEventListener('mouseenter', () => {
     const icon = card.querySelector('.material-symbols-outlined');

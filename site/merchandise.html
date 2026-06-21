@@ -140,6 +140,10 @@ tailwind.config = {
     <button class="bg-tech-blue text-white px-6 py-2.5 rounded-full font-label-md text-label-md scale-98 transition-all hover:opacity-90">
       <span class="material-symbols-outlined align-middle mr-1" style="font-size: 18px;">shopping_bag</span> Bag
     </button>
+    <button onclick="toggleDarkMode()" class="hidden md:flex p-2 text-on-surface-variant hover:text-tech-blue transition-colors" title="Toggle dark mode">
+      <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+      <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+    </button>
     <button class="md:hidden p-2 text-on-surface-variant" onclick="toggleMobileMenu()">
       <span class="material-symbols-outlined">menu</span>
     </button>
@@ -305,7 +309,21 @@ tailwind.config = {
     <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface hover:text-jkuat-gold transition-colors" href="events.html">Events</a>
     <a class="font-body-md text-body-md text-jkuat-gold font-bold" href="merchandise.html">Merchandise</a>
     <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface hover:text-jkuat-gold transition-colors" href="community.html">Community</a>
+    <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface hover:text-jkuat-gold transition-colors" href="contact.html">Contact</a>
     <a class="font-body-md text-body-md text-on-surface-variant dark:text-on-surface hover:text-jkuat-gold transition-colors" href="privacy.html">Privacy Policy</a>
+  </div>
+  <div class="flex gap-4 mb-8">
+    <a href="https://twitter.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all">
+      <span class="material-symbols-outlined text-xl">alternate_email</span>
+    </a>
+    <a href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all">
+      <span class="material-symbols-outlined text-xl">work</span>
+    </a>
+    <a href="https://instagram.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all">
+      <span class="material-symbols-outlined text-xl">photo_camera</span>
+    </a>
+  </div>
+  <p class="font-body-md text-body-md text-on-surface-variant text-center opacity-60">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club. Venture First.</p>
   </div>
   <p class="font-body-md text-body-md text-on-surface-variant text-center opacity-60">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club. Venture First.</p>
 </div>

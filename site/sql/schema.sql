@@ -6,6 +6,8 @@
 -- ===== STEP 1: DROP EVERYTHING EXISTING =====
 
 -- Drop tables (order matters due to foreign key in payments.member_id)
+DROP TABLE IF EXISTS blog_posts CASCADE;
+DROP TABLE IF EXISTS contact_messages CASCADE;
 DROP TABLE IF EXISTS payments CASCADE;
 DROP TABLE IF EXISTS newsletter CASCADE;
 DROP TABLE IF EXISTS members CASCADE;
@@ -69,6 +71,29 @@ CREATE TABLE events (
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Blog posts (for public blog + admin)
+CREATE TABLE blog_posts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  author TEXT,
+  category TEXT,
+  image_url TEXT,
+  published_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+-- Contact messages (from contact.html form)
+CREATE TABLE contact_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  is_read BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
 -- ===== STEP 3: ROW LEVEL SECURITY =====
 
 ALTER TABLE members ENABLE ROW LEVEL SECURITY;
@@ -76,6 +101,8 @@ ALTER TABLE newsletter ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE blog_posts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
 -- Anon users can insert
 CREATE POLICY "Allow anon insert members" ON members
@@ -94,6 +121,14 @@ CREATE POLICY "Allow anon select projects" ON projects
 CREATE POLICY "Allow anon select events" ON events
   FOR SELECT TO anon USING (true);
 
+-- Anon can read blog posts
+CREATE POLICY "Allow anon select blog_posts" ON blog_posts
+  FOR SELECT TO anon USING (true);
+
+-- Anon can insert contact messages
+CREATE POLICY "Allow anon insert contact_messages" ON contact_messages
+  FOR INSERT TO anon WITH CHECK (true);
+
 -- Service role has full access
 CREATE POLICY "Allow service_role all members" ON members
   FOR ALL TO service_role USING (true) WITH CHECK (true);
@@ -108,6 +143,12 @@ CREATE POLICY "Allow service_role all projects" ON projects
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 CREATE POLICY "Allow service_role all events" ON events
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow service_role all blog_posts" ON blog_posts
+  FOR ALL TO service_role USING (true) WITH CHECK (true);
+
+CREATE POLICY "Allow service_role all contact_messages" ON contact_messages
   FOR ALL TO service_role USING (true) WITH CHECK (true);
 
 -- ===== STEP 4: SEED SAMPLE DATA =====

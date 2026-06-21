@@ -46,7 +46,13 @@ tailwind.config = {
 <nav class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-glass-border shadow-sm">
 <div class="flex justify-between items-center px-grid-margin py-4 max-w-7xl mx-auto">
   <a href="index.html" class="text-headline-md font-bold text-jkuat-green">IEC JKUAT</a>
-  <a href="index.html" class="font-label-md text-label-md text-tech-blue hover:underline">&larr; Back to Home</a>
+  <div class="flex items-center gap-4">
+    <button onclick="toggleDarkMode()" class="p-2 text-on-surface-variant hover:text-tech-blue transition-colors" title="Toggle dark mode">
+      <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+      <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+    </button>
+    <a href="index.html" class="font-label-md text-label-md text-tech-blue hover:underline">&larr; Back to Home</a>
+  </div>
 </div>
 </nav>
 <main class="pt-32 pb-section-padding px-grid-margin max-w-4xl mx-auto">
@@ -66,6 +72,20 @@ tailwind.config = {
   </div>
 </main>
 <footer class="border-t border-outline-variant/30 py-section-padding text-center">
+  <div class="flex justify-center gap-6 mb-6">
+    <a href="https://twitter.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue transition-all">
+      <span class="material-symbols-outlined text-xl">alternate_email</span>
+    </a>
+    <a href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue transition-all">
+      <span class="material-symbols-outlined text-xl">work</span>
+    </a>
+    <a href="https://instagram.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue transition-all">
+      <span class="material-symbols-outlined text-xl">photo_camera</span>
+    </a>
+    <a href="mailto:info@iec.jkuat.org" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue transition-all">
+      <span class="material-symbols-outlined text-xl">mail</span>
+    </a>
+  </div>
   <p class="text-on-surface-variant/60 font-body-md">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club.</p>
 </footer>
 </body>

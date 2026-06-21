@@ -139,6 +139,10 @@ tailwind.config = {
   <div class="flex gap-4">
     <a class="hidden sm:block px-6 py-2.5 bg-jkuat-green text-white font-button-text text-button-text rounded-full hover:scale-105 active:scale-95 transition-transform" href="#join">Join the Hub</a>
     <a href="merchandise.html" class="hidden sm:block px-6 py-2.5 border-2 border-jkuat-green text-jkuat-green font-button-text text-button-text rounded-full hover:bg-jkuat-green hover:text-white transition-all">Merch</a>
+    <button onclick="toggleDarkMode()" class="hidden md:flex p-2 text-on-surface-variant hover:text-tech-blue transition-colors" title="Toggle dark mode">
+      <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+      <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
+    </button>
     <button class="md:hidden p-2 text-on-surface-variant" onclick="toggleMobileMenu()">
       <span class="material-symbols-outlined">menu</span>
     </button>
@@ -418,8 +422,14 @@ tailwind.config = {
       Raising future leaders with strong character, technical excellence, and a global outlook.
     </p>
     <div class="flex gap-4">
-          <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="community.html">
-        <span class="material-symbols-outlined text-xl">share</span>
+      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="https://twitter.com/iecjkuat" target="_blank" rel="noopener">
+        <span class="material-symbols-outlined text-xl">alternate_email</span>
+      </a>
+      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener">
+        <span class="material-symbols-outlined text-xl">work</span>
+      </a>
+      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="https://instagram.com/iecjkuat" target="_blank" rel="noopener">
+        <span class="material-symbols-outlined text-xl">photo_camera</span>
       </a>
       <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="mailto:info@iec.jkuat.org">
         <span class="material-symbols-outlined text-xl">mail</span>
@@ -433,6 +443,8 @@ tailwind.config = {
       <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="events.html">Events</a></li>
       <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="showcase.html">Projects</a></li>
       <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="community.html">Community</a></li>
+      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="blog.html">Blog</a></li>
+      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="contact.html">Contact</a></li>
       <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="merchandise.html">Merchandise</a></li>
     </ul>
   </div>
