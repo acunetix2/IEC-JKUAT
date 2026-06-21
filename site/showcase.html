@@ -154,27 +154,25 @@ tailwind.config = {
 
 <main class="pt-24 pb-section-padding">
 
-<!-- Hero Section: Featured Project -->
+<!-- Hero Section: Featured Project (loaded from Supabase) -->
 <section class="px-grid-margin max-w-7xl mx-auto mb-stack-lg">
 <div class="mb-stack-md text-center md:text-left">
   <h1 class="font-display-lg text-display-lg md:text-display-lg text-headline-lg-mobile mb-2">Project Showcase</h1>
   <p class="font-headline-md text-headline-md text-on-surface-variant opacity-80">Where Ideas Take Flight.</p>
 </div>
-<div class="relative group rounded-3xl overflow-hidden bg-white border border-outline-variant/30 shadow-lg flex flex-col md:flex-row min-h-[500px]">
-  <div class="w-full md:w-1/2 relative h-64 md:h-auto overflow-hidden">
-    <img class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop" alt="AgTech sensor device in farm"/>
+<div id="featured-project" class="relative group rounded-3xl overflow-hidden bg-white border border-outline-variant/30 shadow-lg flex flex-col md:flex-row min-h-[500px]">
+  <div class="w-full md:w-1/2 relative h-64 md:h-auto overflow-hidden bg-surface-container-high">
+    <img id="featured-project-img" class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop" alt="Featured project"/>
     <div class="absolute top-6 left-6 flex gap-2">
-      <span class="bg-jkuat-gold text-white font-label-md text-label-md px-4 py-1.5 rounded-full shadow-lg">Featured Startup</span>
-      <span class="bg-white/90 backdrop-blur-md text-tech-blue font-label-md text-label-md px-4 py-1.5 rounded-full border border-tech-blue/20">Venture</span>
+      <span id="featured-project-badge" class="bg-jkuat-gold text-white font-label-md text-label-md px-4 py-1.5 rounded-full shadow-lg">Featured Startup</span>
+      <span id="featured-project-status" class="bg-white/90 backdrop-blur-md text-tech-blue font-label-md text-label-md px-4 py-1.5 rounded-full border border-tech-blue/20">Venture</span>
     </div>
   </div>
   <div class="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center bg-gradient-to-br from-white to-surface-container-low">
-    <h2 class="font-headline-lg text-headline-lg text-jkuat-green mb-4">Eco-Irrigate: AI-Powered AgTech</h2>
-    <p class="font-body-lg text-body-lg text-on-surface-variant mb-8 leading-relaxed">
-      Redefining precision farming for Kenyan smallholder farmers. Eco-Irrigate uses low-cost soil moisture sensors and satellite data to automate irrigation, reducing water waste by 40% and increasing crop yields by nearly double.
-    </p>
+    <h2 id="featured-project-title" class="font-headline-lg text-headline-lg text-jkuat-green mb-4">Loading...</h2>
+    <p id="featured-project-desc" class="font-body-lg text-body-lg text-on-surface-variant mb-8 leading-relaxed">Loading projects...</p>
     <div class="flex flex-wrap gap-4">
-      <button class="bg-tech-blue text-white font-button-text text-button-text px-8 py-4 rounded-xl hover:shadow-lg hover:shadow-tech-blue/20 active:scale-95 transition-all">
+      <button class="bg-tech-blue text-white font-button-text text-button-text px-8 py-4 rounded-xl hover:shadow-lg hover:shadow-tech-blue/20 active:scale-95 transition-all" onclick="document.querySelector('.project-card')?.click()">
         View Details
       </button>
       <button class="border-2 border-outline-variant text-on-surface font-button-text text-button-text px-8 py-4 rounded-xl hover:border-tech-blue hover:text-tech-blue transition-all">
@@ -185,21 +183,21 @@ tailwind.config = {
 </div>
 </section>
 
-<!-- Stats Band -->
+<!-- Stats Band (loaded from Supabase) -->
 <section class="bg-jkuat-green py-10 my-stack-lg">
 <div class="max-w-7xl mx-auto px-grid-margin">
   <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
     <div class="flex flex-col items-center">
-      <span class="font-display-lg text-display-lg text-jkuat-gold">40+</span>
+      <span id="stat-projects-count" class="font-display-lg text-display-lg text-jkuat-gold">--</span>
       <span class="font-label-md text-label-md text-white/80 uppercase tracking-widest">Active Projects</span>
     </div>
     <div class="flex flex-col items-center">
-      <span class="font-display-lg text-display-lg text-jkuat-gold">15</span>
-      <span class="font-label-md text-label-md text-white/80 uppercase tracking-widest">Startups Founded</span>
+      <span id="stat-progress-count" class="font-display-lg text-display-lg text-jkuat-gold">--</span>
+      <span class="font-label-md text-label-md text-white/80 uppercase tracking-widest">In Incubation</span>
     </div>
     <div class="flex flex-col items-center">
-      <span class="font-display-lg text-display-lg text-jkuat-gold">KES 2M+</span>
-      <span class="font-label-md text-label-md text-white/80 uppercase tracking-widest">Funding Raised</span>
+      <span id="stat-live-count" class="font-display-lg text-display-lg text-jkuat-gold">--</span>
+      <span class="font-label-md text-label-md text-white/80 uppercase tracking-widest">MVP Live</span>
     </div>
   </div>
 </div>
@@ -296,8 +294,11 @@ async function loadProjects() {
     
     // Update featured hero with first project
     if (allProjects.length > 0) {
-      // updateFeaturedProject(allProjects[0]);
+      updateFeaturedProject(allProjects[0]);
     }
+    
+    // Update stats from database
+    updateProjectStats(allProjects);
   } catch (err) {
     console.error('Projects load error:', err);
     document.getElementById('project-loading').innerHTML = '<p class="text-red-500">Failed to load projects: ' + err.message + '</p>';
@@ -488,6 +489,30 @@ function showProjectImage(index) {
   dots?.forEach((dot, i) => {
     dot.className = `w-2 h-2 rounded-full ${i === index ? 'bg-white' : 'bg-white/40'} transition-all`;
   });
+}
+
+// Update featured project hero from first project
+function updateFeaturedProject(project) {
+  let mediaUrls = [];
+  try { mediaUrls = JSON.parse(project.media_urls || '[]'); } catch(e) {}
+  const imgUrl = mediaUrls.find(u => isImageUrl(u)) || 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=800&h=600&fit=crop';
+  
+  document.getElementById('featured-project-img').src = imgUrl;
+  document.getElementById('featured-project-title').textContent = project.name + (project.category ? ': ' + project.category : '');
+  document.getElementById('featured-project-desc').textContent = project.description?.substring(0, 200) || '';
+  document.getElementById('featured-project-badge').textContent = project.status === 'Incubating' ? 'Featured Startup' : 'Venture';
+  document.getElementById('featured-project-status').textContent = project.status;
+}
+
+// Update stats band from projects data
+function updateProjectStats(projects) {
+  const total = projects.length;
+  const incubating = projects.filter(p => p.status === 'Incubating').length;
+  const live = projects.filter(p => p.status === 'MVP Live').length;
+  
+  document.getElementById('stat-projects-count').textContent = total + '+';
+  document.getElementById('stat-progress-count').textContent = incubating;
+  document.getElementById('stat-live-count').textContent = live;
 }
 
 // Close modal

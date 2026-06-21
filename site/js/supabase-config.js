@@ -184,6 +184,35 @@ async function deleteBlogPost(id) {
   return true;
 }
 
+// ===== Event Comments =====
+
+// Fetch comments for an event
+async function getEventComments(eventId) {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('event_comments')
+    .select('*')
+    .eq('event_id', eventId)
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return data || [];
+}
+
+// Add a comment to an event
+async function addEventComment(comment) {
+  const sb = initSupabase();
+  const { data, error } = await sb.from('event_comments').insert([comment]).select();
+  if (error) throw error;
+  return data;
+}
+
+// Delete a comment (admin only)
+async function deleteEventComment(id) {
+  const sb = initSupabase();
+  const { error } = await sb.from('event_comments').delete().eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
 // ===== Contact Messages =====
 
 async function getContactMessages() {
