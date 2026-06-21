@@ -1,0 +1,36 @@
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node modules (if any)
+node_modules/
+.env
+.env.local
+.env.*.local
+
+# Supabase local files
+supabase/.temp/
+supabase/.branches/
+.branch/
+migrations/
+
+# Design reference files (keep the site but not the design mockups)
+stitch_school_club_portal_redesign/
+
+# Executables
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs
+*.log
+npm-debug.log*

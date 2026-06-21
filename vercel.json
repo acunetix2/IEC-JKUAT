@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "outputDirectory": "site",
+  "framework": null,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "rewrites": [
+    { "source": "/((?!index|events|showcase|merchandise|community|privacy|terms|admin|js/|sql/).*)", "destination": "/404.html" }
+  ]
+}

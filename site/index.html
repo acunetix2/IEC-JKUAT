@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>IEC JKUAT | Venture Pulse — Innovation &amp; Entrepreneurship Club</title>
+<meta name="description" content="IEC JKUAT — JKUAT's Innovation &amp; Entrepreneurship Club. Join a community of innovators, creators, and problem solvers building the future."/>
+<meta property="og:title" content="IEC JKUAT | Venture Pulse"/>
+<meta property="og:description" content="Be an innovator, a creator, and a problem solver. Join IEC JKUAT."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://iec.jkuat.org"/>
+<meta name="theme-color" content="#006838"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="js/supabase-config.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "jkuat-gold": "#FBB03B",
+        "jkuat-green": "#006838",
+        "on-tertiary-container": "#9ed8ff",
+        "outline": "#6f7a70",
+        "on-tertiary-fixed-variant": "#004c6b",
+        "tech-blue": "#00AEEF",
+        "surface-variant": "#e2e2e5",
+        "on-tertiary": "#ffffff",
+        "on-surface-variant": "#3f4940",
+        "on-error-container": "#93000a",
+        "on-secondary-container": "#6e4700",
+        "tertiary-fixed": "#c6e7ff",
+        "on-primary-fixed": "#00210e",
+        "on-tertiary-fixed": "#001e2d",
+        "surface-tint": "#0b6d3c",
+        "on-primary-container": "#8ee4a8",
+        "secondary": "#825500",
+        "primary": "#004d28",
+        "secondary-fixed-dim": "#ffb953",
+        "on-secondary-fixed-variant": "#633f00",
+        "glass-border": "rgba(255, 255, 255, 0.2)",
+        "surface-container-high": "#e8e8ea",
+        "inverse-surface": "#2f3133",
+        "surface-dim": "#dadadc",
+        "inverse-on-surface": "#f0f0f3",
+        "primary-fixed-dim": "#83d99d",
+        "on-primary": "#ffffff",
+        "secondary-container": "#feb23d",
+        "surface-container-lowest": "#ffffff",
+        "on-background": "#1a1c1e",
+        "tertiary-fixed-dim": "#82cfff",
+        "surface": "#f9f9fc",
+        "background": "#f9f9fc",
+        "error-container": "#ffdad6",
+        "surface-gray": "#F4F7F9",
+        "on-secondary-fixed": "#291800",
+        "surface-container-low": "#f3f3f6",
+        "surface-bright": "#f9f9fc",
+        "on-error": "#ffffff",
+        "tertiary": "#004765",
+        "tertiary-container": "#006086",
+        "surface-container": "#eeeef0",
+        "primary-fixed": "#9ef5b8",
+        "on-secondary": "#ffffff",
+        "secondary-fixed": "#ffddb4",
+        "inverse-primary": "#83d99d",
+        "on-surface": "#1a1c1e",
+        "on-primary-fixed-variant": "#00522b",
+        "surface-container-highest": "#e2e2e5",
+        "outline-variant": "#bec9be",
+        "primary-container": "#006838",
+        "error": "#ba1a1a"
+      },
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        "2xl": "1rem",
+        "3xl": "1.5rem",
+        full: "9999px"
+      },
+      spacing: {
+        "stack-md": "1rem",
+        "section-padding": "5rem",
+        "stack-lg": "2rem",
+        "stack-sm": "0.5rem",
+        "bento-gap": "1.5rem",
+        "grid-margin": "2rem",
+        "grid-gutter": "1.5rem"
+      },
+      fontFamily: {
+        "headline-lg": ["Plus Jakarta Sans"],
+        "display-lg": ["Plus Jakarta Sans"],
+        "button-text": ["Inter"],
+        "headline-md": ["Plus Jakarta Sans"],
+        "body-md": ["Inter"],
+        "body-lg": ["Inter"],
+        "label-md": ["Inter"],
+      },
+      fontSize: {
+        "headline-lg": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "700"}],
+        "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800"}],
+        "button-text": ["16px", {lineHeight: "1.0", fontWeight: "600"}],
+        "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "600"}],
+        "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}],
+        "body-lg": ["18px", {lineHeight: "1.6", fontWeight: "400"}],
+        "label-md": ["14px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600"}],
+      }
+    },
+  },
+}
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+.glass-nav { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+.bento-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+.bento-card:hover { transform: translateY(-4px); border-color: #00AEEF; box-shadow: 0 10px 30px -10px rgba(0, 174, 239, 0.2); }
+.hide-scrollbar::-webkit-scrollbar { display: none; }
+.step-transition { transition: transform 0.5s ease-in-out, opacity 0.3s ease-in-out; }
+</style>
+</head>
+<body class="bg-surface text-on-background font-body-md overflow-x-hidden">
+
+<!-- Top Navigation Bar -->
+<nav class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-glass-border shadow-sm">
+<div class="flex justify-between items-center px-grid-margin py-4 max-w-7xl mx-auto">
+  <div class="flex items-center gap-2">
+    <span class="text-headline-md font-headline-lg text-jkuat-green tracking-tight">IEC JKUAT</span>
+  </div>
+  <div class="hidden md:flex gap-8 items-center">      <a class="font-label-md text-label-md text-tech-blue border-b-2 border-tech-blue pb-1" href="index.html">Venture First</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="events.html">Programs</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="showcase.html">Showcase</a>
+      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="community.html">Community</a>
+  </div>
+  <div class="flex gap-4">
+    <a class="hidden sm:block px-6 py-2.5 bg-jkuat-green text-white font-button-text text-button-text rounded-full hover:scale-105 active:scale-95 transition-transform" href="#join">Join the Hub</a>
+    <a href="merchandise.html" class="hidden sm:block px-6 py-2.5 border-2 border-jkuat-green text-jkuat-green font-button-text text-button-text rounded-full hover:bg-jkuat-green hover:text-white transition-all">Merch</a>
+    <button class="md:hidden p-2 text-on-surface-variant" onclick="toggleMobileMenu()">
+      <span class="material-symbols-outlined">menu</span>
+    </button>
+  </div>
+</div>
+</nav>
+
+<!-- Hero Section -->
+<section class="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
+<div class="absolute inset-0 z-0"></div>
+<div class="relative z-10 max-w-7xl mx-auto px-grid-margin grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+  <div>
+    <span class="inline-block px-4 py-1.5 rounded-full bg-primary-container text-white font-label-md text-label-md mb-6">EST. 2020 &bull; JKUAT, KENYA</span>
+    <h1 class="font-display-lg text-display-lg text-on-background mb-6 leading-tight">
+      Be an <span class="text-jkuat-green">innovator</span>, a creator, and a <span class="text-tech-blue">problem solver.</span>
+    </h1>
+    <p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-lg">
+      At IEC, we believe that innovation combined with entrepreneurial spirit equips students with the knowledge, values, and skills they need to excel in their pursuit of excellence.
+    </p>
+    <div class="flex flex-wrap gap-4">
+      <a class="px-8 py-4 bg-tech-blue text-white font-button-text text-button-text rounded-2xl shadow-lg shadow-tech-blue/20 hover:scale-[1.02] active:scale-95 transition-transform" href="#join">Join the Hub</a>
+      <button class="px-8 py-4 bg-white/50 backdrop-blur-md border border-outline-variant text-on-surface font-button-text text-button-text rounded-2xl hover:bg-white transition-all flex items-center gap-2">
+        Club Tour
+        <span class="material-symbols-outlined">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+  <div class="relative group">
+    <div class="absolute -inset-4 bg-gradient-to-tr from-jkuat-green to-tech-blue rounded-3xl opacity-10 blur-2xl group-hover:opacity-20 transition-opacity"></div>
+    <div class="relative rounded-3xl overflow-hidden aspect-[1.69] shadow-2xl border border-white/20">
+      <img alt="High-tech workspace with laptop and brainstorming materials" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=500&fit=crop"/>
+    </div>
+    <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl border border-outline-variant hidden md:block">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-white">
+          <span class="material-symbols-outlined">rocket_launch</span>
+        </div>
+        <div>
+          <div class="text-headline-md font-bold text-on-surface">15+</div>
+          <div class="text-label-md text-on-surface-variant">Active Startups</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Venture First Bento Grid -->
+<section class="py-section-padding bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-grid-margin">
+  <div class="text-center mb-16">
+    <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">The Venture First Framework</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
+      We've redesigned student entrepreneurship. Every module is built to turn a spark of an idea into a flame of a business.
+    </p>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-12 gap-bento-gap">
+    <!-- Large Tile -->
+    <div class="md:col-span-8 bento-card bg-white p-8 rounded-3xl border border-outline-variant flex flex-col justify-between">
+      <div>
+        <div class="w-12 h-12 bg-tech-blue/10 text-tech-blue rounded-xl flex items-center justify-center mb-6">
+          <span class="material-symbols-outlined">hub</span>
+        </div>
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Innovation Challenges &amp; Hackathons</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant mb-6 max-w-xl">
+          We organize regular hackathons that bring together students from different disciplines to solve real-world problems in fintech, healthtech, and agritech. Present solutions to potential investors and employers.
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <span class="px-3 py-1 bg-surface-container text-label-md rounded-full">FinTech</span>
+        <span class="px-3 py-1 bg-surface-container text-label-md rounded-full">AgriTech</span>
+        <span class="px-3 py-1 bg-surface-container text-label-md rounded-full">HealthTech</span>
+      </div>
+    </div>
+    <!-- Medium Tile -->
+    <div class="md:col-span-4 bento-card bg-jkuat-green p-8 rounded-3xl text-white flex flex-col justify-between relative overflow-hidden">
+      <div class="relative z-10">
+        <div class="w-12 h-12 bg-white/20 text-white rounded-xl flex items-center justify-center mb-6">
+          <span class="material-symbols-outlined">groups</span>
+        </div>
+        <h3 class="font-headline-md text-headline-md mb-4">Startups &amp; Incubation</h3>
+        <p class="font-body-md opacity-90">
+          Transition promising ideas into market-ready solutions through our project incubation program.
+        </p>
+      </div>
+      <div class="relative z-10 mt-8">
+        <button class="w-full py-3 bg-white text-jkuat-green font-button-text rounded-xl hover:bg-jkuat-gold hover:text-white transition-colors">Apply for Incubation</button>
+      </div>
+      <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+    </div>
+    <!-- Small Tile 1 -->
+    <div class="md:col-span-6 bento-card bg-white p-8 rounded-3xl border border-outline-variant flex gap-6 items-start">
+      <div class="w-14 h-14 shrink-0 bg-jkuat-gold/10 text-jkuat-gold rounded-2xl flex items-center justify-center">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
+      </div>
+      <div>
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Mentorship &amp; Growth</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          Connecting students with industry pros, successful entrepreneurs, and alumni for one-on-one career guidance.
+        </p>
+      </div>
+    </div>
+    <!-- Small Tile 2 -->
+    <div class="md:col-span-6 bento-card bg-white p-8 rounded-3xl border border-outline-variant flex gap-6 items-start">
+      <div class="w-14 h-14 shrink-0 bg-tech-blue/10 text-tech-blue rounded-2xl flex items-center justify-center">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+      </div>
+      <div>
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Leadership Program</h3>
+        <p class="font-body-md text-body-md text-on-surface-variant">
+          A holistic education blending technical rigor with business values to prepare future leaders for global impact.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Community Section -->
+<section class="py-section-padding bg-surface">
+<div class="max-w-7xl mx-auto px-grid-margin">
+  <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
+    <div class="max-w-2xl">
+      <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">A Global Community, Locally Rooted</h2>
+      <p class="font-body-md text-body-md text-on-surface-variant">
+        Our community is vibrant and diverse, bringing together students from JKUAT, Nairobi, and beyond to cultivate a collaborative environment.
+      </p>
+    </div>
+    <button class="px-6 py-3 border-2 border-outline text-on-surface font-button-text rounded-2xl hover:bg-surface-variant transition-colors">See Outreach Activities</button>
+  </div>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-bento-gap">
+    <!-- Community Card 1 -->
+    <div class="group cursor-pointer">
+      <div class="rounded-3xl overflow-hidden mb-6 aspect-video">
+        <div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=340&fit=crop')"></div>
+      </div>
+      <h4 class="font-headline-md text-headline-md text-on-surface mb-2">Vibrant Diversity</h4>
+      <p class="font-body-md text-body-md text-on-surface-variant">Cultivating cultures and perspectives to nurture a global mindset among JKUAT innovators.</p>
+    </div>
+    <!-- Community Card 2 -->
+    <div class="group cursor-pointer">
+      <div class="rounded-3xl overflow-hidden mb-6 aspect-video">
+        <div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=340&fit=crop')"></div>
+      </div>
+      <h4 class="font-headline-md text-headline-md text-on-surface mb-2">Local Engagement</h4>
+      <p class="font-body-md text-body-md text-on-surface-variant">From community service to hackathons, we strengthen our roots and enrich the learning experience.</p>
+    </div>
+    <!-- Community Card 3 -->
+    <div class="group cursor-pointer">
+      <div class="rounded-3xl overflow-hidden mb-6 aspect-video">
+        <div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=340&fit=crop')"></div>
+      </div>
+      <h4 class="font-headline-md text-headline-md text-on-surface mb-2">Startup Pitches</h4>
+      <p class="font-body-md text-body-md text-on-surface-variant">Connecting student founders with families, organizations, and potential angel investors.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Membership Flow Section -->
+<section class="py-section-padding bg-surface-container-high relative overflow-hidden" id="join">
+<div class="absolute top-0 right-0 w-1/3 h-full bg-tech-blue/5 skew-x-12 transform origin-top translate-x-20"></div>
+<div class="max-w-4xl mx-auto px-grid-margin relative z-10">
+  <div class="text-center mb-12">
+    <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">Join the Club</h2>
+    <p class="font-body-md text-body-md text-on-surface-variant">
+      Membership is open to all JKUAT students. Start your journey for just KES 200 per semester.
+    </p>
+  </div>
+  <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-outline-variant">
+    <div class="flex border-b border-outline-variant">
+      <button class="flex-1 py-6 text-center font-label-md text-tech-blue border-b-4 border-tech-blue bg-tech-blue/5" id="step1-tab" onclick="switchStep(1)">
+        Step 1: Registration
+      </button>
+      <button class="flex-1 py-6 text-center font-label-md text-on-surface-variant border-b-4 border-transparent hover:bg-surface-variant/30" id="step2-tab" onclick="switchStep(2)">
+        Step 2: Activation
+      </button>
+    </div>
+    <div class="p-8 md:p-12">
+      <!-- Step 1: Registration -->
+      <div class="step-transition" id="step1-content">
+        <h3 class="font-headline-md text-headline-md text-on-surface mb-8">New Member Registration</h3>
+        <form class="grid grid-cols-1 md:grid-cols-2 gap-6" id="registration-form" onsubmit="handleRegistration(event)">
+          <div class="md:col-span-2">
+            <label class="block text-label-md mb-2 text-on-surface">Full Name *</label>
+            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="John Doe" required type="text"/>
+          </div>
+          <div>
+            <label class="block text-label-md mb-2 text-on-surface">Student Registration Number *</label>
+            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="SCT211-XXXX/20XX" required type="text"/>
+          </div>
+          <div>
+            <label class="block text-label-md mb-2 text-on-surface">College *</label>
+            <select class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" required>
+              <option value="">Select your college</option>
+              <option>COPAS &mdash; Pure &amp; Applied Sciences</option>
+              <option>COETEC &mdash; Engineering &amp; Technology</option>
+              <option>COHES &mdash; Health Sciences</option>
+              <option>COANRE &mdash; Agriculture, Natural Resources &amp; Environment</option>
+              <option>COHRED &mdash; Human Resource &amp; Enterprise Development</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-label-md mb-2 text-on-surface">Course / Department *</label>
+            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" required type="text"/>
+          </div>
+          <div>
+            <label class="block text-label-md mb-2 text-on-surface">Year of Study *</label>
+            <select class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" required>
+              <option value="">Select Year</option>
+              <option>1</option>
+              <option>2</option>
+              <option>3</option>
+              <option>4</option>
+              <option>5</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-label-md mb-2 text-on-surface">Phone Number *</label>
+            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="07XXXXXXXX" required type="tel"/>
+          </div>
+          <div>
+            <label class="block text-label-md mb-2 text-on-surface">JKUAT Student Email *</label>
+            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="user@students.jkuat.ac.ke" required type="email"/>
+          </div>
+          <div class="md:col-span-2 pt-4">
+            <button class="w-full py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:scale-[1.01] active:scale-95 transition-transform flex items-center justify-center gap-2" type="submit">
+              Register Details
+              <span class="material-symbols-outlined">chevron_right</span>
+            </button>
+          </div>
+        </form>
+      </div>
+      <!-- Step 2: Payment -->
+      <div class="hidden step-transition opacity-0 scale-95" id="step2-content">
+        <div class="text-center mb-10">
+          <div class="w-20 h-20 bg-primary-container/10 text-primary-container rounded-full flex items-center justify-center mx-auto mb-6">
+            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">payments</span>
+          </div>
+          <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Activate Membership</h3>
+          <p class="text-on-surface-variant">Pay your semester membership fee via M-Pesa.</p>
+          <div class="mt-4 inline-block px-6 py-3 bg-surface-container-low rounded-2xl border border-outline-variant">
+            <span class="text-label-md text-on-surface-variant block uppercase tracking-widest">Amount Due</span>
+            <span class="text-headline-lg font-bold text-jkuat-green">KES 200</span>
+          </div>
+        </div>
+        <form class="max-w-sm mx-auto" id="payment-form" onsubmit="handlePayment(event)">
+          <div class="mb-6">
+            <label class="block text-label-md mb-2 text-on-surface">M-Pesa Phone Number *</label>
+            <input id="payment-phone" class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="07XXXXXXXX" required type="tel"/>
+            <p class="text-[12px] text-on-surface-variant mt-2">Can be any M-Pesa number &mdash; payment is tied to your reg number.</p>
+          </div>
+          <button id="payment-btn" class="w-full py-4 bg-tech-blue text-white font-button-text text-button-text rounded-2xl hover:scale-[1.01] active:scale-95 transition-transform flex items-center justify-center gap-2" type="submit">
+            Pay via M-Pesa
+            <span class="material-symbols-outlined">bolt</span>
+          </button>
+        </form>
+        <div class="hidden mt-10 p-6 bg-primary-container/10 border border-primary-container/20 rounded-2xl text-center" id="payment-status">
+          <div class="flex items-center justify-center gap-3 text-jkuat-green font-semibold">
+            <span class="material-symbols-outlined animate-spin">refresh</span>
+            Payment Initiated!
+          </div>
+          <p class="text-on-surface-variant mt-2 text-sm">Check your phone for the M-Pesa prompt and enter your PIN.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="w-full rounded-t-xl bg-surface-container-highest dark:bg-inverse-surface mt-20">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-bento-gap px-grid-margin py-section-padding max-w-7xl mx-auto w-full">
+  <div class="col-span-1 md:col-span-1">
+    <span class="text-headline-md font-headline-md text-jkuat-green mb-6 block">IEC JKUAT</span>
+    <p class="font-body-md text-body-md text-on-surface-variant/80 mb-6">
+      Raising future leaders with strong character, technical excellence, and a global outlook.
+    </p>
+    <div class="flex gap-4">
+          <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="community.html">
+        <span class="material-symbols-outlined text-xl">share</span>
+      </a>
+      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="mailto:info@iec.jkuat.org">
+        <span class="material-symbols-outlined text-xl">mail</span>
+      </a>
+    </div>
+  </div>
+  <div>
+    <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider mb-6">Our Club</h4>
+    <ul class="space-y-4">
+      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="index.html">Home</a></li>
+      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="events.html">Events</a></li>
+      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="showcase.html">Projects</a></li>
+      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="community.html">Community</a></li>
+      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="merchandise.html">Merchandise</a></li>
+    </ul>
+  </div>
+  <div>
+    <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider mb-6">Stay Connected</h4>
+    <ul class="space-y-4">
+      <li class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-jkuat-green">location_on</span>
+        <span class="font-label-md text-label-md text-on-surface-variant/80">JKUAT Main Campus, Kiambu, Kenya</span>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-jkuat-green">info</span>
+        <span class="font-label-md text-label-md text-on-surface-variant/80">Student Center, Room 201</span>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-jkuat-green">phone</span>
+        <span class="font-label-md text-label-md text-on-surface-variant/80">0712 345 678</span>
+      </li>
+      <li class="flex items-start gap-3">
+        <span class="material-symbols-outlined text-jkuat-green">mail</span>
+        <span class="font-label-md text-label-md text-on-surface-variant/80">info@iec.jkuat.org</span>
+      </li>
+    </ul>
+  </div>
+  <div>
+    <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider mb-6">Join Newsletter</h4>
+    <p class="font-label-md text-label-md text-on-surface-variant/80 mb-4">Get updates on new hackathons and programs.</p>
+    <form id="newsletter-form" class="relative" onsubmit="handleNewsletter(event)">
+      <input id="newsletter-email" class="w-full h-12 bg-surface-container rounded-xl border-none px-4 pr-12 focus:ring-1 focus:ring-tech-blue" placeholder="Email address" type="email" required/>
+      <button type="submit" class="absolute right-2 top-2 w-8 h-8 bg-jkuat-green text-white rounded-lg flex items-center justify-center">
+        <span class="material-symbols-outlined text-sm">send</span>
+      </button>
+    </form>
+    <p id="newsletter-feedback" class="text-[12px] text-jkuat-green mt-2 hidden">Thanks for subscribing!</p>
+  </div>
+</div>
+<div class="max-w-7xl mx-auto px-grid-margin py-8 border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-4">
+  <p class="font-label-md text-label-md text-on-surface-variant/60">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club. All rights reserved.</p>
+  <div class="flex gap-6">
+    <a class="font-label-md text-label-md text-on-surface-variant/60 hover:text-jkuat-green transition-colors" href="privacy.html">Privacy Policy</a>
+    <a class="font-label-md text-label-md text-on-surface-variant/60 hover:text-jkuat-green transition-colors" href="terms.html">Terms of Use</a>
+  </div>
+</div>
+</footer>
+
+<script>
+// Step switcher
+function switchStep(step) {
+  const s1Tab = document.getElementById('step1-tab');
+  const s2Tab = document.getElementById('step2-tab');
+  const s1Content = document.getElementById('step1-content');
+  const s2Content = document.getElementById('step2-content');
+  if (step === 1) {
+    s1Tab.className = "flex-1 py-6 text-center font-label-md text-tech-blue border-b-4 border-tech-blue bg-tech-blue/5";
+    s2Tab.className = "flex-1 py-6 text-center font-label-md text-on-surface-variant border-b-4 border-transparent hover:bg-surface-variant/30";
+    s2Content.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+      s2Content.classList.add('hidden');
+      s1Content.classList.remove('hidden');
+      setTimeout(() => { s1Content.classList.remove('opacity-0', 'scale-95'); }, 50);
+    }, 300);
+  } else {
+    s2Tab.className = "flex-1 py-6 text-center font-label-md text-tech-blue border-b-4 border-tech-blue bg-tech-blue/5";
+    s1Tab.className = "flex-1 py-6 text-center font-label-md text-on-surface-variant border-b-4 border-transparent hover:bg-surface-variant/30";
+    s1Content.classList.add('opacity-0', 'scale-95');
+    setTimeout(() => {
+      s1Content.classList.add('hidden');
+      s2Content.classList.remove('hidden');
+      setTimeout(() => { s2Content.classList.remove('opacity-0', 'scale-95'); }, 50);
+    }, 300);
+  }
+}
+
+let currentMemberId = null;
+
+// Handle registration form submission
+async function handleRegistration(e) {
+  e.preventDefault();
+  const btn = e.target.querySelector('button[type="submit"]');
+  const originalText = btn.innerHTML;
+  btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Registering...';
+  btn.disabled = true;
+
+  try {
+    const form = e.target;
+    const formData = {
+      fullName: form.querySelector('input[placeholder="John Doe"]').value,
+      regNumber: form.querySelector('input[placeholder="SCT211-XXXX/20XX"]').value,
+      college: form.querySelector('select').value,
+      course: form.querySelectorAll('input[type="text"]')[1].value,
+      yearOfStudy: form.querySelectorAll('select')[1].value,
+      phone: form.querySelector('input[type="tel"]').value,
+      email: form.querySelector('input[type="email"]').value
+    };
+
+    await initSupabase();
+    const data = await submitMemberRegistration(formData);
+    currentMemberId = data[0].id;
+    switchStep(2);
+  } catch (err) {
+    alert('Registration failed: ' + err.message + '\n\nPlease try again or contact us at info@iec.jkuat.org');
+  } finally {
+    btn.innerHTML = originalText;
+    btn.disabled = false;
+  }
+}
+
+// Handle payment
+async function handlePayment(e) {
+  e.preventDefault();
+  const btn = document.getElementById('payment-btn');
+  const phone = document.getElementById('payment-phone').value;
+  const status = document.getElementById('payment-status');
+  
+  btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing...';
+  btn.disabled = true;
+
+  try {
+    await initSupabase();
+    const result = await initiatePayment(phone, 200, currentMemberId);
+    
+    status.classList.remove('hidden');
+    status.innerHTML = `
+      <div class="flex items-center justify-center gap-3 text-jkuat-green font-semibold">
+        <span class="material-symbols-outlined">check_circle</span>
+        Payment Initiated!
+      </div>
+      <p class="text-on-surface-variant mt-2 text-sm">Check your phone for the M-Pesa prompt and enter your PIN.</p>
+      <p class="text-xs text-on-surface-variant/60 mt-1">Ref: ${result.transactionRef || 'Pending'}</p>
+    `;
+    status.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  } catch (err) {
+    status.classList.remove('hidden');
+    status.innerHTML = `
+      <div class="flex items-center justify-center gap-3 text-red-500 font-semibold">
+        <span class="material-symbols-outlined">error</span>
+        Payment Failed
+      </div>
+      <p class="text-on-surface-variant mt-2 text-sm">${err.message}. Please try again or contact info@iec.jkuat.org</p>
+    `;
+  } finally {
+    btn.innerHTML = 'Pay via M-Pesa <span class="material-symbols-outlined">bolt</span>';
+    btn.disabled = false;
+  }
+}
+
+// Handle newsletter signup
+async function handleNewsletter(e) {
+  e.preventDefault();
+  const email = document.getElementById('newsletter-email').value;
+  const feedback = document.getElementById('newsletter-feedback');
+  
+  try {
+    await initSupabase();
+    await submitNewsletter(email);
+    feedback.textContent = 'Thanks for subscribing!';
+    feedback.className = 'text-[12px] text-jkuat-green mt-2';
+    feedback.classList.remove('hidden');
+    document.getElementById('newsletter-email').value = '';
+  } catch (err) {
+    feedback.textContent = err.message.includes('duplicate') ? 'You\'re already subscribed!' : 'Something went wrong. Try again.';
+    feedback.className = 'text-[12px] text-amber-600 mt-2';
+    feedback.classList.remove('hidden');
+  }
+}
+
+// Bento card micro-interactions
+document.querySelectorAll('.bento-card').forEach(card => {
+  card.addEventListener('mousedown', () => { card.style.transform = 'scale(0.98)'; });
+  card.addEventListener('mouseup', () => { card.style.transform = 'translateY(-4px)'; });
+});
+</script>
+</body>
+</html>
