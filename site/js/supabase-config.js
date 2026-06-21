@@ -318,8 +318,242 @@ const DARK_MODE_BUTTON = `
 </button>
 `;
 
+// ===== Dark Mode CSS Injection =====
+
+function injectDarkModeStyles() {
+  const style = document.createElement('style');
+  style.id = 'iec-dark-mode-styles';
+  style.textContent = `
+    /* ===== IEC JKUAT Dark Mode ===== */
+    .dark body,
+    .dark .bg-surface,
+    .dark .bg-surface-gray,
+    .dark .bg-surface-container,
+    .dark .bg-surface-container-low,
+    .dark .bg-surface-container-high,
+    .dark .bg-surface-container-highest,
+    .dark .bg-surface-container-lowest,
+    .dark .bg-surface-bright,
+    .dark .bg-surface-dim {
+      background-color: #121212 !important;
+      color: #e0e0e0;
+    }
+
+    .dark body {
+      background: #121212 !important;
+    }
+
+    /* Navigation bars */
+    .dark header,
+    .dark nav.fixed,
+    .dark .glass-nav {
+      background: rgba(30, 30, 30, 0.85) !important;
+      backdrop-filter: blur(20px);
+      border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Cards */
+    .dark .bento-card,
+    .dark .glass-card,
+    .dark .bg-white {
+      background: #1e1e1e !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .dark .bento-card:hover {
+      border-color: #00AEEF !important;
+    }
+
+    /* Text colors */
+    .dark .text-on-surface,
+    .dark .text-on-background,
+    .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6,
+    .dark .font-headline-md,
+    .dark .font-headline-lg,
+    .dark .font-display-lg {
+      color: #e8e8e8 !important;
+    }
+
+    .dark .text-on-surface-variant,
+    .dark p,
+    .dark .font-body-md,
+    .dark .font-body-lg,
+    .dark .font-label-md {
+      color: #b0b0b0 !important;
+    }
+
+    .dark .text-jkuat-green {
+      color: #4ade80 !important;
+    }
+
+    .dark .text-tech-blue {
+      color: #38bdf8 !important;
+    }
+
+    .dark .text-jkuat-gold {
+      color: #fbbf24 !important;
+    }
+
+    /* Footers */
+    .dark footer,
+    .dark .bg-surface-container-highest,
+    .dark .bg-surface-container-higher {
+      background: #1a1a1a !important;
+      border-top-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    /* Modals & overlays */
+    .dark .modal-overlay {
+      background: rgba(0, 0, 0, 0.7) !important;
+    }
+
+    .dark .modal-overlay > div {
+      background: #1e1e1e !important;
+    }
+
+    /* Form inputs */
+    .dark input,
+    .dark select,
+    .dark textarea,
+    .dark .bg-surface-container-low {
+      background: #2a2a2a !important;
+      color: #e0e0e0 !important;
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .dark input::placeholder {
+      color: #666 !important;
+    }
+
+    /* Tables */
+    .dark .divide-y > * {
+      border-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    .dark table thead {
+      background: #1a1a1a !important;
+    }
+
+    .dark table tbody tr:hover {
+      background: rgba(255, 255, 255, 0.03) !important;
+    }
+
+    /* Borders */
+    .dark .border-outline-variant,
+    .dark .border-surface-variant,
+    .dark .border-glass-border {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Sidebar (admin) */
+    .dark aside.sidebar,
+    .dark .bg-surface-container-lowest {
+      background: #1a1a1a !important;
+      border-right-color: rgba(255, 255, 255, 0.06) !important;
+    }
+
+    .dark .sidebar-link:hover,
+    .dark .sidebar-link.active {
+      background: rgba(255, 255, 255, 0.05) !important;
+    }
+
+    /* Specific page sections */
+    .dark .bg-gradient-to-br {
+      background: #1e1e1e !important;
+    }
+
+    .dark .bg-on-tertiary-fixed-variant {
+      background: #002e44 !important;
+    }
+
+    .dark .bg-surface-container-high,
+    .dark .bg-surface-variant {
+      background: #2a2a2a !important;
+    }
+
+    /* Mobile menu */
+    .dark #mobile-menu {
+      background: #1a1a1a !important;
+    }
+
+    .dark #mobile-menu .border-b {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Toast */
+    .dark .bg-surface-container-highest.bento-card {
+      background: #1e1e1e !important;
+    }
+
+    /* Stats band on showcase */
+    .dark .bg-jkuat-green {
+      background: #0d4f2b !important;
+    }
+
+    /* CTA sections */
+    .dark .bg-tech-blue {
+      background: #006994 !important;
+    }
+
+    .dark .bg-primary-container {
+      background: #0d4f2b !important;
+    }
+
+    /* Filter buttons */
+    .dark .filter-btn.active,
+    .dark .filter-btn-events.bg-white {
+      background: #00AEEF !important;
+      color: white !important;
+    }
+
+    /* Tag badges */
+    .dark .bg-jkuat-green\/10,
+    .dark .bg-tech-blue\/10,
+    .dark .bg-jkuat-gold\/10 {
+      background: rgba(255, 255, 255, 0.08) !important;
+    }
+
+    /* Ensure icons are visible */
+    .dark .material-symbols-outlined {
+      color: inherit;
+    }
+
+    .dark img {
+      opacity: 0.85;
+    }
+
+    /* Section backgrounds */
+    .dark .bg-surface-container-low,
+    .dark section.bg-surface-container-low {
+      background: #181818 !important;
+    }
+
+    /* Button backgrounds */
+    .dark .bg-on-surface,
+    .dark .bg-on-surface-variant {
+      background: #333 !important;
+    }
+
+    .dark .text-white {
+      color: #e8e8e8 !important;
+    }
+
+    /* Admin specific */
+    .dark .bento-card[style*="background: #fff"] {
+      background: #1e1e1e !important;
+    }
+
+    /* Scrollbar */
+    .dark ::-webkit-scrollbar-thumb {
+      background: #444 !important;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 // Auto-init dark mode
 initDarkMode();
+injectDarkModeStyles();
 
 // ===== Toast Notification =====
 
