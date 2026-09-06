@@ -3,621 +3,1557 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>IEC JKUAT | Venture Pulse — Innovation &amp; Entrepreneurship Club</title>
-<meta name="description" content="IEC JKUAT — JKUAT's Innovation &amp; Entrepreneurship Club. Join a community of innovators, creators, and problem solvers building the future."/>
-<meta property="og:title" content="IEC JKUAT | Venture Pulse"/>
-<meta property="og:description" content="Be an innovator, a creator, and a problem solver. Join IEC JKUAT."/>
+<!-- Theme flash prevention — must be first script in <head> -->
+<script>
+(function(){
+  var t = localStorage.getItem('iec-theme');
+  var preferLight = t === 'light' || (!t && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (preferLight) document.documentElement.classList.add('light');
+})();
+</script>
+<title>IEC JKUAT — Innovation & Entrepreneurship Club</title>
+<meta name="description" content="IEC JKUAT is a student community at JKUAT for innovation, entrepreneurship and leadership. Join us to build, compete, connect and lead."/>
+<meta property="og:title" content="IEC JKUAT — Ideas Are Everywhere. Let's Build Them."/>
+<meta property="og:description" content="A student community turning ideas into projects, businesses and solutions that matter."/>
 <meta property="og:type" content="website"/>
-<meta property="og:url" content="https://iec.jkuat.org"/>
-<meta name="theme-color" content="#006838"/>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<meta property="og:url" content="https://iecjkuat.com/"/>
+<link rel="canonical" href="https://iecjkuat.com/"/>
+<meta name="theme-color" content="#18C8FF"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<!-- Supabase + Config -->
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="js/supabase-config.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+<!-- Three.js -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
 <script>
 tailwind.config = {
-  darkMode: "class",
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
-        "jkuat-gold": "#FBB03B",
-        "jkuat-green": "#006838",
-        "on-tertiary-container": "#9ed8ff",
-        "outline": "#6f7a70",
-        "on-tertiary-fixed-variant": "#004c6b",
-        "tech-blue": "#00AEEF",
-        "surface-variant": "#e2e2e5",
-        "on-tertiary": "#ffffff",
-        "on-surface-variant": "#3f4940",
-        "on-error-container": "#93000a",
-        "on-secondary-container": "#6e4700",
-        "tertiary-fixed": "#c6e7ff",
-        "on-primary-fixed": "#00210e",
-        "on-tertiary-fixed": "#001e2d",
-        "surface-tint": "#0b6d3c",
-        "on-primary-container": "#8ee4a8",
-        "secondary": "#825500",
-        "primary": "#004d28",
-        "secondary-fixed-dim": "#ffb953",
-        "on-secondary-fixed-variant": "#633f00",
-        "glass-border": "rgba(255, 255, 255, 0.2)",
-        "surface-container-high": "#e8e8ea",
-        "inverse-surface": "#2f3133",
-        "surface-dim": "#dadadc",
-        "inverse-on-surface": "#f0f0f3",
-        "primary-fixed-dim": "#83d99d",
-        "on-primary": "#ffffff",
-        "secondary-container": "#feb23d",
-        "surface-container-lowest": "#ffffff",
-        "on-background": "#1a1c1e",
-        "tertiary-fixed-dim": "#82cfff",
-        "surface": "#f9f9fc",
-        "background": "#f9f9fc",
-        "error-container": "#ffdad6",
-        "surface-gray": "#F4F7F9",
-        "on-secondary-fixed": "#291800",
-        "surface-container-low": "#f3f3f6",
-        "surface-bright": "#f9f9fc",
-        "on-error": "#ffffff",
-        "tertiary": "#004765",
-        "tertiary-container": "#006086",
-        "surface-container": "#eeeef0",
-        "primary-fixed": "#9ef5b8",
-        "on-secondary": "#ffffff",
-        "secondary-fixed": "#ffddb4",
-        "inverse-primary": "#83d99d",
-        "on-surface": "#1a1c1e",
-        "on-primary-fixed-variant": "#00522b",
-        "surface-container-highest": "#e2e2e5",
-        "outline-variant": "#bec9be",
-        "primary-container": "#006838",
-        "error": "#ba1a1a"
-      },
-      borderRadius: {
-        DEFAULT: "0.25rem",
-        lg: "0.5rem",
-        xl: "0.75rem",
-        "2xl": "1rem",
-        "3xl": "1.5rem",
-        full: "9999px"
-      },
-      spacing: {
-        "stack-md": "1rem",
-        "section-padding": "5rem",
-        "stack-lg": "2rem",
-        "stack-sm": "0.5rem",
-        "bento-gap": "1.5rem",
-        "grid-margin": "2rem",
-        "grid-gutter": "1.5rem"
+        'iec-blue': '#18C8FF',
+        'iec-gold':    '#FBB03B',
+        'iec-navy':    '#00243d',
+        'iec-dark':    '#0a0a0a',
+        'iec-green':   '#006838',
+        'surface':     '#f9f9fc',
+        'on-surface':  '#0a0a0a',
+        'muted':       '#6b7280',
       },
       fontFamily: {
-        "headline-lg": ["Plus Jakarta Sans"],
-        "display-lg": ["Plus Jakarta Sans"],
-        "button-text": ["Inter"],
-        "headline-md": ["Plus Jakarta Sans"],
-        "body-md": ["Inter"],
-        "body-lg": ["Inter"],
-        "label-md": ["Inter"],
+        display: ['Plus Jakarta Sans', 'sans-serif'],
+        body:    ['Inter', 'sans-serif'],
       },
       fontSize: {
-        "headline-lg": ["32px", {lineHeight: "1.2", letterSpacing: "-0.01em", fontWeight: "700"}],
-        "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800"}],
-        "button-text": ["16px", {lineHeight: "1.0", fontWeight: "600"}],
-        "headline-md": ["24px", {lineHeight: "1.3", fontWeight: "600"}],
-        "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}],
-        "body-lg": ["18px", {lineHeight: "1.6", fontWeight: "400"}],
-        "label-md": ["14px", {lineHeight: "1.2", letterSpacing: "0.05em", fontWeight: "600"}],
-      }
+        'hero':  ['clamp(3rem, 8vw, 7rem)', { lineHeight: '1.0', letterSpacing: '-0.03em', fontWeight: '800' }],
+        'title': ['clamp(2rem, 4vw, 3.5rem)', { lineHeight: '1.1', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'lead':  ['clamp(1rem, 1.5vw, 1.25rem)', { lineHeight: '1.6' }],
+      },
     },
   },
 }
 </script>
+
 <style>
-.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-.glass-nav { backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-.bento-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-.bento-card:hover { transform: translateY(-4px); border-color: #00AEEF; box-shadow: 0 10px 30px -10px rgba(0, 174, 239, 0.2); }
-.hide-scrollbar::-webkit-scrollbar { display: none; }
-.step-transition { transition: transform 0.5s ease-in-out, opacity 0.3s ease-in-out; }
+  /* ── Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden; /* fallback for old browsers */
+    overflow-x: clip; /* doesn't create a scroll container — keeps position: sticky working on mobile WebKit */
+    background-color: #07101a;
+    background-image:
+      radial-gradient(ellipse 120% 60% at 80% 0%, rgba(0,36,61,0.55), transparent),
+      radial-gradient(ellipse 80% 50% at 10% 100%, rgba(0,20,40,0.6), transparent);
+    background-attachment: fixed;
+    color: #f0f0f0;
+  }
+
+  ::selection { background: #18C8FF; color: #000; }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+
+  /* ── Scroll reveal ────────────────────────────── */
+  /* Hero elements animate in immediately via CSS — no JS needed */
+  /* Non-hero [data-reveal] elements use IntersectionObserver in animations.js */
+  [data-reveal] {
+    opacity: 0;
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  [data-reveal="up"]    { transform: translateY(48px); }
+  [data-reveal="left"]  { transform: translateX(-48px); }
+  [data-reveal="right"] { transform: translateX(48px); }
+  [data-reveal="fade"]  { transform: none; }
+  [data-reveal].revealed { opacity: 1; transform: none !important; }
+
+  /* Hero-specific: auto-reveal using the transition-delay already on each element */
+  .hero-animate {
+    opacity: 0;
+    transform: translateY(32px);
+    transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.16,1,0.3,1);
+  }
+  .hero-animate.go { opacity: 1; transform: none; }
+
+  /* ── Split text ───────────────────────────────── */
+  [data-split] .split-word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(100%);
+    transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.16,1,0.3,1);
+    overflow: hidden;
+  }
+  [data-split].revealed .split-word { opacity: 1; transform: none; }
+
+  /* ── Nav ──────────────────────────────────────── */
+  #nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    transition: background 0.4s, backdrop-filter 0.4s;
+    /* Always transparent — links float over the page */
+    background: transparent;
+  }
+  /* Scrolled: just a very subtle blur — no opaque background box */
+  #nav.scrolled {
+    background: rgba(7,16,26,0.45);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+
+  /* ── Hero canvas ──────────────────────────────── */
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* ── Pill tag ─────────────────────────────────── */
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.6);
+  }
+  .pill-blue {
+    background: rgba(0,174,239,0.12);
+    border-color: rgba(0,174,239,0.3);
+    color: #18C8FF;
+  }
+
+  /* ── Buttons ──────────────────────────────────── */
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #18C8FF;
+    color: #000;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    padding: 14px 32px;
+    border-radius: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .btn-primary:hover {
+    box-shadow: 0 0 32px rgba(0,174,239,0.4);
+    transform: translateY(-2px);
+  }
+  .btn-primary:focus-visible { outline: 2px solid #18C8FF; outline-offset: 2px; }
+  .btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    padding: 14px 32px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.15);
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+  }
+  .btn-ghost:hover {
+    background: rgba(255,255,255,0.06);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+  .btn-ghost:focus-visible { outline: 2px solid #18C8FF; outline-offset: 2px; }
+  a:focus-visible, button:focus-visible { outline: 2px solid #18C8FF; outline-offset: 2px; }
+
+  /* ── Section dividers ─────────────────────────── */
+  .section-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #18C8FF;
+  }
+
+  /* ── What we do grid ──────────────────────────── */
+  .do-card {
+    padding: 40px 36px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    transition: background 0.25s;
+    position: relative;
+    overflow: hidden;
+  }
+  .do-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,174,239,0.05), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .do-card:hover::before { opacity: 1; }
+  .do-card:hover .do-icon { transform: scale(1.1) rotate(-5deg); }
+  .do-icon {
+    font-size: 32px;
+    margin-bottom: 20px;
+    display: block;
+    transition: transform 0.3s;
+  }
+  .do-number {
+    font-size: 72px;
+    font-weight: 800;
+    line-height: 1;
+    color: rgba(255,255,255,0.12);
+    position: absolute;
+    top: 16px;
+    right: 24px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    pointer-events: none;
+    user-select: none;
+    z-index: 2;
+  }
+
+  /* ── Journey steps ────────────────────────────── */
+  .journey-step {
+    min-width: 320px;
+    padding: 48px 40px;
+    border-left: 1px solid rgba(255,255,255,0.08);
+    opacity: 1;
+    transition: border-color 0.4s;
+    flex-shrink: 0;
+  }
+  .journey-step:first-child { border-left: none; }
+  .journey-step.journey-active {
+    opacity: 1;
+    border-color: rgba(0,174,239,0.4);
+  }
+  .journey-sticky {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    height: 100vh; /* fallback */
+    height: 100svh; /* excludes mobile browser chrome — no hidden overflow band */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    overflow: hidden;
+  }
+  @media (min-width: 768px) {
+    .journey-step-last { min-width: calc(320px + 6rem); }
+  }
+
+  /* ── Events ───────────────────────────────────── */
+  .event-item {
+    display: grid;
+    grid-template-columns: 64px 1fr auto;
+    align-items: center;
+    gap: 24px;
+    padding: 24px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    transition: background 0.2s;
+  }
+  .event-item:hover { background: rgba(255,255,255,0.02); }
+
+  /* ── Discipline tags ──────────────────────────── */
+  .discipline-tag {
+    display: inline-block;
+    padding: 7px 16px;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+    cursor: default;
+    white-space: nowrap;
+  }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .discipline-tag:hover {
+    background: rgba(0,174,239,0.1);
+    border-color: #18C8FF;
+    color: #18C8FF;
+  }
+
+  /* ── Stat row ─────────────────────────────────── */
+  .stat-item + .stat-item { border-left: 1px solid rgba(255,255,255,0.08); }
+
+  /* ── Join section ─────────────────────────────── */
+  .join-bg {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 100%, rgba(0,174,239,0.12), transparent),
+      radial-gradient(ellipse 120% 60% at 80% 0%, rgba(0,36,61,0.55), transparent),
+      #07101a;
+  }
+
+  /* ── Form inputs ──────────────────────────────── */
+  .iec-input {
+    width: 100%;
+    background: #0d1b2a;
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 4px;
+    padding: 14px 16px;
+    color: #ffffff;
+    font-size: 14px;
+    transition: border-color 0.2s;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .iec-input:focus { border-color: #18C8FF; }
+  .iec-input::placeholder { color: rgba(255,255,255,0.3); }
+  .iec-input option { background: #0d1b2a; color: #ffffff; }
+
+  /* Kill browser autofill white background */
+  .iec-input:-webkit-autofill,
+  .iec-input:-webkit-autofill:hover,
+  .iec-input:-webkit-autofill:focus,
+  .iec-input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 100px #0d1b2a inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff;
+  }
+
+  /* Light mode inputs */
+  html.light .iec-input {
+    background: #eef1f6;
+    border-color: rgba(0,0,0,0.18);
+    color: #0d0f12;
+  }
+  html.light .iec-input:focus { border-color: #0aaad4; background: #fff; }
+  html.light .iec-input::placeholder { color: #94a3b8; }
+  html.light .iec-input option { background: #ffffff; color: #0d0f12; }
+  html.light .iec-input:-webkit-autofill,
+  html.light .iec-input:-webkit-autofill:hover,
+  html.light .iec-input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 100px #eef1f6 inset !important;
+    -webkit-text-fill-color: #0d0f12 !important;
+  }
+
+  /* ── Step tabs ────────────────────────────────── */
+  .step-tab {
+    flex: 1;
+    padding: 18px 16px;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.35);
+    border-bottom: 2px solid rgba(255,255,255,0.06);
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+  }
+  .step-tab.active { color: #18C8FF; border-color: #18C8FF; }
+  html.light .step-tab { color: rgba(0,0,0,0.6); border-color: rgba(0,0,0,0.08); }
+  html.light .step-tab.active { color: #0077a8; border-color: #0077a8; }
+
+  /* ── Dark footer ──────────────────────────────── */
+  footer { background: #060606; }
+  /* Blend footer into the page in dark mode instead of a flat black slab */
+  html:not(.light) body footer { background: transparent !important; }
+
+  /* ── Noise overlay ────────────────────────────── */
+  .noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  /* ── Horizontal rule accent ───────────────────── */
+  .rule { border: none; border-top: 1px solid rgba(255,255,255,0.06); margin: 0; }
+
+  /* ── Photo marquee ───────────────────────────── */
+  .marquee-track {
+    display: flex;
+    gap: 12px;
+    animation: marquee-scroll 30s linear infinite;
+    width: max-content;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .marquee-photo {
+    width: 280px;
+    height: 180px;
+    object-fit: cover;
+    flex-shrink: 0;
+    filter: saturate(0.9) brightness(1.0);
+    transition: filter 0.3s;
+  }
+  .marquee-photo:hover { filter: saturate(1.1) brightness(1.1); }
+
+  /* ── Do card photo bg ─────────────────────────── */
+  .do-card-photo {
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 0;
+    filter: saturate(0.85) brightness(0.72);
+  }
+  /* Dark gradient overlay on top of photo — keeps text readable */
+  .do-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.55) 60%, rgba(0,0,0,0.4) 100%);
+    opacity: 0;
+    transition: opacity 0.4s;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .do-card:hover .do-card-photo { opacity: 1; }
+  .do-card:hover::after { opacity: 1; }
+  /* All text content sits above both the photo and the overlay */
+  .do-card > *:not(.do-card-photo):not(.do-number) { position: relative; z-index: 2; }
+  .do-number { z-index: 2; }
+  /* When photo shows on hover, force all text white — works in both themes */
+  .do-card:hover h3,
+  .do-card:hover p,
+  .do-card:hover .do-icon { color: #ffffff !important; }
+  .do-card:hover .do-number { color: rgba(255,255,255,0.12) !important; }
+  @media (max-width: 767px) {
+    body { background-attachment: scroll; }
+    /* Mobile hero hugs its content: no forced viewport height, image flush at the bottom
+       (!important required — the section sets min-height inline) */
+    .hero { min-height: 0 !important; max-height: none !important; justify-content: flex-start; }
+    /* Keep mobile milestones aligned with the desktop sticky stage. */
+    .journey-sticky {
+      position: static;
+      height: auto;
+      min-height: 0;
+      justify-content: center;
+      padding-top: 3.5rem;
+      padding-bottom: 0;
+    }
+    #journey-track {
+      width: 100%;
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-snap-type: x mandatory;
+      scroll-padding-inline: 6vw;
+      scrollbar-width: none;
+      gap: 16px;
+    }
+    #journey-track::-webkit-scrollbar { display: none; }
+    .journey-step {
+      width: 78vw; min-width: 78vw;
+      padding: 32px 24px;
+      display: flex; flex-direction: column; justify-content: center;
+      border-left: none;
+      scroll-snap-align: center;
+    }
+    .do-number { font-size: 56px; }
+    .event-item { grid-template-columns: 56px 1fr auto; gap: 16px; }
+  }
+  /* Idea paths: card containers on phones only — desktop keeps its clean editorial look */
+  @media (max-width: 767px) {
+    .idea-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 24px 20px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+    [data-reveal], .hero-animate, [data-split] .split-word {
+      opacity: 1 !important; transform: none !important; transition: none !important;
+    }
+    .btn-primary:hover, .btn-ghost:hover { transform: none; }
+    #journey-track { overflow-x: auto; }
+  }
+
+  /* ── Light-mode contrast hardening (page-local, beats global theme) ── */
+  /* Primary buttons: white on #0aaad4 fails — deepen to a passing blue */
+  html.light body .btn-primary { background: #0077a8 !important; color: #ffffff !important; }
+  html.light body .btn-primary:hover { box-shadow: 0 0 28px rgba(0,119,168,0.35); }
+  /* Error text */
+  html.light body .text-red-400 { color: #dc2626 !important; }
+  /* Join section copy + accents (join panel flips light) */
+  html.light body #join .text-iec-blue { color: #0077a8 !important; }
+  html.light body #join .section-label { color: #0077a8 !important; }
+  /* Home event category labels (neon-on-white otherwise) */
+  html.light body .event-item .text-iec-blue { color: #0077a8 !important; }
+  html.light body .event-item .text-iec-gold { color: #92400e !important; }
+  html.light body .event-item .text-green-400 { color: #15803d !important; }
+  html.light body .event-item .text-red-400 { color: #dc2626 !important; }
+  /* Journey numerals are huge display type — keep them legible */
+  html.light body .journey-step .text-iec-blue { color: #0077a8 !important; }
+  /* Hero eyebrow labels sit on the dark hero even in light mode */
+  html.light body section:has(#hero-canvas) .text-white\/40 { color: rgba(255,255,255,0.65) !important; }
+  /* Ghost sign-off: clearly visible, still hushed */
+  .ghost-text { color: rgba(255,255,255,0.4); }
+  html.light body .ghost-text { color: rgba(0,0,0,0.45) !important; }
+  /* Idea photo accents: half-opacity washes out to gray on light bg */
+  html.light body .idea-photo {
+    opacity: 1 !important;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
 </style>
 </head>
-<body class="bg-surface text-on-background font-body-md overflow-x-hidden">
+<body>
 
-<!-- Top Navigation Bar -->
-<nav class="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-glass-border shadow-sm">
-<div class="flex justify-between items-center px-grid-margin py-4 max-w-7xl mx-auto">
-  <div class="flex items-center gap-2">
-    <span class="text-headline-md font-headline-lg text-jkuat-green tracking-tight">IEC JKUAT</span>
+<!-- ═══════════════════════════════════════════════════════
+     NAVIGATION
+═══════════════════════════════════════════════════════ -->
+<nav id="nav">
+  <div class="flex justify-between items-center px-6 md:px-16 py-5 max-w-screen-xl mx-auto">
+    <!-- Logo -->
+    <a href="index.html" class="font-display font-bold text-white text-lg tracking-tight">
+      IEC <span class="text-iec-blue">JKUAT</span>
+    </a>
+
+    <!-- Desktop links -->
+    <div class="hidden md:flex items-center gap-10">
+      <a class="text-sm font-medium text-white/60 hover:text-white transition-colors" href="index.html">Home</a>
+      <a class="text-sm font-medium text-white/60 hover:text-white transition-colors" href="events.html">Events</a>
+      <a class="text-sm font-medium text-white/60 hover:text-white transition-colors" href="showcase.html">Projects</a>
+      <a class="text-sm font-medium text-white/60 hover:text-white transition-colors" href="contact.html">Contact</a>
+    </div>
+
+    <!-- CTAs -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <a href="merchandise.html" class="hidden md:block text-sm font-medium text-white/50 hover:text-white transition-colors">Merch</a>
+      <a href="#join" class="hidden sm:inline-flex btn-primary text-sm py-2 px-5" data-magnetic="0.3">Join IEC</a>
+      <button onclick="toggleDarkMode()" class="flex p-2 text-white/50 hover:text-white transition-colors" title="Toggle theme" aria-label="Toggle dark/light mode" style="line-height:1;"><span data-theme-icon-light class="material-symbols-outlined" style="display:none;">light_mode</span><span data-theme-icon-dark class="material-symbols-outlined" style="display:inline-block;">dark_mode</span></button>
+      <button class="md:hidden p-2 text-white/60 hover:text-white transition-colors" onclick="toggleMobileMenu()" aria-label="Open menu">
+        <span class="material-symbols-outlined">menu</span>
+      </button>
+    </div>
   </div>
-  <div class="hidden md:flex gap-8 items-center">      <a class="font-label-md text-label-md text-tech-blue border-b-2 border-tech-blue pb-1" href="index.html">Venture First</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="events.html">Programs</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="showcase.html">Showcase</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="community.html">Community</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="blog.html">Blog</a>
-      <a class="font-label-md text-label-md text-on-surface-variant hover:text-tech-blue transition-colors" href="contact.html">Contact</a>
-  </div>
-  <div class="flex gap-4">
-    <a class="hidden sm:block px-6 py-2.5 bg-jkuat-green text-white font-button-text text-button-text rounded-full hover:scale-105 active:scale-95 transition-transform" href="#join">Join the Hub</a>
-    <a href="merchandise.html" class="hidden sm:block px-6 py-2.5 border-2 border-jkuat-green text-jkuat-green font-button-text text-button-text rounded-full hover:bg-jkuat-green hover:text-white transition-all">Merch</a>
-    <button onclick="toggleDarkMode()" class="hidden md:flex p-2 text-on-surface-variant hover:text-tech-blue transition-colors" title="Toggle dark mode">
-      <span class="material-symbols-outlined dark:hidden">dark_mode</span>
-      <span class="material-symbols-outlined hidden dark:inline">light_mode</span>
-    </button>
-    <button class="md:hidden p-2 text-on-surface-variant" onclick="toggleMobileMenu()">
-      <span class="material-symbols-outlined">menu</span>
-    </button>
-  </div>
-</div>
 </nav>
 
-<!-- Hero Section -->
-<section class="relative pt-32 pb-20 md:pt-48 md:pb-32 overflow-hidden">
-<div class="absolute inset-0 z-0"></div>
-<div class="relative z-10 max-w-7xl mx-auto px-grid-margin grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-  <div>
-    <span class="inline-block px-4 py-1.5 rounded-full bg-primary-container text-white font-label-md text-label-md mb-6">EST. 2020 &bull; JKUAT, KENYA</span>
-    <h1 class="font-display-lg text-display-lg text-on-background mb-6 leading-tight">
-      Be an <span class="text-jkuat-green">innovator</span>, a creator, and a <span class="text-tech-blue">problem solver.</span>
-    </h1>
-    <p class="font-body-lg text-body-lg text-on-surface-variant mb-10 max-w-lg">
-      At IEC, we believe that innovation combined with entrepreneurial spirit equips students with the knowledge, values, and skills they need to excel in their pursuit of excellence.
-    </p>
-    <div class="flex flex-wrap gap-4">
-      <a class="px-8 py-4 bg-tech-blue text-white font-button-text text-button-text rounded-2xl shadow-lg shadow-tech-blue/20 hover:scale-[1.02] active:scale-95 transition-transform" href="#join">Join the Hub</a>
-      <button class="px-8 py-4 bg-white/50 backdrop-blur-md border border-outline-variant text-on-surface font-button-text text-button-text rounded-2xl hover:bg-white transition-all flex items-center gap-2">
-        Club Tour
-        <span class="material-symbols-outlined">arrow_forward</span>
-      </button>
-    </div>
-  </div>
-  <div class="relative group">
-    <div class="absolute -inset-4 bg-gradient-to-tr from-jkuat-green to-tech-blue rounded-3xl opacity-10 blur-2xl group-hover:opacity-20 transition-opacity"></div>
-    <div class="relative rounded-3xl overflow-hidden aspect-[1.69] shadow-2xl border border-white/20">
-      <img alt="High-tech workspace with laptop and brainstorming materials" class="w-full h-full object-cover" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=500&fit=crop"/>
-    </div>
-    <div class="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-xl border border-outline-variant hidden md:block">
-      <div class="flex items-center gap-4">
-        <div class="w-12 h-12 bg-primary-container rounded-full flex items-center justify-center text-white">
-          <span class="material-symbols-outlined">rocket_launch</span>
+<!-- ═══════════════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════════════ -->
+<section class="hero relative flex flex-col justify-center overflow-hidden noise"
+  style="min-height: 100svh; max-height: 1000px; background: radial-gradient(ellipse 110% 90% at 70% 40%, rgba(0,46,80,0.7), transparent);">
+
+  <!-- Three.js canvas — full bleed behind everything -->
+  <canvas id="hero-canvas"></canvas>
+
+  <!-- Content — two column on desktop, stacked on mobile -->
+  <div class="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto w-full pt-8 pb-0 md:py-12 mt-12 md:mt-16">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center">
+
+      <!-- LEFT: all text content -->
+      <div>
+        <!-- Headline -->
+        <h1 class="font-display font-extrabold text-white mb-3 md:mb-4"
+          style="font-size: clamp(2rem, 3.8vw, 3.8rem); line-height: 1.08; letter-spacing: -0.03em;">
+          <span class="block overflow-hidden">
+            <span class="block hero-animate" style="transition-delay: 0.15s">Ideas are</span>
+          </span>
+          <span class="block overflow-hidden">
+            <span class="block text-iec-blue hero-animate" style="transition-delay: 0.25s">everywhere.</span>
+          </span>
+          <span class="block overflow-hidden">
+            <span class="block hero-animate" style="transition-delay: 0.35s">Let's build</span>
+          </span>
+          <span class="block overflow-hidden">
+            <span class="block hero-animate" style="transition-delay: 0.45s">them.</span>
+          </span>
+        </h1>
+
+        <!-- Sub -->
+        <p class="text-white/55 text-sm font-light max-w-md leading-relaxed mb-5 md:mb-6 hero-animate"
+          style="transition-delay: 0.6s">
+          IEC JKUAT is a student community turning ideas into projects,
+          businesses and solutions that matter.
+        </p>
+
+        <!-- CTAs -->
+        <div class="flex flex-wrap gap-3 mb-5 md:mb-6 hero-animate" style="transition-delay: 0.7s">
+          <a href="#join" class="btn-primary" data-magnetic="0.3">
+            Join IEC
+            <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
+          </a>
+          <a href="#what-we-do" class="btn-ghost">
+            What we do
+            <span class="material-symbols-outlined text-[18px]">expand_more</span>
+          </a>
         </div>
-        <div>
-          <div class="text-headline-md font-bold text-on-surface">15+</div>
-          <div class="text-label-md text-on-surface-variant">Active Startups</div>
+
+        <!-- Tagline strip -->
+        <div class="flex flex-wrap gap-x-3 gap-y-2 md:gap-5 pt-5 border-t border-white/8 hero-animate"
+          style="transition-delay: 0.85s">
+          <span class="text-[10px] font-bold tracking-[0.16em] uppercase text-white/40">Innovation</span>
+          <span class="text-white/10 hidden sm:inline">·</span>
+          <span class="text-[10px] font-bold tracking-[0.16em] uppercase text-white/40">Entrepreneurship</span>
+          <span class="text-white/10 hidden sm:inline">·</span>
+          <span class="text-[10px] font-bold tracking-[0.16em] uppercase text-white/40">Leadership</span>
+          <span class="text-white/10 hidden sm:inline">·</span>
+          <span class="text-[10px] font-bold tracking-[0.16em] uppercase text-white/40">Community</span>
+        </div>
+
+        <!-- Mobile stats (desktop shows the visual column instead) -->
+        <div class="flex md:hidden gap-6 pt-5 hero-animate" style="transition-delay: 0.95s">
+          <div><p class="text-iec-blue font-extrabold font-display text-xl leading-none">200+</p><p class="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Members</p></div>
+          <div><p class="text-iec-blue font-extrabold font-display text-xl leading-none">30+</p><p class="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Projects</p></div>
+          <div><p class="text-iec-gold font-extrabold font-display text-xl leading-none">20+</p><p class="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Events / yr</p></div>
+        </div>
+
+        <!-- Mobile photo (desktop shows the visual column instead) -->
+        <div class="md:hidden mt-5 -mx-6 overflow-hidden hero-animate" style="transition-delay: 1.05s">
+          <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=800&h=450&fit=crop&q=75"
+            alt="IEC students collaborating" class="block w-full aspect-video object-cover"
+            style="filter: saturate(1.0) brightness(0.95);"/>
         </div>
       </div>
+
+      <!-- RIGHT: visual element -->
+      <div class="hidden md:flex flex-col items-end gap-3 relative hero-animate" style="transition-delay: 0.4s; max-height: calc(100svh - 200px);">
+
+        <!-- Top stat card -->
+        <div class="rounded px-5 py-3 text-right self-end" style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); backdrop-filter: blur(12px);">
+          <p class="text-iec-blue font-extrabold font-display text-2xl leading-none">200+</p>
+          <p class="text-white/50 text-xs mt-0.5 uppercase tracking-wider font-medium">Active Members</p>
+        </div>
+
+        <!-- Photo — height fills remaining space, never overflows -->
+        <!-- REPLACE src with a real IEC event photo -->
+        <div class="relative w-full rounded overflow-hidden flex-1" style="min-height: 0; max-width: 420px;">
+          <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=500&fit=crop&q=80"
+            alt="IEC students collaborating"
+            class="w-full h-full object-cover"
+            style="filter: saturate(1.0) brightness(0.95);"/>
+          <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(0,174,239,0.15) 0%, transparent 50%);"></div>
+          <div class="absolute bottom-3 left-4 right-4">
+            <p class="text-white/80 text-xs font-semibold uppercase tracking-widest">Silicon Savannah</p>
+            <p class="text-white/50 text-[10px] mt-0.5">JKUAT, Kenya</p>
+          </div>
+        </div>
+
+        <!-- Bottom row: two stat cards -->
+        <div class="flex gap-3 w-full" style="max-width: 420px;">
+          <div class="flex-1 rounded px-4 py-3" style="background: rgba(0,174,239,0.08); border: 1px solid rgba(0,174,239,0.2); backdrop-filter: blur(12px);">
+            <p class="text-iec-blue font-extrabold font-display text-2xl leading-none">30+</p>
+            <p class="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Projects</p>
+          </div>
+          <div class="flex-1 rounded px-4 py-3" style="background: rgba(251,176,59,0.08); border: 1px solid rgba(251,176,59,0.2); backdrop-filter: blur(12px);">
+            <p class="text-iec-gold font-extrabold font-display text-2xl leading-none">20+</p>
+            <p class="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Events / yr</p>
+          </div>
+        </div>
+
+  </div>
+
+  <!-- Scroll indicator (desktop only — overlaps content on small screens) -->
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 opacity-30">
+    <span class="text-[10px] font-semibold tracking-widest uppercase text-white">Scroll</span>
+    <div class="w-px h-8 bg-white/30 relative overflow-hidden">
+      <div class="absolute top-0 w-full h-1/2 bg-white animate-bounce"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     WHAT IS IEC — editorial split layout
+═══════════════════════════════════════════════════════ -->
+<section class="pt-4 pb-8 md:py-12 px-6 md:px-16 max-w-screen-xl mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-24 items-center">
+
+    <!-- Left: big statement text -->
+    <div>
+      <p class="section-label mb-6" data-reveal="fade">What is IEC?</p>
+      <h2 class="font-display font-bold text-white leading-tight mb-8" style="font-size: clamp(2.5rem, 5vw, 3.6rem);" data-split data-reveal="up">
+        A student movement. Not a lecture.
+      </h2>
+      <p class="text-white/55 text-base leading-relaxed mb-6" data-reveal="up" style="transition-delay: 0.15s">
+        IEC JKUAT isn't a class you sit in. It's a space where students from every
+        discipline at JKUAT come together to experiment, build things, solve real
+        problems and grow beyond their degree.
+      </p>
+      <p class="text-white/55 text-base leading-relaxed mb-10" data-reveal="up" style="transition-delay: 0.25s">
+        Whether you have a startup idea, a skill you want to apply, or you're still
+        figuring out what you're about — there's a place for you here.
+      </p>
+
+      <!-- Stats row — removed, now in hero -->
+
+      <!-- Mobile photo (desktop shows the collage instead) -->
+      <div class="md:hidden mt-2 rounded-xl overflow-hidden" data-reveal="up">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=480&fit=crop&q=75"
+          alt="Students collaborating" class="w-full h-60 object-cover"/>
+      </div>
+
+    </div>
+
+    <!-- Right: photo collage -->
+    <!-- REPLACE these Unsplash images with real IEC photos when available -->
+    <div class="relative h-[520px] hidden md:block" data-reveal="right" style="transition-delay: 0.2s">
+      <!-- Large background photo -->
+      <div class="absolute inset-0 rounded-sm overflow-hidden">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&h=600&fit=crop&q=80"
+          alt="Students collaborating" class="w-full h-full object-cover"/>
+        <div class="absolute inset-0" style="background: linear-gradient(135deg, rgba(10,10,10,0.25) 0%, transparent 55%, rgba(0,174,239,0.08) 100%);"></div>
+      </div>
+      <!-- Floating overlay card — top right -->
+      <div class="absolute top-6 right-6 w-44 rounded overflow-hidden shadow-2xl border border-white/10" style="transform: rotate(3deg);">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=300&h=200&fit=crop&q=80"
+          alt="Hackathon session" class="w-full h-28 object-cover"/>
+        <div class="bg-[#0f0f0f] px-3 py-2">
+          <p class="text-white text-[11px] font-bold">Hackathon 2024</p>
+          <p class="text-white/40 text-[10px]">48hrs · JKUAT</p>
+        </div>
+      </div>
+      <!-- Floating stat bubble -->
+      <div class="absolute bottom-12 left-6 px-5 py-4 rounded shadow-xl" style="background: rgba(0,174,239,0.15); border: 1px solid rgba(0,174,239,0.3); backdrop-filter: blur(12px);">
+        <p class="text-iec-blue font-extrabold text-2xl font-display leading-none">Est. 2020</p>
+        <p class="text-white/40 text-xs mt-1">Building since day one</p>
+      </div>
+      <!-- Small accent photo bottom right -->
+      <div class="absolute bottom-6 right-8 w-36 h-24 rounded overflow-hidden shadow-xl border border-white/8" style="transform: rotate(-2deg);">
+        <img loading="lazy" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&h=150&fit=crop&q=80"
+          alt="Innovation event" class="w-full h-full object-cover opacity-100"/>
+      </div>
+      <!-- Blue glow -->
+      <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0,174,239,0.15), transparent 70%); filter: blur(30px);"></div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="rule mx-6 md:mx-16"/>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     WHAT WE DO — borderless 6-cell grid
+═══════════════════════════════════════════════════════ -->
+<section id="what-we-do" class="py-10 md:py-16">
+  <div class="px-6 md:px-16 max-w-screen-xl mx-auto mb-8">
+    <p class="section-label mb-4" data-reveal="fade">What we do</p>
+    <h2 class="font-display font-bold text-white leading-tight" style="font-size: clamp(2.5rem, 5vw, 3.4rem);" data-reveal="up">
+      Six ways to show up.
+    </h2>
+  </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style="border-top: 1px solid rgba(255,255,255,0.06);">
+
+    <!-- BUILD -->
+    <div class="do-card" data-reveal="up" style="transition-delay: 0.05s">
+      <img class="do-card-photo" loading="lazy" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=600&h=400&fit=crop&q=80" alt=""/>
+      <span class="do-number">01</span>
+      <span class="do-icon material-symbols-outlined text-iec-blue" style="font-size:32px;font-variation-settings:'FILL' 1;">construction</span>
+      <h3 class="font-display font-bold text-white text-xl mb-3">Build</h3>
+      <p class="text-white/60 text-sm leading-relaxed">Turn an idea into something people can actually use. Prototypes, MVPs, real products.</p>
+    </div>
+
+    <!-- COMPETE -->
+    <div class="do-card" data-reveal="up" style="transition-delay: 0.1s">
+      <img class="do-card-photo" loading="lazy" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=400&fit=crop&q=80" alt=""/>
+      <span class="do-number">02</span>
+      <span class="do-icon material-symbols-outlined text-iec-gold" style="font-size:32px;font-variation-settings:'FILL' 1;">emoji_events</span>
+      <h3 class="font-display font-bold text-white text-xl mb-3">Compete</h3>
+      <p class="text-white/60 text-sm leading-relaxed">Hackathons, innovation challenges and competitions. Represent JKUAT, win things, prove what you've got.</p>
+    </div>
+
+    <!-- LEARN -->
+    <div class="do-card" data-reveal="up" style="transition-delay: 0.15s">
+      <img class="do-card-photo" loading="lazy" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=400&fit=crop&q=80" alt=""/>
+      <span class="do-number">03</span>
+      <span class="do-icon material-symbols-outlined text-iec-blue" style="font-size:32px;font-variation-settings:'FILL' 1;">school</span>
+      <h3 class="font-display font-bold text-white text-xl mb-3">Learn</h3>
+      <p class="text-white/60 text-sm leading-relaxed">Workshops, founder talks and practical sessions on things your lecturers won't cover.</p>
+    </div>
+
+    <!-- CONNECT -->
+    <div class="do-card" data-reveal="up" style="transition-delay: 0.2s">
+      <img class="do-card-photo" loading="lazy" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=600&h=400&fit=crop&q=80" alt=""/>
+      <span class="do-number">04</span>
+      <span class="do-icon material-symbols-outlined text-iec-gold" style="font-size:32px;font-variation-settings:'FILL' 1;">hub</span>
+      <h3 class="font-display font-bold text-white text-xl mb-3">Connect</h3>
+      <p class="text-white/60 text-sm leading-relaxed">Meet students, founders, mentors and professionals. Your network will matter more than your GPA.</p>
+    </div>
+
+    <!-- LEAD -->
+    <div class="do-card" data-reveal="up" style="transition-delay: 0.25s">
+      <img class="do-card-photo" loading="lazy" src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=400&fit=crop&q=80" alt=""/>
+      <span class="do-number">05</span>
+      <span class="do-icon material-symbols-outlined text-iec-blue" style="font-size:32px;font-variation-settings:'FILL' 1;">record_voice_over</span>
+      <h3 class="font-display font-bold text-white text-xl mb-3">Lead</h3>
+      <p class="text-white/60 text-sm leading-relaxed">Take responsibility. Organise events, run projects, and grow into the kind of person others follow.</p>
+    </div>
+
+    <!-- IMPACT -->
+    <div class="do-card" data-reveal="up" style="transition-delay: 0.3s">
+      <img class="do-card-photo" loading="lazy" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop&q=80" alt=""/>
+      <span class="do-number">06</span>
+      <span class="do-icon material-symbols-outlined text-iec-gold" style="font-size:32px;font-variation-settings:'FILL' 1;">public</span>
+      <h3 class="font-display font-bold text-white text-xl mb-3">Impact</h3>
+      <p class="text-white/60 text-sm leading-relaxed">Build solutions that address real problems around us. Not just for the marks.</p>
+    </div>
+
+  </div>
+</section>
+
+<hr class="rule mx-6 md:mx-16"/>
+
+<!-- ═══════════════════════════════════════════════════════
+     PHOTO MARQUEE — infinite scroll strip
+     REPLACE these Unsplash images with real IEC event/activity photos
+═══════════════════════════════════════════════════════ -->
+<div class="py-6 overflow-hidden" style="background: rgba(255,255,255,0.015);">
+  <div class="marquee-track">
+    <!-- Set 1 -->
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=260&fit=crop&q=70" alt="Students in a hackathon session"/>
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=260&fit=crop&q=70" alt="Students collaborating on a project"/>
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=260&fit=crop&q=70" alt="Audience at an innovation event"/>
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=260&fit=crop&q=70" alt="Student workspace with laptop"/>
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=260&fit=crop&q=70" alt="Team meeting around a table"/>
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=260&fit=crop&q=70" alt="Speaker on stage at a conference"/>
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=260&fit=crop&q=70" alt="Community outreach activity"/>
+    <img class="marquee-photo" loading="lazy" src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=260&fit=crop&q=70" alt="Students celebrating a win"/>
+    <!-- Set 2 (duplicate for seamless loop, hidden from assistive tech) -->
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1531482615713-2afd69097998?w=400&h=260&fit=crop&q=70" alt=""/>
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=260&fit=crop&q=70" alt=""/>
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=400&h=260&fit=crop&q=70" alt=""/>
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=400&h=260&fit=crop&q=70" alt=""/>
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=400&h=260&fit=crop&q=70" alt=""/>
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=260&fit=crop&q=70" alt=""/>
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=400&h=260&fit=crop&q=70" alt=""/>
+    <img class="marquee-photo" loading="lazy" aria-hidden="true" src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=400&h=260&fit=crop&q=70" alt=""/>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     THE JOURNEY — pinned horizontal scroll on all screens
+═══════════════════════════════════════════════════════ -->
+<div id="journey-section">
+  <div class="journey-sticky">
+    <!-- Header (stays fixed while scrolling) -->
+    <div class="px-6 md:px-16 mb-12 max-w-screen-xl mx-auto w-full">
+      <p class="section-label mb-4" data-reveal="fade">The IEC journey</p>
+      <h2 class="font-display font-bold text-white" style="font-size: clamp(2.3rem, 5vw, 3.2rem);" data-reveal="up">
+        From idea to impact.
+      </h2>
+    </div>
+
+    <!-- Scrolling track (vertical scroll drives it on all screens) -->
+    <div id="journey-track" class="flex overflow-visible pl-6 md:pl-16 pb-4" style="will-change: transform;">
+
+      <div class="journey-step journey-active">
+        <div class="font-display font-extrabold text-iec-blue text-5xl md:text-6xl mb-6 leading-none">01</div>
+        <h3 class="font-display font-bold text-white text-2xl mb-3">Discover</h3>
+        <p class="text-white/60 text-sm leading-relaxed max-w-xs">Find problems worth solving. Ask questions. Look around. The best ideas start with noticing something that doesn't work.</p>
+      </div>
+
+      <div class="journey-step">
+        <div class="font-display font-extrabold text-iec-blue text-5xl md:text-6xl mb-6 leading-none">02</div>
+        <h3 class="font-display font-bold text-white text-2xl mb-3">Create</h3>
+        <p class="text-white/60 text-sm leading-relaxed max-w-xs">Sketch it out. Brainstorm with others. Shape a vague idea into something that has a direction.</p>
+      </div>
+
+      <div class="journey-step">
+        <div class="font-display font-extrabold text-iec-blue text-5xl md:text-6xl mb-6 leading-none">03</div>
+        <h3 class="font-display font-bold text-white text-2xl mb-3">Build</h3>
+        <p class="text-white/60 text-sm leading-relaxed max-w-xs">Work with a team. Make something tangible. A working prototype beats a perfect plan every time.</p>
+      </div>
+
+      <div class="journey-step">
+        <div class="font-display font-extrabold text-iec-blue text-5xl md:text-6xl mb-6 leading-none">04</div>
+        <h3 class="font-display font-bold text-white text-2xl mb-3">Test</h3>
+        <p class="text-white/60 text-sm leading-relaxed max-w-xs">Get feedback from real users. Break it. Fix it. Learn more in a week of testing than a semester of theory.</p>
+      </div>
+
+      <div class="journey-step journey-step-last">
+        <div class="font-display font-extrabold text-iec-blue text-5xl md:text-6xl mb-6 leading-none">05</div>
+        <h3 class="font-display font-bold text-white text-2xl mb-3">Launch</h3>
+        <p class="text-white/60 text-sm leading-relaxed max-w-xs">Take your project beyond the classroom. Into the real world. Into the hands of the people it was built for.</p>
+      </div>
+
     </div>
   </div>
 </div>
-</section>
 
-<!-- Venture First Bento Grid -->
-<section class="py-section-padding bg-surface-container-low">
-<div class="max-w-7xl mx-auto px-grid-margin">
-  <div class="text-center mb-16">
-    <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">The Venture First Framework</h2>
-    <p class="font-body-md text-body-md text-on-surface-variant max-w-2xl mx-auto">
-      We've redesigned student entrepreneurship. Every module is built to turn a spark of an idea into a flame of a business.
-    </p>
+<hr class="rule mx-6 md:mx-16"/>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     YOU DON'T HAVE TO BE A TECHIE
+═══════════════════════════════════════════════════════ -->
+<!-- REPLACE background image with a real IEC group/diversity photo -->
+<section class="py-10 md:py-16 relative overflow-hidden">
+  <!-- Background photo -->
+  <div class="absolute inset-0 z-0">
+    <img loading="lazy" src="https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=1400&h=800&fit=crop&q=70"
+      alt="" class="w-full h-full object-cover" style="filter: saturate(0.9) brightness(0.65);"/>
+    <div class="absolute inset-0" style="background: linear-gradient(to right, rgba(10,10,10,0.88) 20%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0.75) 100%);"></div>
   </div>
-  <div class="grid grid-cols-1 md:grid-cols-12 gap-bento-gap">
-    <!-- Large Tile -->
-    <div class="md:col-span-8 bento-card bg-white p-8 rounded-3xl border border-outline-variant flex flex-col justify-between">
-      <div>
-        <div class="w-12 h-12 bg-tech-blue/10 text-tech-blue rounded-xl flex items-center justify-center mb-6">
-          <span class="material-symbols-outlined">hub</span>
-        </div>
-        <h3 class="font-headline-md text-headline-md text-on-surface mb-4">Innovation Challenges &amp; Hackathons</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant mb-6 max-w-xl">
-          We organize regular hackathons that bring together students from different disciplines to solve real-world problems in fintech, healthtech, and agritech. Present solutions to potential investors and employers.
-        </p>
-      </div>
-      <div class="flex gap-2">
-        <span class="px-3 py-1 bg-surface-container text-label-md rounded-full">FinTech</span>
-        <span class="px-3 py-1 bg-surface-container text-label-md rounded-full">AgriTech</span>
-        <span class="px-3 py-1 bg-surface-container text-label-md rounded-full">HealthTech</span>
-      </div>
+
+  <div class="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto">
+    <div class="max-w-2xl mb-8">
+      <p class="section-label mb-6" data-reveal="fade">Who can join?</p>
+      <h2 class="font-display font-black text-white leading-tight" style="font-size: clamp(2.5rem, 5.5vw, 4.2rem); letter-spacing: -0.03em;" data-reveal="up">
+        You don't have<br/>to be a techie.
+      </h2>
     </div>
-    <!-- Medium Tile -->
-    <div class="md:col-span-4 bento-card bg-jkuat-green p-8 rounded-3xl text-white flex flex-col justify-between relative overflow-hidden">
-      <div class="relative z-10">
-        <div class="w-12 h-12 bg-white/20 text-white rounded-xl flex items-center justify-center mb-6">
-          <span class="material-symbols-outlined">groups</span>
-        </div>
-        <h3 class="font-headline-md text-headline-md mb-4">Startups &amp; Incubation</h3>
-        <p class="font-body-md opacity-90">
-          Transition promising ideas into market-ready solutions through our project incubation program.
-        </p>
-      </div>
-      <div class="relative z-10 mt-8">
-        <button class="w-full py-3 bg-white text-jkuat-green font-button-text rounded-xl hover:bg-jkuat-gold hover:text-white transition-colors">Apply for Incubation</button>
-      </div>
-      <div class="absolute -right-12 -bottom-12 w-48 h-48 bg-white/10 rounded-full blur-3xl"></div>
+
+    <!-- Discipline grid -->
+    <div class="flex gap-2 mb-10 overflow-x-auto scrollbar-hide pb-1" data-reveal="up" style="transition-delay: 0.15s;">
+      <span class="discipline-tag shrink-0">Designer</span>
+      <span class="discipline-tag shrink-0">Engineer</span>
+      <span class="discipline-tag shrink-0">Business student</span>
+      <span class="discipline-tag shrink-0">Developer</span>
+      <span class="discipline-tag shrink-0">Artist</span>
+      <span class="discipline-tag shrink-0">Agriculture student</span>
+      <span class="discipline-tag shrink-0">Health Sciences</span>
+      <span class="discipline-tag shrink-0">Law student</span>
+      <span class="discipline-tag shrink-0">Still figuring it out</span>
     </div>
-    <!-- Small Tile 1 -->
-    <div class="md:col-span-6 bento-card bg-white p-8 rounded-3xl border border-outline-variant flex gap-6 items-start">
-      <div class="w-14 h-14 shrink-0 bg-jkuat-gold/10 text-jkuat-gold rounded-2xl flex items-center justify-center">
-        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">psychology</span>
-      </div>
-      <div>
-        <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Mentorship &amp; Growth</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant">
-          Connecting students with industry pros, successful entrepreneurs, and alumni for one-on-one career guidance.
-        </p>
-      </div>
-    </div>
-    <!-- Small Tile 2 -->
-    <div class="md:col-span-6 bento-card bg-white p-8 rounded-3xl border border-outline-variant flex gap-6 items-start">
-      <div class="w-14 h-14 shrink-0 bg-tech-blue/10 text-tech-blue rounded-2xl flex items-center justify-center">
-        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
-      </div>
-      <div>
-        <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Leadership Program</h3>
-        <p class="font-body-md text-body-md text-on-surface-variant">
-          A holistic education blending technical rigor with business values to prepare future leaders for global impact.
-        </p>
-      </div>
+
+    <!-- Statement -->
+    <div class="border-l-2 border-iec-blue pl-8 max-w-xl" data-reveal="left" style="transition-delay: 0.25s">
+      <p class="text-white/70 text-lg md:text-xl font-light leading-relaxed italic">
+        "Great ideas rarely come from one discipline."
+      </p>
+      <p class="text-white/50 text-sm mt-3 font-medium">— IEC JKUAT</p>
     </div>
   </div>
-</div>
 </section>
 
-<!-- Community Section -->
-<section class="py-section-padding bg-surface">
-<div class="max-w-7xl mx-auto px-grid-margin">
-  <div class="flex flex-col md:flex-row justify-between items-end gap-6 mb-16">
-    <div class="max-w-2xl">
-      <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">A Global Community, Locally Rooted</h2>
-      <p class="font-body-md text-body-md text-on-surface-variant">
-        Our community is vibrant and diverse, bringing together students from JKUAT, Nairobi, and beyond to cultivate a collaborative environment.
+
+<!-- ═══════════════════════════════════════════════════════
+     UPCOMING EVENTS
+═══════════════════════════════════════════════════════ -->
+<section class="py-10 md:py-16" style="background: rgba(255,255,255,0.02);">
+  <div class="px-6 md:px-16 max-w-screen-xl mx-auto">
+
+    <div class="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12">
+      <div>
+        <p class="section-label mb-4" data-reveal="fade">What's happening?</p>
+        <h2 class="font-display font-bold text-white" style="font-size: clamp(2.3rem, 5vw, 3.2rem);" data-reveal="up">
+          Upcoming events
+        </h2>
+      </div>
+      <a href="events.html" class="btn-ghost text-sm self-start md:self-auto" data-reveal="fade">
+        All events
+        <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+      </a>
+    </div>
+
+    <!-- Event list (loaded from Supabase) -->
+    <div id="events-list">
+      <!-- Loading state -->
+      <div id="events-loading" class="py-16 text-center text-white/30 text-sm">
+        <span class="material-symbols-outlined animate-spin inline-block mb-2" style="font-size:24px">sync</span>
+        <p>Loading events…</p>
+      </div>
+    </div>
+
+    <!-- Empty state (shown if no events) -->
+    <div id="events-empty" class="hidden py-16 text-center">
+      <p class="text-white/25 text-sm">No events scheduled yet. Check back soon.</p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     HAVE AN IDEA? / HAVE NO IDEA? — full-width statement
+═══════════════════════════════════════════════════════ -->
+<section class="py-10 md:py-16 relative overflow-hidden">
+  <!-- Ambient glow blobs -->
+  <div class="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(0,174,239,0.08), transparent 70%); filter: blur(60px);"></div>
+  <div class="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none" style="background: radial-gradient(circle, rgba(251,176,59,0.08), transparent 70%); filter: blur(60px);"></div>
+
+  <div class="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
+
+      <!-- Have an idea -->
+      <div class="idea-card md:border-r border-white/8 md:pr-16 relative" data-reveal="left">
+        <!-- Small photo accent -->
+        <div class="idea-photo absolute top-0 right-8 w-20 h-20 rounded overflow-hidden opacity-50 hidden md:block">
+          <img loading="lazy" src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=100&h=100&fit=crop" alt="" class="w-full h-full object-cover"/>
+        </div>
+        <p class="md:hidden font-display font-extrabold text-iec-blue text-sm tracking-[0.2em] mb-3">01</p>
+        <p class="font-display font-extrabold text-white leading-tight mb-4" style="font-size: clamp(2.5rem, 5vw, 3.4rem);">
+          Have an<br/><span class="text-iec-blue">idea?</span>
+        </p>
+        <p class="text-white/60 text-base leading-relaxed">
+          Great. Let's find out if it's worth building. IEC gives you the people,
+          tools and environment to take it seriously.
+        </p>
+        <a href="#join" class="btn-primary w-full justify-center mt-6 md:hidden">Join IEC <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+      </div>
+
+      <!-- Have no idea -->
+      <div class="idea-card md:pl-16 relative" data-reveal="right" style="transition-delay: 0.15s">
+        <!-- Small photo accent -->
+        <div class="idea-photo absolute top-0 right-0 w-20 h-20 rounded overflow-hidden opacity-50 hidden md:block">
+          <img loading="lazy" src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=100&h=100&fit=crop" alt="" class="w-full h-full object-cover"/>
+        </div>
+        <p class="md:hidden font-display font-extrabold text-iec-gold text-sm tracking-[0.2em] mb-3">02</p>
+        <p class="font-display font-extrabold text-white leading-tight mb-4" style="font-size: clamp(2.5rem, 5vw, 3.4rem);">
+          Don't have<br/><span class="text-iec-gold">an idea?</span>
+        </p>
+        <p class="text-white/60 text-base leading-relaxed">
+          Also great. IEC isn't only for people who already have startups.
+          It's for students who want to explore, experiment, meet people and
+          figure out what they're capable of.
+        </p>
+        <a href="#join" class="btn-primary w-full justify-center mt-6 md:hidden">Join IEC <span class="material-symbols-outlined text-[18px]">arrow_forward</span></a>
+      </div>
+
+    </div>
+
+    <!-- Bottom line -->
+    <div class="mt-8 pt-8 border-t border-white/6 text-center" data-reveal="up" style="transition-delay: 0.3s">
+      <p class="ghost-text font-display font-black uppercase tracking-[0.2em] text-sm">
+        You just need curiosity.
       </p>
     </div>
-    <button class="px-6 py-3 border-2 border-outline text-on-surface font-button-text rounded-2xl hover:bg-surface-variant transition-colors">See Outreach Activities</button>
   </div>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-bento-gap">
-    <!-- Community Card 1 -->
-    <div class="group cursor-pointer">
-      <div class="rounded-3xl overflow-hidden mb-6 aspect-video">
-        <div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&h=340&fit=crop')"></div>
-      </div>
-      <h4 class="font-headline-md text-headline-md text-on-surface mb-2">Vibrant Diversity</h4>
-      <p class="font-body-md text-body-md text-on-surface-variant">Cultivating cultures and perspectives to nurture a global mindset among JKUAT innovators.</p>
-    </div>
-    <!-- Community Card 2 -->
-    <div class="group cursor-pointer">
-      <div class="rounded-3xl overflow-hidden mb-6 aspect-video">
-        <div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=600&h=340&fit=crop')"></div>
-      </div>
-      <h4 class="font-headline-md text-headline-md text-on-surface mb-2">Local Engagement</h4>
-      <p class="font-body-md text-body-md text-on-surface-variant">From community service to hackathons, we strengthen our roots and enrich the learning experience.</p>
-    </div>
-    <!-- Community Card 3 -->
-    <div class="group cursor-pointer">
-      <div class="rounded-3xl overflow-hidden mb-6 aspect-video">
-        <div class="w-full h-full bg-cover bg-center group-hover:scale-105 transition-transform duration-500" style="background-image: url('https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=340&fit=crop')"></div>
-      </div>
-      <h4 class="font-headline-md text-headline-md text-on-surface mb-2">Startup Pitches</h4>
-      <p class="font-body-md text-body-md text-on-surface-variant">Connecting student founders with families, organizations, and potential angel investors.</p>
-    </div>
-  </div>
-</div>
 </section>
 
-<!-- Membership Flow Section -->
-<section class="py-section-padding bg-surface-container-high relative overflow-hidden" id="join">
-<div class="absolute top-0 right-0 w-1/3 h-full bg-tech-blue/5 skew-x-12 transform origin-top translate-x-20"></div>
-<div class="max-w-4xl mx-auto px-grid-margin relative z-10">
-  <div class="text-center mb-12">
-    <h2 class="font-headline-lg text-headline-lg text-on-background mb-4">Join the Club</h2>
-    <p class="font-body-md text-body-md text-on-surface-variant">
-      Membership is open to all JKUAT students. Start your journey for just KES 200 per semester.
-    </p>
-  </div>
-  <div class="bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-outline-variant">
-    <div class="flex border-b border-outline-variant">
-      <button class="flex-1 py-6 text-center font-label-md text-tech-blue border-b-4 border-tech-blue bg-tech-blue/5" id="step1-tab" onclick="switchStep(1)">
-        Step 1: Registration
-      </button>
-      <button class="flex-1 py-6 text-center font-label-md text-on-surface-variant border-b-4 border-transparent hover:bg-surface-variant/30" id="step2-tab" onclick="switchStep(2)">
-        Step 2: Activation
-      </button>
+<hr class="rule mx-6 md:mx-16"/>
+
+
+<!-- ═══════════════════════════════════════════════════════
+     JOIN THE CLUB
+═══════════════════════════════════════════════════════ -->
+<section class="join-bg py-10 md:py-16 px-6 md:px-16" id="join">
+  <div class="max-w-screen-xl mx-auto">
+
+    <!-- Header -->
+    <div class="max-w-2xl mx-auto text-center mb-8">
+      <p class="section-label mb-6" data-reveal="fade">Ready?</p>
+      <h2 class="font-display font-black text-white leading-none mb-6" style="font-size: clamp(2.5rem, 6vw, 5rem); letter-spacing: -0.03em;" data-reveal="up">
+        Ready to build<br/>with us?
+      </h2>
+      <p class="text-white/45 text-base leading-relaxed" data-reveal="up" style="transition-delay: 0.15s">
+        Open to all JKUAT students. KES 200 per semester.
+        Fill in your details, then complete activation via M-Pesa.
+      </p>
     </div>
-    <div class="p-8 md:p-12">
-      <!-- Step 1: Registration -->
-      <div class="step-transition" id="step1-content">
-        <h3 class="font-headline-md text-headline-md text-on-surface mb-8">New Member Registration</h3>
-        <form class="grid grid-cols-1 md:grid-cols-2 gap-6" id="registration-form" onsubmit="handleRegistration(event)">
-          <div class="md:col-span-2">
-            <label class="block text-label-md mb-2 text-on-surface">Full Name *</label>
-            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="John Doe" required type="text"/>
+
+    <!-- Registration card -->
+    <div class="max-w-2xl mx-auto" data-reveal="up" style="transition-delay: 0.25s">
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; overflow: visible;">
+
+        <!-- Step tabs -->
+        <div class="flex" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+          <button class="step-tab active" id="step1-tab" onclick="switchStep(1)">01 — Registration</button>
+          <button class="step-tab"        id="step2-tab" onclick="switchStep(2)">02 — Activation</button>
+        </div>
+
+        <!-- Step 1: Registration form -->
+        <div class="p-5 sm:p-8 md:p-10" id="step1-content">
+          <form class="grid grid-cols-1 md:grid-cols-2 gap-4" id="registration-form" onsubmit="handleRegistration(event)">
+            <div class="md:col-span-2">
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">Full Name *</label>
+              <input id="reg-full-name" class="iec-input" placeholder="Jane Mwangi" required type="text"/>
+            </div>
+            <div>
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">Reg Number *</label>
+              <input id="reg-reg-number" class="iec-input" placeholder="SCT211-XXXX/20XX" required type="text"/>
+            </div>
+            <div style="position: relative; z-index: 50;">
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">College *</label>
+              <select id="reg-college" class="iec-input" required>
+                <option value="">Select college</option>
+                <option>COPAS — Pure &amp; Applied Sciences</option>
+                <option>COETEC — Engineering &amp; Technology</option>
+                <option>COHES — Health Sciences</option>
+                <option>COANRE — Agriculture, Natural Resources &amp; Environment</option>
+                <option>COHRED — Human Resource &amp; Enterprise Development</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">Course *</label>
+              <input id="reg-course" class="iec-input" placeholder="e.g. BSc Computer Science" required type="text"/>
+            </div>
+            <div style="position: relative; z-index: 40;">
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">Year of Study *</label>
+              <select id="reg-year" class="iec-input" required>
+                <option value="">Select year</option>
+                <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">Phone *</label>
+              <input id="reg-phone" class="iec-input" placeholder="07XXXXXXXX" required type="tel"/>
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">JKUAT Email *</label>
+              <input id="reg-email" class="iec-input" placeholder="user@students.jkuat.ac.ke" required type="email"/>
+            </div>
+            <div class="md:col-span-2 mt-2">
+              <button class="btn-primary w-full justify-center" type="submit">
+                Continue to Activation
+                <span class="material-symbols-outlined text-[18px]">chevron_right</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Step 2: Activation — standalone, works for new & returning members -->
+        <div class="hidden p-5 sm:p-8 md:p-10" id="step2-content">
+          <div class="text-center mb-8">
+            <div class="inline-flex w-14 h-14 rounded-full items-center justify-center mb-4" style="background: rgba(0,174,239,0.12);">
+              <span class="material-symbols-outlined text-iec-blue" style="font-size:28px;font-variation-settings:'FILL' 1;">payments</span>
+            </div>
+            <h3 class="font-display font-bold text-white text-xl mb-1">Activate Membership</h3>
+            <p class="text-white/40 text-sm">New member or renewing for a new semester? Pay KES 200 via M-Pesa.</p>
           </div>
-          <div>
-            <label class="block text-label-md mb-2 text-on-surface">Student Registration Number *</label>
-            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="SCT211-XXXX/20XX" required type="text"/>
-          </div>
-          <div>
-            <label class="block text-label-md mb-2 text-on-surface">College *</label>
-            <select class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" required>
-              <option value="">Select your college</option>
-              <option>COPAS &mdash; Pure &amp; Applied Sciences</option>
-              <option>COETEC &mdash; Engineering &amp; Technology</option>
-              <option>COHES &mdash; Health Sciences</option>
-              <option>COANRE &mdash; Agriculture, Natural Resources &amp; Environment</option>
-              <option>COHRED &mdash; Human Resource &amp; Enterprise Development</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-label-md mb-2 text-on-surface">Course / Department *</label>
-            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" required type="text"/>
-          </div>
-          <div>
-            <label class="block text-label-md mb-2 text-on-surface">Year of Study *</label>
-            <select class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" required>
-              <option value="">Select Year</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-              <option>4</option>
-              <option>5</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-label-md mb-2 text-on-surface">Phone Number *</label>
-            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="07XXXXXXXX" required type="tel"/>
-          </div>
-          <div>
-            <label class="block text-label-md mb-2 text-on-surface">JKUAT Student Email *</label>
-            <input class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="user@students.jkuat.ac.ke" required type="email"/>
-          </div>
-          <div class="md:col-span-2 pt-4">
-            <button class="w-full py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:scale-[1.01] active:scale-95 transition-transform flex items-center justify-center gap-2" type="submit">
-              Register Details
-              <span class="material-symbols-outlined">chevron_right</span>
+
+          <form class="max-w-sm mx-auto space-y-4" id="payment-form" onsubmit="handlePayment(event)">
+
+            <!-- Member lookup -->
+            <div>
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">Registration Number *</label>
+              <div class="flex gap-2">
+                <input id="payment-reg-number" class="iec-input flex-1" placeholder="SCT211-XXXX/20XX" required type="text"/>
+                <button type="button" onclick="lookupMember()" id="lookup-btn"
+                  class="px-4 py-2 text-sm font-bold rounded text-iec-blue shrink-0 hover:bg-white/5 transition-all"
+                  style="border: 1px solid rgba(0,174,239,0.4);">
+                  Find
+                </button>
+              </div>
+              <p class="text-white/40 text-xs mt-1.5">Enter your reg number and click Find, or just pay directly.</p>
+            </div>
+
+            <!-- Member preview (shown after lookup) -->
+            <div id="member-preview" class="hidden px-4 py-3 rounded flex items-center gap-3"
+              style="background: rgba(0,174,239,0.08); border: 1px solid rgba(0,174,239,0.2);">
+              <span class="material-symbols-outlined text-iec-blue text-[18px]" style="font-variation-settings:'FILL' 1;">account_circle</span>
+              <div class="min-w-0">
+                <p id="member-preview-name" class="text-white text-sm font-semibold truncate">—</p>
+                <p id="member-preview-reg" class="text-white/40 text-xs truncate">—</p>
+              </div>
+              <span class="material-symbols-outlined text-iec-blue text-[16px] ml-auto shrink-0">check_circle</span>
+            </div>
+
+            <!-- Amount -->
+            <div class="flex items-center justify-between px-4 py-3 rounded"
+              style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
+              <span class="text-white/35 text-xs uppercase tracking-widest">Amount Due</span>
+              <span class="font-display font-extrabold text-iec-blue text-2xl">KES 200</span>
+            </div>
+
+            <!-- Phone number -->
+            <div>
+              <label class="block text-[13px] font-medium text-white/60 mb-1.5">M-Pesa Number *</label>
+              <input id="payment-phone" class="iec-input" placeholder="07XXXXXXXX" required type="tel"/>
+              <p class="text-white/40 text-xs mt-1.5">Can be any Safaricom number — yours or someone else's.</p>
+            </div>
+
+            <button id="payment-btn" class="btn-primary w-full justify-center" type="submit">
+              Pay via M-Pesa
+              <span class="material-symbols-outlined text-[18px]">bolt</span>
             </button>
+          </form>
+
+          <!-- Payment status -->
+          <div class="hidden mt-6 p-5 rounded text-center" id="payment-status"
+            style="background: rgba(0,174,239,0.08); border: 1px solid rgba(0,174,239,0.2);">
+            <div class="flex items-center justify-center gap-2 text-iec-blue font-semibold text-sm">
+              <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">check_circle</span>
+              STK Push sent!
+            </div>
+            <p class="text-white/40 text-xs mt-2">Check your phone for the M-Pesa prompt and enter your PIN.</p>
+            <p id="payment-ref" class="text-white/40 text-xs mt-1"></p>
           </div>
-        </form>
-      </div>
-      <!-- Step 2: Payment -->
-      <div class="hidden step-transition opacity-0 scale-95" id="step2-content">
-        <div class="text-center mb-10">
-          <div class="w-20 h-20 bg-primary-container/10 text-primary-container rounded-full flex items-center justify-center mx-auto mb-6">
-            <span class="material-symbols-outlined text-4xl" style="font-variation-settings: 'FILL' 1;">payments</span>
-          </div>
-          <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Activate Membership</h3>
-          <p class="text-on-surface-variant">Pay your semester membership fee via M-Pesa.</p>
-          <div class="mt-4 inline-block px-6 py-3 bg-surface-container-low rounded-2xl border border-outline-variant">
-            <span class="text-label-md text-on-surface-variant block uppercase tracking-widest">Amount Due</span>
-            <span class="text-headline-lg font-bold text-jkuat-green">KES 200</span>
-          </div>
+
+          <!-- Back link -->
+          <p class="text-center mt-6">
+            <button onclick="switchStep(1)" class="text-white/50 text-xs hover:text-white/70 transition-colors">
+              ← Register a new member instead
+            </button>
+          </p>
         </div>
-        <form class="max-w-sm mx-auto" id="payment-form" onsubmit="handlePayment(event)">
-          <div class="mb-6">
-            <label class="block text-label-md mb-2 text-on-surface">M-Pesa Phone Number *</label>
-            <input id="payment-phone" class="w-full h-14 bg-surface-container-low rounded-xl border-none focus:ring-2 focus:ring-tech-blue focus:bg-white transition-all px-4" placeholder="07XXXXXXXX" required type="tel"/>
-            <p class="text-[12px] text-on-surface-variant mt-2">Can be any M-Pesa number &mdash; payment is tied to your reg number.</p>
-          </div>
-          <button id="payment-btn" class="w-full py-4 bg-tech-blue text-white font-button-text text-button-text rounded-2xl hover:scale-[1.01] active:scale-95 transition-transform flex items-center justify-center gap-2" type="submit">
-            Pay via M-Pesa
-            <span class="material-symbols-outlined">bolt</span>
-          </button>
-        </form>
-        <div class="hidden mt-10 p-6 bg-primary-container/10 border border-primary-container/20 rounded-2xl text-center" id="payment-status">
-          <div class="flex items-center justify-center gap-3 text-jkuat-green font-semibold">
-            <span class="material-symbols-outlined animate-spin">refresh</span>
-            Payment Initiated!
-          </div>
-          <p class="text-on-surface-variant mt-2 text-sm">Check your phone for the M-Pesa prompt and enter your PIN.</p>
-        </div>
-      </div>
+
     </div>
   </div>
-</div>
 </section>
 
-<!-- Footer -->
-<footer class="w-full rounded-t-xl bg-surface-container-highest dark:bg-inverse-surface mt-20">
-<div class="grid grid-cols-1 md:grid-cols-4 gap-bento-gap px-grid-margin py-section-padding max-w-7xl mx-auto w-full">
-  <div class="col-span-1 md:col-span-1">
-    <span class="text-headline-md font-headline-md text-jkuat-green mb-6 block">IEC JKUAT</span>
-    <p class="font-body-md text-body-md text-on-surface-variant/80 mb-6">
-      Raising future leaders with strong character, technical excellence, and a global outlook.
-    </p>
-    <div class="flex gap-4">
-      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="https://twitter.com/iecjkuat" target="_blank" rel="noopener">
-        <span class="material-symbols-outlined text-xl">alternate_email</span>
-      </a>
-      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener">
-        <span class="material-symbols-outlined text-xl">work</span>
-      </a>
-      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="https://instagram.com/iecjkuat" target="_blank" rel="noopener">
-        <span class="material-symbols-outlined text-xl">photo_camera</span>
-      </a>
-      <a class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue hover:bg-white transition-all" href="mailto:info@iec.jkuat.org">
-        <span class="material-symbols-outlined text-xl">mail</span>
-      </a>
+
+<!-- ═══════════════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════════════ -->
+<style>
+/* Light mode footer — placed here so it always beats Tailwind CDN */
+html.light footer,
+html.light footer *:not(.text-iec-blue):not([class*="text-iec-blue"]) {
+  color: #0d0f12 !important;
+}
+html.light footer span.text-iec-blue { color: #0aaad4 !important; }
+html.light footer a:hover,
+html.light footer a:hover * { color: #0aaad4 !important; }
+html.light footer { background: #e4e7ec !important; }
+html.light footer .border-white\/6 { border-color: rgba(0,0,0,0.12) !important; }
+html.light footer [class*="bg-white"] { background: rgba(0,0,0,0.05) !important; }
+html.light footer [class*="hover:bg-white"] { background: transparent !important; }
+html.light footer a[class*="hover:bg-white"]:hover { background: rgba(0,153,214,0.1) !important; }
+</style>
+<footer>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-6 md:gap-y-8 px-6 md:px-16 py-8 md:py-12 max-w-screen-xl mx-auto w-full">
+    <!-- Brand -->
+    <div class="col-span-2 md:col-span-1 order-1">
+      <a href="index.html" class="font-display font-bold text-white text-base mb-3 block">IEC <span class="text-iec-blue">JKUAT</span></a>
+      <p class="text-xs text-white/50 mb-3 leading-relaxed max-w-xs">
+        A student community for innovation, entrepreneurship and leadership at JKUAT.
+      </p>
+      <div class="flex flex-wrap gap-2.5">
+        <a class="w-11 h-11 rounded-lg flex items-center justify-center text-white/40 hover:text-iec-blue hover:bg-white/5 transition-all" href="https://x.com/iecjkuat" target="_blank" rel="noopener" aria-label="X (Twitter)">
+          <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        </a>
+        <a class="w-11 h-11 rounded-lg flex items-center justify-center text-white/40 hover:text-iec-blue hover:bg-white/5 transition-all" href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener" aria-label="LinkedIn">
+          <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a class="w-11 h-11 rounded-lg flex items-center justify-center text-white/40 hover:text-iec-blue hover:bg-white/5 transition-all" href="https://instagram.com/iecjkuat" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+        </a>
+        <a class="w-11 h-11 rounded-lg flex items-center justify-center text-white/40 hover:text-iec-blue hover:bg-white/5 transition-all" href="https://github.com/iecjkuat" target="_blank" rel="noopener" aria-label="GitHub">
+          <svg class="w-[18px] h-[18px]" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+        </a>
+        <a class="w-11 h-11 rounded-lg flex items-center justify-center text-white/40 hover:text-iec-blue hover:bg-white/5 transition-all" href="mailto:info@iecjkuat.com" aria-label="Email">
+          <span class="material-symbols-outlined text-[18px]">mail</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Nav -->
+    <div class="order-2 md:order-2">
+      <h4 class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">Navigate</h4>
+      <ul class="space-y-2">
+        <li><a class="text-xs text-white/40 hover:text-white transition-colors" href="index.html">Home</a></li>
+        <li><a class="text-xs text-white/40 hover:text-white transition-colors" href="events.html">Events</a></li>
+        <li><a class="text-xs text-white/40 hover:text-white transition-colors" href="showcase.html">Projects</a></li>
+        <li><a class="text-xs text-white/40 hover:text-white transition-colors" href="contact.html">Contact</a></li>
+        <li><a class="text-xs text-white/40 hover:text-white transition-colors" href="merchandise.html">Merchandise</a></li>
+      </ul>
+    </div>
+
+    <!-- Legal -->
+    <div class="order-3 md:order-4">
+      <h4 class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">Legal</h4>
+      <ul class="space-y-2">
+        <li><a class="text-xs text-white/40 hover:text-white transition-colors" href="privacy.html">Privacy Policy</a></li>
+        <li><a class="text-xs text-white/40 hover:text-white transition-colors" href="terms.html">Terms of Use</a></li>
+      </ul>
+    </div>
+
+    <!-- Find us (full-width inline row on mobile) -->
+    <div class="col-span-2 md:col-span-1 order-4 md:order-3">
+      <h4 class="text-[10px] font-bold uppercase tracking-widest text-white/50 mb-3">Find Us</h4>
+      <ul class="flex flex-row flex-wrap gap-x-6 gap-y-2 md:flex-col md:gap-2.5">
+        <li class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-iec-blue text-[13px] mt-0.5 shrink-0">location_on</span>
+          <span class="text-xs text-white/50">JKUAT Main Campus, Kiambu</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-iec-blue text-[13px] mt-0.5 shrink-0">meeting_room</span>
+          <span class="text-xs text-white/50">Student Center, Room 201</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-iec-blue text-[13px] mt-0.5 shrink-0">mail</span>
+          <span class="text-xs text-white/50">info@iecjkuat.com</span>
+        </li>
+      </ul>
     </div>
   </div>
-  <div>
-    <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider mb-6">Our Club</h4>
-    <ul class="space-y-4">
-      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="index.html">Home</a></li>
-      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="events.html">Events</a></li>
-      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="showcase.html">Projects</a></li>
-      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="community.html">Community</a></li>
-      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="blog.html">Blog</a></li>
-      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="contact.html">Contact</a></li>
-      <li><a class="font-label-md text-label-md text-on-surface-variant/80 hover:text-jkuat-gold hover:translate-x-1 transition-all block" href="merchandise.html">Merchandise</a></li>
-    </ul>
+
+  <!-- Bottom bar -->
+  <div class="px-6 md:px-16 py-8 max-w-screen-xl mx-auto border-t border-white/6">
+    <p class="text-[11px] text-white/50 text-center">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club. All rights reserved.</p>
   </div>
-  <div>
-    <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider mb-6">Stay Connected</h4>
-    <ul class="space-y-4">
-      <li class="flex items-start gap-3">
-        <span class="material-symbols-outlined text-jkuat-green">location_on</span>
-        <span class="font-label-md text-label-md text-on-surface-variant/80">JKUAT Main Campus, Kiambu, Kenya</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <span class="material-symbols-outlined text-jkuat-green">info</span>
-        <span class="font-label-md text-label-md text-on-surface-variant/80">Student Center, Room 201</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <span class="material-symbols-outlined text-jkuat-green">phone</span>
-        <span class="font-label-md text-label-md text-on-surface-variant/80">0712 345 678</span>
-      </li>
-      <li class="flex items-start gap-3">
-        <span class="material-symbols-outlined text-jkuat-green">mail</span>
-        <span class="font-label-md text-label-md text-on-surface-variant/80">info@iec.jkuat.org</span>
-      </li>
-    </ul>
-  </div>
-  <div>
-    <h4 class="font-label-md text-label-md text-on-surface font-bold uppercase tracking-wider mb-6">Join Newsletter</h4>
-    <p class="font-label-md text-label-md text-on-surface-variant/80 mb-4">Get updates on new hackathons and programs.</p>
-    <form id="newsletter-form" class="relative" onsubmit="handleNewsletter(event)">
-      <input id="newsletter-email" class="w-full h-12 bg-surface-container rounded-xl border-none px-4 pr-12 focus:ring-1 focus:ring-tech-blue" placeholder="Email address" type="email" required/>
-      <button type="submit" class="absolute right-2 top-2 w-8 h-8 bg-jkuat-green text-white rounded-lg flex items-center justify-center">
-        <span class="material-symbols-outlined text-sm">send</span>
-      </button>
-    </form>
-    <p id="newsletter-feedback" class="text-[12px] text-jkuat-green mt-2 hidden">Thanks for subscribing!</p>
-  </div>
-</div>
-<div class="max-w-7xl mx-auto px-grid-margin py-8 border-t border-outline-variant/30 flex flex-col md:flex-row justify-between items-center gap-4">
-  <p class="font-label-md text-label-md text-on-surface-variant/60">&copy; 2026 IEC JKUAT — Innovation &amp; Entrepreneurship Club. All rights reserved.</p>
-  <div class="flex gap-6">
-    <a class="font-label-md text-label-md text-on-surface-variant/60 hover:text-jkuat-green transition-colors" href="privacy.html">Privacy Policy</a>
-    <a class="font-label-md text-label-md text-on-surface-variant/60 hover:text-jkuat-green transition-colors" href="terms.html">Terms of Use</a>
-  </div>
-</div>
 </footer>
 
+
+<!-- ═══════════════════════════════════════════════════════
+     SCRIPTS
+═══════════════════════════════════════════════════════ -->
+<script src="js/main.js"></script>
+
 <script>
-// Step switcher
+// ── Nav scroll ───────────────────────────────────
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+}, { passive: true });
+
+// ── Hero entrance — fires immediately, no scroll needed ──
+// Uses requestAnimationFrame so the initial opacity:0 paint completes first
+requestAnimationFrame(() => {
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.hero-animate').forEach(el => {
+      el.classList.add('go');
+    });
+  });
+});
+
+// ── Step switcher ─────────────────────────────────
 function switchStep(step) {
-  const s1Tab = document.getElementById('step1-tab');
-  const s2Tab = document.getElementById('step2-tab');
-  const s1Content = document.getElementById('step1-content');
-  const s2Content = document.getElementById('step2-content');
+  const s1tab     = document.getElementById('step1-tab');
+  const s2tab     = document.getElementById('step2-tab');
+  const s1content = document.getElementById('step1-content');
+  const s2content = document.getElementById('step2-content');
+
   if (step === 1) {
-    s1Tab.className = "flex-1 py-6 text-center font-label-md text-tech-blue border-b-4 border-tech-blue bg-tech-blue/5";
-    s2Tab.className = "flex-1 py-6 text-center font-label-md text-on-surface-variant border-b-4 border-transparent hover:bg-surface-variant/30";
-    s2Content.classList.add('opacity-0', 'scale-95');
-    setTimeout(() => {
-      s2Content.classList.add('hidden');
-      s1Content.classList.remove('hidden');
-      setTimeout(() => { s1Content.classList.remove('opacity-0', 'scale-95'); }, 50);
-    }, 300);
+    s1tab.classList.add('active');    s2tab.classList.remove('active');
+    s1content.classList.remove('hidden'); s2content.classList.add('hidden');
   } else {
-    s2Tab.className = "flex-1 py-6 text-center font-label-md text-tech-blue border-b-4 border-tech-blue bg-tech-blue/5";
-    s1Tab.className = "flex-1 py-6 text-center font-label-md text-on-surface-variant border-b-4 border-transparent hover:bg-surface-variant/30";
-    s1Content.classList.add('opacity-0', 'scale-95');
-    setTimeout(() => {
-      s1Content.classList.add('hidden');
-      s2Content.classList.remove('hidden');
-      setTimeout(() => { s2Content.classList.remove('opacity-0', 'scale-95'); }, 50);
-    }, 300);
+    s2tab.classList.add('active');    s1tab.classList.remove('active');
+    s2content.classList.remove('hidden'); s1content.classList.add('hidden');
   }
 }
 
+// ── Registration ──────────────────────────────────
 let currentMemberId = null;
 
-// Handle registration form submission
 async function handleRegistration(e) {
   e.preventDefault();
   const btn = e.target.querySelector('button[type="submit"]');
-  const originalText = btn.innerHTML;
-  btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Registering...';
+  const orig = btn.innerHTML;
+  btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">refresh</span> Registering…';
   btn.disabled = true;
 
   try {
-    const form = e.target;
-    const formData = {
-      fullName: form.querySelector('input[placeholder="John Doe"]').value,
-      regNumber: form.querySelector('input[placeholder="SCT211-XXXX/20XX"]').value,
-      college: form.querySelector('select').value,
-      course: form.querySelectorAll('input[type="text"]')[1].value,
-      yearOfStudy: form.querySelectorAll('select')[1].value,
-      phone: form.querySelector('input[type="tel"]').value,
-      email: form.querySelector('input[type="email"]').value
-    };
-
-    await initSupabase();
-    const data = await submitMemberRegistration(formData);
+    const data = await submitMemberRegistration({
+      fullName:    document.getElementById('reg-full-name').value.trim(),
+      regNumber:   document.getElementById('reg-reg-number').value.trim(),
+      college:     document.getElementById('reg-college').value,
+      course:      document.getElementById('reg-course').value.trim(),
+      yearOfStudy: document.getElementById('reg-year').value,
+      phone:       document.getElementById('reg-phone').value.trim(),
+      email:       document.getElementById('reg-email').value.trim(),
+    });
     currentMemberId = data[0].id;
+    // Pre-fill reg number in payment form
+    const regInput = document.getElementById('payment-reg-number');
+    if (regInput) {
+      regInput.value = document.getElementById('reg-reg-number').value.trim();
+      // Auto-show the member preview
+      showMemberPreview(data[0]);
+    }
     switchStep(2);
   } catch (err) {
-    alert('Registration failed: ' + err.message + '\n\nPlease try again or contact us at info@iec.jkuat.org');
+    showToast('Registration failed: ' + err.message, 'error');
   } finally {
-    btn.innerHTML = originalText;
-    btn.disabled = false;
+    btn.innerHTML = orig;
+    btn.disabled  = false;
   }
 }
 
-// Handle payment
-async function handlePayment(e) {
-  e.preventDefault();
-  const btn = document.getElementById('payment-btn');
-  const phone = document.getElementById('payment-phone').value;
-  const status = document.getElementById('payment-status');
-  
-  btn.innerHTML = '<span class="material-symbols-outlined animate-spin">refresh</span> Processing...';
+// ── Member lookup (for returning members paying a new semester) ──
+async function lookupMember() {
+  const regNum = document.getElementById('payment-reg-number').value.trim();
+  if (!regNum) { showToast('Enter a registration number first', 'error'); return; }
+
+  const btn = document.getElementById('lookup-btn');
+  btn.textContent = '…';
   btn.disabled = true;
 
   try {
-    await initSupabase();
-    const result = await initiatePayment(phone, 200, currentMemberId);
-    
-    status.classList.remove('hidden');
-    status.innerHTML = `
-      <div class="flex items-center justify-center gap-3 text-jkuat-green font-semibold">
-        <span class="material-symbols-outlined">check_circle</span>
-        Payment Initiated!
-      </div>
-      <p class="text-on-surface-variant mt-2 text-sm">Check your phone for the M-Pesa prompt and enter your PIN.</p>
-      <p class="text-xs text-on-surface-variant/60 mt-1">Ref: ${result.transactionRef || 'Pending'}</p>
-    `;
-    status.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const sb = initSupabase();
+    const { data, error } = await sb
+      .from('members')
+      .select('id, full_name, reg_number, membership_status')
+      .ilike('reg_number', regNum)
+      .limit(1)
+      .single();
+
+    if (error || !data) throw new Error('Member not found. Please register first.');
+
+    currentMemberId = data.id;
+    showMemberPreview(data);
+    showToast('Member found!', 'success');
   } catch (err) {
-    status.classList.remove('hidden');
-    status.innerHTML = `
-      <div class="flex items-center justify-center gap-3 text-red-500 font-semibold">
-        <span class="material-symbols-outlined">error</span>
-        Payment Failed
-      </div>
-      <p class="text-on-surface-variant mt-2 text-sm">${err.message}. Please try again or contact info@iec.jkuat.org</p>
-    `;
+    currentMemberId = null;
+    document.getElementById('member-preview').classList.add('hidden');
+    showToast(err.message, 'error');
   } finally {
-    btn.innerHTML = 'Pay via M-Pesa <span class="material-symbols-outlined">bolt</span>';
+    btn.textContent = 'Find';
     btn.disabled = false;
   }
 }
 
-// Handle newsletter signup
-async function handleNewsletter(e) {
+function showMemberPreview(member) {
+  const preview = document.getElementById('member-preview');
+  document.getElementById('member-preview-name').textContent = member.full_name || '—';
+  document.getElementById('member-preview-reg').textContent  = member.reg_number || '—';
+  preview.classList.remove('hidden');
+}
+
+// ── Payment ───────────────────────────────────────
+async function handlePayment(e) {
   e.preventDefault();
-  const email = document.getElementById('newsletter-email').value;
-  const feedback = document.getElementById('newsletter-feedback');
-  
+  const btn    = document.getElementById('payment-btn');
+  const status = document.getElementById('payment-status');
+  const phone  = document.getElementById('payment-phone').value.trim();
+  const regNum = document.getElementById('payment-reg-number').value.trim();
+
+  if (!regNum) {
+    showToast('Enter your registration number first', 'error');
+    return;
+  }
+
+  // If no member looked up yet, try to find them now
+  if (!currentMemberId) {
+    await lookupMember();
+    if (!currentMemberId) return; // lookup failed, stop
+  }
+
+  btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-[18px]">refresh</span> Processing…';
+  btn.disabled  = true;
+
   try {
-    await initSupabase();
-    await submitNewsletter(email);
-    feedback.textContent = 'Thanks for subscribing!';
-    feedback.className = 'text-[12px] text-jkuat-green mt-2';
-    feedback.classList.remove('hidden');
-    document.getElementById('newsletter-email').value = '';
+    const result = await initiatePayment(phone, 200, currentMemberId);
+    status.classList.remove('hidden');
+    status.innerHTML = `
+      <div class="flex items-center justify-center gap-2 text-iec-blue font-semibold text-sm">
+        <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+        STK Push sent!
+      </div>
+      <p class="text-white/40 text-xs mt-2">Check your phone for the M-Pesa prompt and enter your PIN.</p>
+      <p class="text-white/40 text-xs mt-1">Ref: ${result.transactionRef || '—'}</p>`;
+
+    // Membership activates ONLY when the payment webhook confirms money
+    // actually moved. Never mark active client-side (push-sent ≠ paid).
+    // Reset for next use
+    currentMemberId = null;
   } catch (err) {
-    feedback.textContent = err.message.includes('duplicate') ? 'You\'re already subscribed!' : 'Something went wrong. Try again.';
-    feedback.className = 'text-[12px] text-amber-600 mt-2';
-    feedback.classList.remove('hidden');
+    status.classList.remove('hidden');
+    status.innerHTML = `
+      <div class="flex items-center justify-center gap-2 text-red-400 font-semibold text-sm">
+        <span class="material-symbols-outlined text-[18px]">error</span>
+        Payment failed
+      </div>
+      <p class="text-white/40 text-xs mt-2">${err.message}</p>`;
+  } finally {
+    btn.innerHTML = 'Pay via M-Pesa <span class="material-symbols-outlined text-[18px]">bolt</span>';
+    btn.disabled  = false;
   }
 }
 
-// Bento card micro-interactions
-document.querySelectorAll('.bento-card').forEach(card => {
-  card.addEventListener('mousedown', () => { card.style.transform = 'scale(0.98)'; });
-  card.addEventListener('mouseup', () => { card.style.transform = 'translateY(-4px)'; });
-});
+// ── Events from Supabase ──────────────────────────
+async function loadHomeEvents() {
+  const list    = document.getElementById('events-list');
+  const loading = document.getElementById('events-loading');
+  const empty   = document.getElementById('events-empty');
+
+  try {
+    const sb = initSupabase();
+    if (!sb) throw new Error('Supabase not available');
+
+    const { data, error } = await sb
+      .from('events')
+      .select('id, title, event_date, category, location')
+      .gte('event_date', new Date().toISOString().split('T')[0])
+      .order('event_date', { ascending: true })
+      .limit(5);
+
+    if (error) throw error;
+
+    loading.classList.add('hidden');
+
+    if (!data || data.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+
+    const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+    const catColors = {
+      fintech:    'text-iec-blue',
+      agtech:     'text-green-400',
+      leadership: 'text-iec-gold',
+      hackathon:  'text-iec-blue',
+      networking: 'text-red-400',
+      workshop:   'text-green-400',
+    };
+
+    list.innerHTML = data.map(ev => {
+      const d   = new Date(ev.event_date);
+      const validDate = !isNaN(d.getTime());
+      const cat = (ev.category || '').toLowerCase();
+      const col = catColors[cat] || 'text-iec-blue';
+      const safeTitle = escapeHtml(ev.title);
+      const safeCat = escapeHtml(ev.category || '');
+      const safeLoc = escapeHtml(ev.location || '');
+      return `
+        <a href="event.html?id=${ev.id}" class="event-item group" data-reveal="up">
+          <div class="text-center shrink-0">
+            <div class="font-display font-extrabold text-white text-2xl leading-none">${validDate ? d.getDate() : '—'}</div>
+            <div class="text-white/40 text-[10px] font-bold tracking-widest">${validDate ? months[d.getMonth()] : ''}</div>
+          </div>
+          <div class="min-w-0">
+            <p class="font-display font-semibold text-white text-base leading-tight truncate group-hover:text-iec-blue transition-colors">${safeTitle}</p>
+            <div class="flex items-center gap-3 mt-1.5">
+              ${ev.category ? `<span class="text-[11px] font-bold uppercase tracking-wider ${col}">${safeCat}</span>` : ''}
+              ${ev.location ? `<span class="text-white/40 text-[11px]">${safeLoc}</span>` : ''}
+            </div>
+          </div>
+          <span class="material-symbols-outlined text-white/15 group-hover:text-iec-blue group-hover:translate-x-1 transition-all text-[20px] shrink-0">arrow_forward</span>
+        </a>`;
+    }).join('');
+
+    // Trigger reveal on newly added items
+    list.querySelectorAll('[data-reveal]').forEach(el => {
+      setTimeout(() => el.classList.add('revealed'), 50);
+    });
+
+  } catch (err) {
+    loading.innerHTML = `<p class="text-white/20 text-sm text-center py-8">Could not load events.</p>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadHomeEvents);
 </script>
+
+<!-- 3D + Animations (deferred) -->
+<script src="js/hero3d.js" defer></script>
+<script src="js/animations.js" defer></script>
+
 </body>
 </html>

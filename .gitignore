@@ -25,6 +25,10 @@ migrations/
 # Design reference files (keep the site but not the design mockups)
 stitch_school_club_portal_redesign/
 
+# Uploaded media files (staged locally before Supabase upload)
+site/uploads/**/*
+!site/uploads/**/.gitkeep
+
 # Executables
 *.exe
 *.dll

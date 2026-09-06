@@ -1,0 +1,13 @@
+# This folder holds locally staged media before upload to Supabase Storage.
+# Subfolders mirror the Supabase storage buckets:
+#   events/    → event-media bucket
+#   projects/  → project-media bucket
+#   blog/      → blog-media bucket
+#   products/  → product-images bucket
+#   members/   → member-media bucket (new)
+#
+# Files here are temporary. Once uploaded via the admin panel they
+# are served from Supabase CDN and this folder can be cleared.
+#
+# Do NOT commit actual media files — this .gitkeep is the only
+# tracked file in this directory.

@@ -1,62 +1,70 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<!-- Theme flash prevention � must be first script in <head> -->
+<script>
+(function(){
+  var t = localStorage.getItem('iec-theme');
+  var preferLight = t === 'light' || (!t && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+  if (preferLight) document.documentElement.classList.add('light');
+})();
+</script>
 <title>Page Not Found | IEC JKUAT</title>
-<meta name="theme-color" content="#006838"/>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚀</text></svg>"/>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<meta name="theme-color" content="#18C8FF"/>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms"></script>
 <script>
 tailwind.config = {
   theme: {
     extend: {
-      colors: { "jkuat-green": "#006838", "tech-blue": "#00AEEF", "jkuat-gold": "#FBB03B", "on-surface": "#1a1c1e", "surface-gray": "#F4F7F9", "on-surface-variant": "#3f4940" },
-      fontFamily: { "display-lg": ["Plus Jakarta Sans"], "body-md": ["Inter"], "button-text": ["Inter"] },
-      fontSize: {
-        "display-lg": ["48px", {lineHeight: "1.1", letterSpacing: "-0.02em", fontWeight: "800"}],
-        "headline-lg": ["32px", {lineHeight: "1.2", fontWeight: "700"}],
-        "body-md": ["16px", {lineHeight: "1.5", fontWeight: "400"}],
-        "button-text": ["16px", {lineHeight: "1.0", fontWeight: "600"}]
-      }
+      colors: { 'iec-blue': '#18C8FF', 'iec-gold': '#FBB03B' },
+      fontFamily: { display: ['Plus Jakarta Sans','sans-serif'], body: ['Inter','sans-serif'] },
     }
   }
 }
 </script>
 <style>
-.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { font-family: 'Inter', sans-serif; background-color: #07101a; background-image: radial-gradient(ellipse 120% 60% at 80% 0%, rgba(0,36,61,0.55), transparent), radial-gradient(ellipse 80% 50% at 10% 100%, rgba(0,20,40,0.6), transparent); background-attachment: fixed; color: #f0f0f0; }
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  .btn-primary { display: inline-flex; align-items: center; gap: 8px; background: #18C8FF; color: #000; font-weight: 700; font-size: 14px; padding: 12px 28px; border-radius: 4px; transition: transform 0.2s, box-shadow 0.2s; }
+  .btn-primary:hover { box-shadow: 0 0 28px rgba(0,174,239,0.4); transform: translateY(-2px); }
+  .btn-ghost { display: inline-flex; align-items: center; gap: 8px; background: transparent; color: rgba(255,255,255,0.55); font-weight: 600; font-size: 14px; padding: 12px 28px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.12); transition: background 0.2s, color 0.2s; }
+  .btn-ghost:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .social-icon { width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 6px; color: rgba(255,255,255,0.35); background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); transition: all 0.2s; }
+  .social-icon:hover { color: #18C8FF; border-color: rgba(0,174,239,0.3); background: rgba(0,174,239,0.08); }
 </style>
 </head>
-<body class="bg-surface-gray text-on-surface font-body-md min-h-screen flex items-center justify-center">
-<div class="text-center px-6">
-  <div class="text-[120px] font-display-lg font-extrabold text-jkuat-green leading-none mb-4">404</div>
-  <span class="inline-block px-4 py-1.5 rounded-full bg-jkuat-green/10 text-jkuat-green font-bold text-sm mb-6">PAGE NOT FOUND</span>
-  <h1 class="font-headline-lg text-headline-lg mb-4">Oops! This page wandered off.</h1>
-  <p class="font-body-md text-body-md text-on-surface-variant mb-10 max-w-md mx-auto">The page you're looking for doesn't exist or has been moved. Let's get you back on track.</p>
-  <div class="flex flex-wrap justify-center gap-4">
-    <a href="index.html" class="px-8 py-4 bg-jkuat-green text-white font-button-text text-button-text rounded-2xl hover:scale-105 active:scale-95 transition-transform flex items-center gap-2">
-      <span class="material-symbols-outlined">home</span> Back to Home
-    </a>
-    <a href="events.html" class="px-8 py-4 border-2 border-outline-variant text-on-surface font-button-text text-button-text rounded-2xl hover:border-tech-blue transition-colors flex items-center gap-2">
-      <span class="material-symbols-outlined">event</span> View Events
-    </a>
-    <a href="contact.html" class="px-8 py-4 border-2 border-outline-variant text-on-surface font-button-text text-button-text rounded-2xl hover:border-tech-blue transition-colors flex items-center gap-2">
-      <span class="material-symbols-outlined">mail</span> Contact Us
-    </a>
+<body class="min-h-screen flex flex-col items-center justify-center px-6 text-center">
+
+  <!-- Big 404 -->
+  <div class="font-display font-extrabold text-iec-blue select-none mb-2" style="font-size: clamp(6rem, 20vw, 14rem); line-height: 1; opacity: 0.15;">404</div>
+
+  <!-- Content -->
+  <div style="margin-top: -2rem;">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 mb-5 text-iec-blue text-xs font-bold uppercase tracking-widest" style="background: rgba(0,174,239,0.08); border: 1px solid rgba(0,174,239,0.2); border-radius: 999px;">
+      Page Not Found
+    </div>
+    <h1 class="font-display font-bold text-white mb-3" style="font-size: clamp(1.5rem, 3vw, 2.5rem); letter-spacing: -0.02em;">This page wandered off.</h1>
+    <p class="text-white/40 text-sm mb-8 max-w-sm mx-auto leading-relaxed">The page you're looking for doesn't exist or has been moved.</p>
+
+    <div class="flex flex-wrap justify-center gap-3 mb-8">
+      <a href="index.html" class="btn-primary"><span class="material-symbols-outlined text-[16px]">home</span> Back to Home</a>
+      <a href="events.html" class="btn-ghost"><span class="material-symbols-outlined text-[16px]">event</span> View Events</a>
+      <a href="contact.html" class="btn-ghost"><span class="material-symbols-outlined text-[16px]">mail</span> Contact Us</a>
+    </div>
+
+    <div class="flex justify-center gap-3">
+      <a href="https://twitter.com/iecjkuat" target="_blank" rel="noopener" class="social-icon" aria-label="Twitter"><span class="material-symbols-outlined text-[18px]">alternate_email</span></a>
+      <a href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener" class="social-icon" aria-label="LinkedIn"><span class="material-symbols-outlined text-[18px]">work</span></a>
+      <a href="https://instagram.com/iecjkuat" target="_blank" rel="noopener" class="social-icon" aria-label="Instagram"><span class="material-symbols-outlined text-[18px]">photo_camera</span></a>
+    </div>
   </div>
-  <div class="flex justify-center gap-4 mt-8">
-    <a href="https://twitter.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue transition-all">
-      <span class="material-symbols-outlined">alternate_email</span>
-    </a>
-    <a href="https://linkedin.com/company/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue transition-all">
-      <span class="material-symbols-outlined">work</span>
-    </a>
-    <a href="https://instagram.com/iecjkuat" target="_blank" rel="noopener" class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-tech-blue transition-all">
-      <span class="material-symbols-outlined">photo_camera</span>
-    </a>
-  </div>
-</div>
+
 </body>
 </html>

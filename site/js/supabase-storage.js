@@ -11,18 +11,30 @@ const STORAGE_BUCKETS = {
 
 // Upload a file to a storage bucket
 // Returns the public URL of the uploaded file
+const ALLOWED_MIME_TYPES = new Set([
+  'image/png', 'image/jpeg', 'image/gif', 'image/webp',
+  'video/mp4', 'video/webm', 'video/quicktime',
+]);
+
 async function uploadMedia(file, bucket, folder = '') {
   const sb = initSupabase();
   if (!sb) throw new Error('Supabase not loaded');
-  
+
+  // Validate MIME type first (SVG/HTML/etc. are never valid uploads —
+  // they can carry executable script when served from storage).
+  if (!ALLOWED_MIME_TYPES.has(file.type)) {
+    throw new Error(`Unsupported file type: ${file.type || 'unknown'}. Upload JPG, PNG, GIF, WebP, MP4 or WebM.`);
+  }
+
   // Validate file size (50MB max for media, 10MB for images)
   const maxSize = file.type.startsWith('video/') ? 50 * 1024 * 1024 : 10 * 1024 * 1024;
   if (file.size > maxSize) {
     throw new Error(`File too large. Max ${file.type.startsWith('video/') ? '50MB' : '10MB'} for ${file.type.split('/')[0]}s.`);
   }
   
-  // Generate unique filename
-  const ext = file.name.split('.').pop();
+  // Generate unique filename (extension sanitized: no path separators,
+  // no whitespace — prevents path games via crafted filenames)
+  const ext = (file.name.split('.').pop() || '').replace(/[^a-z0-9]/gi, '').slice(0, 5) || 'bin';
   const timestamp = Date.now();
   const random = Math.random().toString(36).substring(2, 8);
   const fileName = `${folder ? folder + '/' : ''}${timestamp}_${random}.${ext}`;
