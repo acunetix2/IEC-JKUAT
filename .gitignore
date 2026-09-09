@@ -28,6 +28,9 @@ stitch_school_club_portal_redesign/
 # Uploaded media files (staged locally before Supabase upload)
 site/uploads/**/*
 !site/uploads/**/.gitkeep
+# Web-ready club photos (compressed, web-safe filenames) — these DO deploy
+!site/uploads/iec-*.jpg
+!site/uploads/iec.jpeg
 
 # Executables
 *.exe

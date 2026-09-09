@@ -311,6 +311,33 @@ CREATE POLICY "Admins can delete media"
 
 
 -- ============================================================
+-- §6b. PUBLIC MEMBER LOOKUP (non-PII only)
+-- Why: anon lost SELECT on members, which broke two public flows:
+--   (a) registration uses insert().select() — RETURNING needs SELECT,
+--       so every signup failed even though the row was written;
+--   (b) the pay-step "Find" lookup queried members directly.
+-- This RPC exposes ONLY id + name + reg + status (no phone/email)
+-- so the public flows work without re-opening PII reads.
+-- ============================================================
+CREATE OR REPLACE FUNCTION public.find_member_lookup(p_reg TEXT)
+RETURNS TABLE (id UUID, full_name TEXT, reg_number TEXT, membership_status TEXT)
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT m.id, m.full_name, m.reg_number, m.membership_status
+  FROM public.members AS m
+  -- Escape LIKE metacharacters so the input is matched literally and
+  -- cannot act as a wildcard probe.
+  WHERE m.reg_number ILIKE replace(replace(replace(p_reg, '\', '\\'), '%', '\%'), '_', '\_')
+  LIMIT 1;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.find_member_lookup(TEXT) TO anon;
+
+
+-- ============================================================
 -- §6. POST-FLIGHT VERIFICATION (all of these must return 0 rows
 --     when run as anon, and the admin probes must succeed only
 --     after signing in as an admin in the same session)

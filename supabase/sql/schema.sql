@@ -209,34 +209,44 @@ ALTER TABLE contact_messages  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE blog_posts        ENABLE ROW LEVEL SECURITY;
 
 -- -------- Public READ (anon can read public content) --------
+DROP POLICY IF EXISTS "Public can read events" ON events;
 CREATE POLICY "Public can read events"
   ON events FOR SELECT TO anon USING (true);
 
+DROP POLICY IF EXISTS "Public can read event_comments" ON event_comments;
 CREATE POLICY "Public can read event_comments"
   ON event_comments FOR SELECT TO anon USING (true);
 
+DROP POLICY IF EXISTS "Public can read projects" ON projects;
 CREATE POLICY "Public can read projects"
   ON projects FOR SELECT TO anon USING (true);
 
+DROP POLICY IF EXISTS "Public can read products" ON products;
 CREATE POLICY "Public can read products"
   ON products FOR SELECT TO anon USING (true);
 
+DROP POLICY IF EXISTS "Public can read blog_posts" ON blog_posts;
 CREATE POLICY "Public can read blog_posts"
   ON blog_posts FOR SELECT TO anon USING (true);
 
 -- -------- Public WRITE (anon can submit forms) --------
+DROP POLICY IF EXISTS "Public can register as member" ON members;
 CREATE POLICY "Public can register as member"
   ON members FOR INSERT TO anon WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public can subscribe to newsletter" ON newsletter;
 CREATE POLICY "Public can subscribe to newsletter"
   ON newsletter FOR INSERT TO anon WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public can initiate payment" ON payments;
 CREATE POLICY "Public can initiate payment"
   ON payments FOR INSERT TO anon WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public can submit contact message" ON contact_messages;
 CREATE POLICY "Public can submit contact message"
   ON contact_messages FOR INSERT TO anon WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Public can post event comment" ON event_comments;
 CREATE POLICY "Public can post event comment"
   ON event_comments FOR INSERT TO anon WITH CHECK (true);
 
@@ -244,51 +254,71 @@ CREATE POLICY "Public can post event comment"
 -- NOTE: These policies allow anyone with the admin URL to write data.
 -- Replace with auth.uid()-based policies once Supabase Auth is set up.
 
+DROP POLICY IF EXISTS "Admin can insert events" ON events;
 CREATE POLICY "Admin can insert events"
   ON events FOR INSERT TO anon WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can update events" ON events;
 CREATE POLICY "Admin can update events"
   ON events FOR UPDATE TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can delete events" ON events;
 CREATE POLICY "Admin can delete events"
   ON events FOR DELETE TO anon USING (true);
 
+DROP POLICY IF EXISTS "Admin can insert projects" ON projects;
 CREATE POLICY "Admin can insert projects"
   ON projects FOR INSERT TO anon WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can update projects" ON projects;
 CREATE POLICY "Admin can update projects"
   ON projects FOR UPDATE TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can delete projects" ON projects;
 CREATE POLICY "Admin can delete projects"
   ON projects FOR DELETE TO anon USING (true);
 
+DROP POLICY IF EXISTS "Admin can insert products" ON products;
 CREATE POLICY "Admin can insert products"
   ON products FOR INSERT TO anon WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can update products" ON products;
 CREATE POLICY "Admin can update products"
   ON products FOR UPDATE TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can delete products" ON products;
 CREATE POLICY "Admin can delete products"
   ON products FOR DELETE TO anon USING (true);
 
+DROP POLICY IF EXISTS "Admin can insert blog_posts" ON blog_posts;
 CREATE POLICY "Admin can insert blog_posts"
   ON blog_posts FOR INSERT TO anon WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can update blog_posts" ON blog_posts;
 CREATE POLICY "Admin can update blog_posts"
   ON blog_posts FOR UPDATE TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can delete blog_posts" ON blog_posts;
 CREATE POLICY "Admin can delete blog_posts"
   ON blog_posts FOR DELETE TO anon USING (true);
 
+DROP POLICY IF EXISTS "Admin can read members" ON members;
 CREATE POLICY "Admin can read members"
   ON members FOR SELECT TO anon USING (true);
+DROP POLICY IF EXISTS "Admin can update members" ON members;
 CREATE POLICY "Admin can update members"
   ON members FOR UPDATE TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can delete members" ON members;
 CREATE POLICY "Admin can delete members"
   ON members FOR DELETE TO anon USING (true);
 
+DROP POLICY IF EXISTS "Admin can read payments" ON payments;
 CREATE POLICY "Admin can read payments"
   ON payments FOR SELECT TO anon USING (true);
 
+DROP POLICY IF EXISTS "Admin can read contact_messages" ON contact_messages;
 CREATE POLICY "Admin can read contact_messages"
   ON contact_messages FOR SELECT TO anon USING (true);
+DROP POLICY IF EXISTS "Admin can update contact_messages" ON contact_messages;
 CREATE POLICY "Admin can update contact_messages"
   ON contact_messages FOR UPDATE TO anon USING (true) WITH CHECK (true);
+DROP POLICY IF EXISTS "Admin can delete contact_messages" ON contact_messages;
 CREATE POLICY "Admin can delete contact_messages"
   ON contact_messages FOR DELETE TO anon USING (true);
 
+DROP POLICY IF EXISTS "Admin can delete event_comments" ON event_comments;
 CREATE POLICY "Admin can delete event_comments"
   ON event_comments FOR DELETE TO anon USING (true);
 
@@ -333,59 +363,74 @@ VALUES (
 ) ON CONFLICT (id) DO NOTHING;
 
 -- Storage RLS: allow public read on all buckets
+DROP POLICY IF EXISTS "Public read event-media" ON storage.objects;
 CREATE POLICY "Public read event-media"
   ON storage.objects FOR SELECT USING (bucket_id = 'event-media');
 
+DROP POLICY IF EXISTS "Public read project-media" ON storage.objects;
 CREATE POLICY "Public read project-media"
   ON storage.objects FOR SELECT USING (bucket_id = 'project-media');
 
+DROP POLICY IF EXISTS "Public read product-images" ON storage.objects;
 CREATE POLICY "Public read product-images"
   ON storage.objects FOR SELECT USING (bucket_id = 'product-images');
 
+DROP POLICY IF EXISTS "Public read blog-media" ON storage.objects;
 CREATE POLICY "Public read blog-media"
   ON storage.objects FOR SELECT USING (bucket_id = 'blog-media');
 
+DROP POLICY IF EXISTS "Public read member-media" ON storage.objects;
 CREATE POLICY "Public read member-media"
   ON storage.objects FOR SELECT USING (bucket_id = 'member-media');
 
 -- Storage RLS: allow anon upload (admin panel and registration)
+DROP POLICY IF EXISTS "Anon upload event-media" ON storage.objects;
 CREATE POLICY "Anon upload event-media"
   ON storage.objects FOR INSERT TO anon
   WITH CHECK (bucket_id = 'event-media');
 
+DROP POLICY IF EXISTS "Anon upload project-media" ON storage.objects;
 CREATE POLICY "Anon upload project-media"
   ON storage.objects FOR INSERT TO anon
   WITH CHECK (bucket_id = 'project-media');
 
+DROP POLICY IF EXISTS "Anon upload product-images" ON storage.objects;
 CREATE POLICY "Anon upload product-images"
   ON storage.objects FOR INSERT TO anon
   WITH CHECK (bucket_id = 'product-images');
 
+DROP POLICY IF EXISTS "Anon upload blog-media" ON storage.objects;
 CREATE POLICY "Anon upload blog-media"
   ON storage.objects FOR INSERT TO anon
   WITH CHECK (bucket_id = 'blog-media');
 
+DROP POLICY IF EXISTS "Anon upload member-media" ON storage.objects;
 CREATE POLICY "Anon upload member-media"
   ON storage.objects FOR INSERT TO anon
   WITH CHECK (bucket_id = 'member-media');
 
 -- Storage RLS: allow anon delete (admin panel cleanup)
+DROP POLICY IF EXISTS "Anon delete event-media" ON storage.objects;
 CREATE POLICY "Anon delete event-media"
   ON storage.objects FOR DELETE TO anon
   USING (bucket_id = 'event-media');
 
+DROP POLICY IF EXISTS "Anon delete project-media" ON storage.objects;
 CREATE POLICY "Anon delete project-media"
   ON storage.objects FOR DELETE TO anon
   USING (bucket_id = 'project-media');
 
+DROP POLICY IF EXISTS "Anon delete product-images" ON storage.objects;
 CREATE POLICY "Anon delete product-images"
   ON storage.objects FOR DELETE TO anon
   USING (bucket_id = 'product-images');
 
+DROP POLICY IF EXISTS "Anon delete blog-media" ON storage.objects;
 CREATE POLICY "Anon delete blog-media"
   ON storage.objects FOR DELETE TO anon
   USING (bucket_id = 'blog-media');
 
+DROP POLICY IF EXISTS "Anon delete member-media" ON storage.objects;
 CREATE POLICY "Anon delete member-media"
   ON storage.objects FOR DELETE TO anon
   USING (bucket_id = 'member-media');

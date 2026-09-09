@@ -28,12 +28,14 @@ window.escapeHtml = window.escapeHtml || function (str) {
 
 // ===== Form Utilities =====
 
-// Submit member registration to Supabase
+// Submit member registration to Supabase.
+// NOTE: no `.select()` after insert — anon has INSERT but not SELECT on
+// members (PII). The new row's id is fetched via the non-PII lookup RPC.
 async function submitMemberRegistration(formData) {
   const sb = initSupabase();
   if (!sb) throw new Error('Supabase not loaded');
-  
-  const { data, error } = await sb.from('members').insert([
+
+  const { error } = await sb.from('members').insert([
     {
       full_name: formData.fullName,
       reg_number: formData.regNumber,
@@ -44,10 +46,26 @@ async function submitMemberRegistration(formData) {
       email: formData.email,
       membership_status: 'registered'
     }
-  ]).select();
-  
+  ]);
+
+  if (error) {
+    if (error.code === '23505') throw new Error('This registration number is already registered. Continue to Activation instead.');
+    throw error;
+  }
+
+  const found = await lookupMemberByReg(formData.regNumber);
+  if (!found) throw new Error('Registered, but we could not load your record. Use Find on the Activation step.');
+  return [found];
+}
+
+// Non-PII member lookup for public flows (registration return + pay-step
+// Find). Returns { id, full_name, reg_number, membership_status } or null.
+async function lookupMemberByReg(regNumber) {
+  const sb = initSupabase();
+  if (!sb) throw new Error('Supabase not loaded');
+  const { data, error } = await sb.rpc('find_member_lookup', { p_reg: regNumber });
   if (error) throw error;
-  return data;
+  return (data && data[0]) || null;
 }
 
 // Submit newsletter signup
