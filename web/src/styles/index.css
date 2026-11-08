@@ -400,6 +400,34 @@ html:not(.light) body footer { background: transparent !important; }
 .do-card:hover p,
 .do-card:hover .do-icon { color: #ffffff !important; }
 .do-card:hover .do-number { color: rgba(255,255,255,0.12) !important; }
+
+/* ── Team cards ───────────────────────────────── */
+.team-card {
+  padding: 20px 16px;
+  text-align: center;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  transition: transform 0.3s cubic-bezier(0.16,1,0.3,1), border-color 0.3s, background 0.3s;
+}
+.team-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0,174,239,0.4);
+  background: rgba(0,174,239,0.06);
+}
+.team-avatar {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 14px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: rgba(0,174,239,0.1);
+  border: 1px solid rgba(0,174,239,0.25);
+}
+
 @media (max-width: 767px) {
   body { background-attachment: scroll; }
   .hero { min-height: 0 !important; max-height: none !important; justify-content: flex-start; }
@@ -1071,6 +1099,23 @@ html.light .do-card:hover span:not(.do-number) {
   color: #ffffff !important;
 }
 html.light .do-card:hover .do-number { color: rgba(255,255,255,0.12) !important; }
+
+/* ── Team cards (light) ──────────────────────────────────── */
+html.light .team-card {
+  background: #ffffff !important;
+  border-color: rgba(0,0,0,0.08) !important;
+}
+html.light .team-card:hover {
+  border-color: rgba(0,153,214,0.4) !important;
+  background: rgba(0,153,214,0.05) !important;
+}
+html.light .team-card h3 { color: #0d0f12 !important; }
+html.light .team-card p { color: rgba(0,0,0,0.5) !important; }
+html.light .team-avatar {
+  background: rgba(0,153,214,0.1) !important;
+  border-color: rgba(0,153,214,0.25) !important;
+}
+html.light .team-avatar span { color: #0aaad4 !important; }
 
 /* ── Journey ─────────────────────────────────────────────── */
 html.light .journey-step { border-left-color: rgba(0,0,0,0.10) !important; }

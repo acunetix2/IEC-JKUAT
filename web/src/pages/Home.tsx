@@ -35,6 +35,37 @@ const MARQUEE = ['iec-12.jpg','iec-06.jpg','iec-16.jpg','iec-04.jpg','iec-14.jpg
 
 const DISCIPLINES = ['Designer','Engineer','Business student','Developer','Artist','Agriculture student','Health Sciences','Law student','Still figuring it out'];
 
+// Recurring meetups — the "when do you meet?" answer. Edit freely.
+const SCHEDULE = [
+  { day: 'Every Thursday', time: '5:00 PM', title: 'General Meetup', place: 'Gandhi Wing, JKUAT', color: 'text-iec-blue' },
+  { day: 'Saturdays', time: '10:00 AM', title: 'Build Sessions', place: 'Innovation Lab', color: 'text-iec-gold' },
+  { day: 'Monthly', time: 'Varies', title: 'Founder Talks', place: 'Main Campus', color: 'text-iec-blue' },
+];
+
+// What members actually get. Pairs the icon with the payoff.
+const BENEFITS = [
+  { icon: 'groups', title: 'A network that matters', text: 'Students, founders, mentors and professionals you\'d never meet in a lecture hall.' },
+  { icon: 'build', title: 'Hands-on workshops', text: 'Practical sessions on building, pitching and shipping — not theory you\'ll forget.' },
+  { icon: 'rocket_launch', title: 'Project support', text: 'Tools, space and people to take an idea from sketch to working prototype.' },
+  { icon: 'military_tech', title: 'Compete & represent', text: 'Hackathons and innovation challenges where JKUAT shows up and wins.' },
+];
+
+// Exec team. Swap `photo` for a real file in /uploads when portraits exist;
+// leave it undefined to show the styled initials tile.
+interface TeamMember { name: string; role: string; photo?: string; }
+const TEAM: TeamMember[] = [
+  { name: 'Chairperson', role: 'Club Lead' },
+  { name: 'Vice Chair', role: 'Operations' },
+  { name: 'Secretary', role: 'Coordination' },
+  { name: 'Treasurer', role: 'Finance' },
+  { name: 'Projects Lead', role: 'Builds & Prototypes' },
+  { name: 'Events Lead', role: 'Programs & Partnerships' },
+];
+
+function initials(name: string): string {
+  return name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
+}
+
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const CAT_COLORS: Record<string, string> = {
   fintech: 'text-iec-blue', agtech: 'text-green-400', leadership: 'text-iec-gold',
@@ -71,10 +102,15 @@ export default function Home() {
       <hr className="rule mx-6 md:mx-16" />
       <WhatWeDoSection />
       <hr className="rule mx-6 md:mx-16" />
+      <BenefitsSection />
+      <hr className="rule mx-6 md:mx-16" />
       <Marquee />
       <JourneySection />
       <hr className="rule mx-6 md:mx-16" />
       <WhoCanJoinSection />
+      <TeamSection />
+      <hr className="rule mx-6 md:mx-16" />
+      <ScheduleSection />
       <UpcomingEventsSection />
       <IdeaSection />
       <hr className="rule mx-6 md:mx-16" />
@@ -388,6 +424,108 @@ function UpcomingEventsSection() {
           </div>
         )}
       </div>
+    </section>
+  );
+}
+
+function BenefitsSection() {
+  return (
+    <section className="py-10 md:py-16 px-6 md:px-16 max-w-screen-xl mx-auto">
+      <div className="mb-8 max-w-2xl">
+        <p className="section-label mb-4" data-reveal="fade">Why join</p>
+        <h2 className="font-display font-bold text-white leading-tight" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
+          What you actually get.
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
+        {BENEFITS.map((b, i) => (
+          <div
+            key={b.title}
+            className="flex gap-4 p-5 md:p-6 rounded"
+            data-reveal="up"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', transitionDelay: `${0.05 * (i + 1)}s` }}
+          >
+            <span
+              className={`material-symbols-outlined ${i % 2 === 0 ? 'text-iec-blue' : 'text-iec-gold'} shrink-0`}
+              style={{ fontSize: '28px', fontVariationSettings: "'FILL' 1" }}
+            >
+              {b.icon}
+            </span>
+            <div className="min-w-0">
+              <h3 className="font-display font-bold text-white text-lg mb-1.5">{b.title}</h3>
+              <p className="text-white/60 text-sm leading-relaxed">{b.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function TeamSection() {
+  return (
+    <section className="py-10 md:py-16 px-6 md:px-16 max-w-screen-xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+        <div className="max-w-2xl">
+          <p className="section-label mb-4" data-reveal="fade">The team</p>
+          <h2 className="font-display font-bold text-white leading-tight" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
+            The people behind IEC.
+          </h2>
+        </div>
+        <p className="text-white/45 text-sm max-w-xs" data-reveal="fade">
+          Students who run the club, organise the events and keep the projects moving.
+        </p>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+        {TEAM.map((m, i) => (
+          <div key={m.name + i} className="team-card" data-reveal="up" style={{ transitionDelay: `${0.04 * (i + 1)}s` }}>
+            <div className="team-avatar">
+              {m.photo ? (
+                <img loading="lazy" src={`/uploads/${m.photo}`} alt={m.name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="font-display font-extrabold text-iec-blue text-2xl">{initials(m.name)}</span>
+              )}
+            </div>
+            <h3 className="font-display font-bold text-white text-sm leading-tight">{m.name}</h3>
+            <p className="text-white/40 text-[11px] uppercase tracking-wider mt-0.5">{m.role}</p>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function ScheduleSection() {
+  return (
+    <section className="py-10 md:py-16 px-6 md:px-16 max-w-screen-xl mx-auto">
+      <div className="mb-8 max-w-2xl">
+        <p className="section-label mb-4" data-reveal="fade">When we meet</p>
+        <h2 className="font-display font-bold text-white leading-tight" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
+          A rhythm you can count on.
+        </h2>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
+        {SCHEDULE.map((s, i) => (
+          <div
+            key={s.title}
+            className="p-5 md:p-6 rounded"
+            data-reveal="up"
+            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', transitionDelay: `${0.06 * (i + 1)}s` }}
+          >
+            <div className="flex items-baseline justify-between gap-3 mb-3">
+              <span className={`font-display font-extrabold ${s.color} text-lg`}>{s.day}</span>
+              <span className="text-white/50 text-xs font-bold uppercase tracking-wider">{s.time}</span>
+            </div>
+            <h3 className="font-display font-bold text-white text-base mb-1">{s.title}</h3>
+            <p className="text-white/45 text-sm flex items-center gap-1.5">
+              <span className="material-symbols-outlined text-[15px]">place</span>{s.place}
+            </p>
+          </div>
+        ))}
+      </div>
+      <p className="text-white/35 text-xs mt-5" data-reveal="fade">
+        Times may shift during exams and holidays — check the events page or our socials for the latest.
+      </p>
     </section>
   );
 }
