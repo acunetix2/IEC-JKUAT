@@ -50,6 +50,19 @@ CREATE TABLE IF NOT EXISTS admins (
 
 ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
 
+-- Helper: true when the caller is an admin. SECURITY DEFINER so it
+-- works inside RLS checks regardless of the caller's grants.
+-- Define this BEFORE any policy calls it. On a fresh project PostgreSQL
+-- resolves policy expressions immediately; creating the policy first would
+-- fail with "function public.is_admin() does not exist".
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public
+AS $$ SELECT EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()) $$;
+
 -- Admins can see the admin list; nobody else can.
 -- NOTE: must go through is_admin(), NOT a direct subquery on admins —
 -- a self-referencing subquery recurses into this same policy forever
@@ -59,16 +72,6 @@ DROP POLICY IF EXISTS "Admins can read admins" ON admins;
 CREATE POLICY "Admins can read admins"
   ON admins FOR SELECT TO authenticated
   USING (public.is_admin());
-
--- Helper: true when the caller is an admin. SECURITY DEFINER so it
--- works inside RLS checks regardless of the caller's grants.
-CREATE OR REPLACE FUNCTION public.is_admin()
-RETURNS BOOLEAN
-LANGUAGE sql
-STABLE
-SECURITY DEFINER
-SET search_path = public
-AS $$ SELECT EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()) $$;
 
 
 -- ============================================================
@@ -82,9 +85,9 @@ DROP POLICY IF EXISTS "Admins can read payments"        ON payments;
 DROP POLICY IF EXISTS "Admins can read contact_messages"  ON contact_messages;
 DROP POLICY IF EXISTS "Admins can update contact_messages" ON contact_messages;
 DROP POLICY IF EXISTS "Admins can delete contact_messages" ON contact_messages;
--- NOTE: event_comments / blog_posts are intentionally absent here: those
--- tables may not exist, and DROP POLICY on a missing table errors.
--- Their conditional DO blocks below are already re-runnable as written.
+-- NOTE: event_comments / blog_posts are optional and handled in
+-- conditional DO blocks below. Each block drops both legacy and current
+-- policy names before creating its current policy names.
 DROP POLICY IF EXISTS "Admins can write events"         ON events;
 DROP POLICY IF EXISTS "Admins can write projects"       ON projects;
 DROP POLICY IF EXISTS "Admins can write products"       ON products;
@@ -180,6 +183,7 @@ BEGIN
   IF to_regclass('public.event_comments') IS NOT NULL THEN
     EXECUTE 'DROP POLICY IF EXISTS "Public can post event comment" ON event_comments';
     EXECUTE 'DROP POLICY IF EXISTS "Admin can delete event_comments" ON event_comments';
+    EXECUTE 'DROP POLICY IF EXISTS "Admins can delete event_comments" ON event_comments';
 
     EXECUTE $pol$
       CREATE POLICY "Public can post event comment"
@@ -229,6 +233,7 @@ BEGIN
     EXECUTE 'DROP POLICY IF EXISTS "Admin can insert blog_posts" ON blog_posts';
     EXECUTE 'DROP POLICY IF EXISTS "Admin can update blog_posts" ON blog_posts';
     EXECUTE 'DROP POLICY IF EXISTS "Admin can delete blog_posts" ON blog_posts';
+    EXECUTE 'DROP POLICY IF EXISTS "Admins can write blog_posts" ON blog_posts';
 
     EXECUTE $pol$
       CREATE POLICY "Admins can write blog_posts"
