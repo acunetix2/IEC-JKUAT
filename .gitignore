@@ -25,12 +25,7 @@ migrations/
 # Design reference files (keep the site but not the design mockups)
 stitch_school_club_portal_redesign/
 
-# Uploaded media files (staged locally before Supabase upload)
-site/uploads/**/*
-!site/uploads/**/.gitkeep
-# Web-ready club photos (compressed, web-safe filenames) — these DO deploy
-!site/uploads/iec-*.jpg
-!site/uploads/iec.jpeg
+# Club photos served by the site live in web/public/uploads (tracked).
 
 # Executables
 *.exe
