@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html class="scroll-smooth" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <!-- Theme flash prevention — must run before first paint -->
+    <script>
+      (function () {
+        var t = localStorage.getItem('iec-theme');
+        var preferLight = t === 'light' || (!t && !window.matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.classList.toggle('light', preferLight);
+        document.documentElement.classList.toggle('dark', !preferLight);
+      })();
+    </script>
+    <title>IEC JKUAT — Innovation & Entrepreneurship Club</title>
+    <meta name="description" content="IEC JKUAT is a student community at JKUAT for innovation, entrepreneurship and leadership. Join us to build, compete, connect and lead." />
+    <meta name="theme-color" content="#18C8FF" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
