@@ -119,6 +119,13 @@ export async function getMembers(search = ''): Promise<Member[]> {
   return (data ?? []) as Member[];
 }
 
+// Update a member (admin)
+export async function updateMember(id: string, updates: Partial<Member>): Promise<boolean> {
+  const { error } = await supabase.from('members').update(updates).eq('id', id);
+  if (error) throw error;
+  return true;
+}
+
 // Delete a member
 export async function deleteMember(id: string): Promise<boolean> {
   const { error } = await supabase.from('members').delete().eq('id', id);
@@ -233,4 +240,46 @@ export async function deleteContactMessage(id: string): Promise<boolean> {
   const { error } = await supabase.from('contact_messages').delete().eq('id', id);
   if (error) throw error;
   return true;
+}
+
+// ===== Payments (admin, read-only) =====
+
+export async function getPayments(): Promise<import('../types/db').Payment[]> {
+  const { data, error } = await supabase
+    .from('payments')
+    .select('*, members(full_name, reg_number)')
+    .order('created_at', { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return (data ?? []) as import('../types/db').Payment[];
+}
+
+// ===== Admin auth =====
+
+export async function signInAdmin(email: string, password: string): Promise<void> {
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) throw new Error('Invalid email or password.');
+}
+
+export async function signOutAdmin(): Promise<void> {
+  try {
+    await supabase.auth.signOut();
+  } catch {
+    /* ignore */
+  }
+}
+
+// Returns the signed-in admin's email if the current session belongs to an
+// admin (present in the admins table), else null. Signs out non-admins.
+export async function verifyAdminSession(): Promise<string | null> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  if (!session?.user) return null;
+  const { data, error } = await supabase.from('admins').select('user_id').limit(1);
+  if (error || !data || data.length === 0) {
+    await signOutAdmin();
+    return null;
+  }
+  return session.user.email ?? '';
 }

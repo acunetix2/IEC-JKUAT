@@ -22,6 +22,7 @@ export interface Project {
   team_lead?: string;
   status?: string;
   category?: string;
+  progress?: number;
   media_urls?: string | string[] | null;
   embed_urls?: string | string[] | null;
   created_at?: string;
