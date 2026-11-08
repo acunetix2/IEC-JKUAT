@@ -1,0 +1,17 @@
+# Supabase CLI config — only the settings this project relies on.
+# `supabase functions deploy <name>` reads these, so a deploy without the
+# --no-verify-jwt flag can no longer switch JWT checking back on.
+
+project_id = "iecjkuat"
+
+# Called by the public site with the anon key. Abuse protection lives in
+# the function itself (fixed fee, member check, one pending push).
+[functions.stk-push]
+verify_jwt = false
+
+# Called by Lipana, which sends no Supabase JWT. With verify_jwt = true the
+# gateway rejects every callback with 401 before the function runs, so
+# payments never complete and memberships never activate. The function
+# authenticates callers itself with the x-lipana-signature HMAC.
+[functions.payment-webhook]
+verify_jwt = false

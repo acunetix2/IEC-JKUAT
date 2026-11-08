@@ -8,7 +8,7 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import Hero3D from '../components/Hero3D';
-import { useReveal } from '../hooks/useReveal';
+import { useReveal, splitWords } from '../hooks/useReveal';
 import { useHomeMotion } from '../hooks/useHomeMotion';
 import { useToast } from '../context/ToastContext';
 import { supabase, submitMemberRegistration, lookupMemberByReg, initiatePayment } from '../lib/supabase';
@@ -170,8 +170,13 @@ function WhatIsSection() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-24 items-center">
         <div>
           <p className="section-label mb-6" data-reveal="fade">What is IEC?</p>
-          <h2 className="font-display font-bold text-white leading-tight mb-8" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.6rem)' }} data-reveal="up">
-            A student movement. Not a lecture.
+          <h2 className="font-display font-bold text-white leading-tight mb-8" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.6rem)' }} data-split data-reveal="up">
+            {splitWords('A student movement. Not a lecture.').map((w, i, all) => (
+              <span key={i}>
+                <span className="split-word" style={w.style}>{w.word}</span>
+                {i < all.length - 1 ? ' ' : ''}
+              </span>
+            ))}
           </h2>
           <p className="text-white/55 text-base leading-relaxed mb-6" data-reveal="up" style={{ transitionDelay: '0.15s' }}>
             IEC JKUAT isn't a class you sit in. It's a space where students from every discipline at JKUAT come together to experiment, build things, solve real problems and grow beyond their degree.
@@ -470,10 +475,11 @@ function JoinSection() {
     }
   }
 
-  async function lookupMember(): Promise<boolean> {
+  // Returns the member's id, or null if not found (and toasts why).
+  async function lookupMember(): Promise<string | null> {
     if (!payReg.trim()) {
       toast('Enter a registration number first', 'error');
-      return false;
+      return null;
     }
     setLookupBusy(true);
     try {
@@ -482,12 +488,12 @@ function JoinSection() {
       setMemberId(data.id);
       setPreview(data);
       toast('Member found!', 'success');
-      return true;
+      return data.id;
     } catch (err) {
       setMemberId(null);
       setPreview(null);
       toast((err as Error).message, 'error');
-      return false;
+      return null;
     } finally {
       setLookupBusy(false);
     }
@@ -499,14 +505,9 @@ function JoinSection() {
       toast('Enter your registration number first', 'error');
       return;
     }
-    let id = memberId;
-    if (!id) {
-      const found = await lookupMember();
-      if (!found) return;
-      // memberId state set asynchronously; re-read via lookup return path
-      id = (await lookupMemberByReg(payReg.trim()))?.id ?? null;
-      if (!id) return;
-    }
+    // Pay directly without pressing Find: look the member up once here.
+    const id = memberId ?? (await lookupMember());
+    if (!id) return;
     setPayBusy(true);
     setStatus(null);
     try {
@@ -613,7 +614,19 @@ function JoinSection() {
                   <div>
                     <label className="block text-[13px] font-medium text-white/60 mb-1.5">Registration Number *</label>
                     <div className="flex gap-2">
-                      <input className="iec-input flex-1" placeholder="SCT211-XXXX/20XX" required type="text" value={payReg} onChange={(e) => setPayReg(e.target.value)} />
+                      <input
+                        className="iec-input flex-1"
+                        placeholder="SCT211-XXXX/20XX"
+                        required
+                        type="text"
+                        value={payReg}
+                        onChange={(e) => {
+                          // A looked-up member belongs to the old value; never pay for them by mistake.
+                          setPayReg(e.target.value);
+                          setMemberId(null);
+                          setPreview(null);
+                        }}
+                      />
                       <button
                         type="button"
                         onClick={lookupMember}

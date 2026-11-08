@@ -104,10 +104,17 @@ DROP POLICY IF EXISTS "Admin can read members"   ON members;
 DROP POLICY IF EXISTS "Admin can update members" ON members;
 DROP POLICY IF EXISTS "Admin can delete members" ON members;
 DROP POLICY IF EXISTS "Public can register as member" ON members;
+-- Left behind by an early version of fix_registration.sql; it made every
+-- member's phone/email world-readable. Never recreate it.
+DROP POLICY IF EXISTS "Public can read own member" ON members;
 
 -- Public registration: INSERT-only, length-checked.
+-- TO anon AND authenticated: a visitor who is signed in (e.g. an admin
+-- who opened /admin in the same browser) sends their user JWT, so the
+-- request runs as `authenticated`. An anon-only policy rejects them with
+-- "new row violates row-level security policy" (HTTP 403).
 CREATE POLICY "Public can register as member"
-  ON members FOR INSERT TO anon WITH CHECK (
+  ON members FOR INSERT TO anon, authenticated WITH CHECK (
     char_length(full_name) BETWEEN 1 AND 120
     AND char_length(reg_number) BETWEEN 1 AND 40
     AND char_length(college) BETWEEN 1 AND 120
@@ -128,7 +135,7 @@ CREATE POLICY "Admins can delete members"
 -- ---------- newsletter ----------
 DROP POLICY IF EXISTS "Public can subscribe to newsletter" ON newsletter;
 CREATE POLICY "Public can subscribe to newsletter"
-  ON newsletter FOR INSERT TO anon WITH CHECK (
+  ON newsletter FOR INSERT TO anon, authenticated WITH CHECK (
     char_length(email) BETWEEN 3 AND 254
   );
 
@@ -136,12 +143,11 @@ CREATE POLICY "Public can subscribe to newsletter"
 DROP POLICY IF EXISTS "Public can initiate payment" ON payments;
 DROP POLICY IF EXISTS "Admin can read payments"     ON payments;
 
--- Edge function (service_role) bypasses RLS; keep a narrow anon
--- insert for the legacy client path, length-checked.
-CREATE POLICY "Public can initiate payment"
-  ON payments FOR INSERT TO anon WITH CHECK (
-    char_length(phone) BETWEEN 1 AND 20
-  );
+-- No public INSERT on payments. Only the stk-push / payment-webhook edge
+-- functions write here, and they use service_role (bypasses RLS). An anon
+-- insert policy let anyone plant fake "completed" rows, or a "pending" row
+-- that the one-pending-per-member index then uses to block a member from
+-- ever paying.
 
 CREATE POLICY "Admins can read payments"
   ON payments FOR SELECT TO authenticated USING (public.is_admin());
@@ -153,7 +159,7 @@ DROP POLICY IF EXISTS "Admin can update contact_messages" ON contact_messages;
 DROP POLICY IF EXISTS "Admin can delete contact_messages" ON contact_messages;
 
 CREATE POLICY "Public can submit contact message"
-  ON contact_messages FOR INSERT TO anon WITH CHECK (
+  ON contact_messages FOR INSERT TO anon, authenticated WITH CHECK (
     char_length(name) BETWEEN 1 AND 120
     AND char_length(email) BETWEEN 3 AND 254
     AND char_length(subject) BETWEEN 1 AND 200

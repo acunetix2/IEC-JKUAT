@@ -6,8 +6,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { PROJECT_FALLBACK_IMG, parseJsonList as parseMedia, isPreviewImage as isImg, isVideoMedia as isVid } from '../lib/media';
 import { parseEmbedUrls } from '../lib/embeds';
-import { PROJECT_FALLBACK_IMG } from '../lib/media';
 import EmbedList from '../components/EmbedList';
 import type { Project } from '../types/db';
 
@@ -17,24 +17,6 @@ const STATUS_STYLE: Record<string, StatusStyle> = {
   'MVP Live': { color: '#22c55e', bg: 'rgba(34,197,94,0.12)', bar: '#22c55e' },
   Ideation: { color: '#FBB03B', bg: 'rgba(251,176,59,0.12)', bar: '#FBB03B' },
 };
-
-function isImg(u: string): boolean {
-  if (!u) return false;
-  const clean = String(u).split('?')[0].split('#')[0];
-  return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(clean);
-}
-function isVid(u: string): boolean {
-  return Boolean(u) && /\.(mp4|webm|mov|avi)$/i.test(u);
-}
-function parseMedia(raw: unknown): string[] {
-  try {
-    if (Array.isArray(raw)) return raw as string[];
-    if (typeof raw === 'string') return JSON.parse(raw || '[]');
-  } catch {
-    /* ignore */
-  }
-  return [];
-}
 
 export default function ProjectDetail() {
   const [params] = useSearchParams();
@@ -207,6 +189,7 @@ function ProjectBody({ project }: { project: Project }) {
         </h1>
         <div className="mb-8">
           <p
+            id="proj-desc"
             className={`text-sm leading-relaxed whitespace-pre-line ${longDesc && !descOpen ? 'desc-collapsed' : longDesc ? 'desc-open' : ''}`}
             style={{ color: 'rgba(255,255,255,0.55)' }}
           >

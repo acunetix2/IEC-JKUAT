@@ -1,13 +1,16 @@
 // IEC JKUAT — Admin console. Ported from admin.html + admin.js.
-// Full-screen chrome (own sidebar + topbar, NOT the public SiteLayout).
-// Auth gate: Supabase Auth sign-in + admins-table membership check. Six tabs:
-// Members, Events, Projects, Products, Messages, Payments — with add/edit/
-// delete modals. Media uploads in the source used a storage helper + file
-// pickers; here media/image URLs are managed via comma-separated URL inputs
-// (the same JSON arrays are written to the DB), which keeps the data shape
-// identical without the binary-upload UI.
+// Full-screen chrome (own sidebar + top bar, not the public SiteLayout).
+// Auth gate: Supabase Auth sign-in + admins-table membership check.
+// Tabs: Members (stats, filters, CSV export), Events, Projects, Products
+// (with photo/video uploads to Supabase Storage), Messages, Payments.
+//
+// JSONB list columns (media_urls, embed_urls, sizes) are read with
+// parseJsonList(), which accepts both real arrays (seed rows) and JSON
+// strings (rows saved by the old admin page), and written back as real
+// arrays. Reading only strings would blank seed rows' media on save.
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type FormEvent, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
 import {
@@ -19,11 +22,11 @@ import {
   deleteMember,
   getEvents,
   addEvent,
-  updateProject,
+  deleteEvent,
   getProjects,
   addProject,
+  updateProject,
   deleteProject,
-  deleteEvent,
   getProducts,
   addProduct,
   updateProduct,
@@ -34,29 +37,43 @@ import {
   getPayments,
   supabase,
 } from '../lib/supabase';
+import { parseJsonList } from '../lib/media';
 import { parseEmbedUrls } from '../lib/embeds';
+import { uploadMedia, isVideoUrl, STORAGE_BUCKETS } from '../lib/storage';
+import { getTimeAgo } from '../lib/format';
 import type { Member, EventRow, Project, Product, ContactMessage, Payment } from '../types/db';
 
 type Tab = 'members' | 'events' | 'projects' | 'products' | 'messages' | 'payments';
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: 'members', label: 'Members', icon: 'group' },
-  { key: 'events', label: 'Events', icon: 'event' },
+  { key: 'events', label: 'Events', icon: 'calendar_month' },
   { key: 'projects', label: 'Projects', icon: 'rocket_launch' },
   { key: 'products', label: 'Products', icon: 'shopping_bag' },
   { key: 'messages', label: 'Messages', icon: 'mail' },
   { key: 'payments', label: 'Payments', icon: 'payments' },
 ];
 
-function jsonArray(csv: string): string {
-  return JSON.stringify(
-    csv
-      .split(/[\n,]+/)
-      .map((s) => s.trim())
-      .filter(Boolean)
-  );
+const COLLEGES = ['COPAS', 'COETEC', 'COHES', 'COANRE', 'COHRED'];
+const YEARS = ['1', '2', '3', '4', '5'];
+const EVENT_CATEGORIES = ['Featured', 'Hackathon', 'Leadership', 'AgTech', 'Fintech', 'Networking', 'Workshop'];
+const PROJECT_CATEGORIES = ['Fintech', 'AgTech', 'HealthTech', 'Social Impact', 'Education', 'Technology'];
+const LABEL = 'block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5';
+
+function splitList(text: string): string[] {
+  return text
+    .split(/[\n,]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : String((e as { message?: string })?.message ?? e);
+}
+
+// ═══════════════════════════════════════════════════
+// AUTH GATE
+// ═══════════════════════════════════════════════════
 export default function Admin() {
   const [checking, setChecking] = useState(true);
   const [adminEmail, setAdminEmail] = useState<string | null>(null);
@@ -64,21 +81,18 @@ export default function Admin() {
   useEffect(() => {
     verifyAdminSession()
       .then((email) => setAdminEmail(email))
+      .catch(() => setAdminEmail(null))
       .finally(() => setChecking(false));
   }, []);
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#07101a', color: 'rgba(255,255,255,0.4)' }}>
+      <div className="fixed inset-0 flex items-center justify-center" style={{ background: '#07101a', color: 'rgba(255,255,255,0.4)' }}>
         <span className="material-symbols-outlined animate-spin mr-3">sync</span> Loading…
       </div>
     );
   }
-
-  if (!adminEmail) {
-    return <AdminLogin onSuccess={(email) => setAdminEmail(email)} />;
-  }
-
+  if (adminEmail === null) return <AdminLogin onSuccess={setAdminEmail} />;
   return <AdminApp adminEmail={adminEmail} onLogout={() => setAdminEmail(null)} />;
 }
 
@@ -95,60 +109,55 @@ function AdminLogin({ onSuccess }: { onSuccess: (email: string) => void }) {
     try {
       await signInAdmin(email.trim(), password);
       const verified = await verifyAdminSession();
-      if (!verified) throw new Error('This account is not an admin.');
+      if (verified === null) throw new Error('This account is not an admin.');
       onSuccess(verified);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Sign-in failed.');
+      setError(errMsg(err) || 'Sign-in failed.');
       setBusy(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6" style={{ background: '#07101a' }}>
-      <div className="w-full max-w-sm rounded-xl p-8" style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)' }}>
-        <h1 className="font-display font-bold text-white text-xl mb-1">IEC Admin</h1>
+    <div id="admin-login" className="fixed inset-0 z-[300] flex items-center justify-center px-4" style={{ background: '#07101a' }}>
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-sm p-8"
+        style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '10px' }}
+      >
+        <p className="font-display font-bold text-white text-base mb-1">
+          IEC <span className="text-iec-blue">JKUAT</span>
+        </p>
         <p className="text-xs text-white/40 mb-6">Admin Console — sign in required</p>
-        <form onSubmit={handleSubmit}>
-          <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5" htmlFor="admin-email">
-            Email
-          </label>
-          <input
-            id="admin-email"
-            type="email"
-            className="admin-input mb-4"
-            placeholder="admin@example.com"
-            required
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5" htmlFor="admin-password">
-            Password
-          </label>
-          <input
-            id="admin-password"
-            type="password"
-            className="admin-input mb-5"
-            placeholder="••••••••"
-            required
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          {error && <p className="text-red-400 text-xs mb-4">{error}</p>}
-          <button type="submit" className="btn-primary w-full justify-center" disabled={busy}>
-            {busy ? 'Signing in…' : 'Sign In'}
-          </button>
-        </form>
-      </div>
+        <label className={LABEL} htmlFor="admin-email">Email</label>
+        <input id="admin-email" type="email" className="admin-input mb-4" placeholder="admin@example.com" required autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <label className={LABEL} htmlFor="admin-password">Password</label>
+        <input id="admin-password" type="password" className="admin-input mb-5" placeholder="••••••••" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />
+        {error && <p className="text-red-400 text-xs mb-4">{error}</p>}
+        <button type="submit" className="btn-primary w-full justify-center" disabled={busy}>
+          {busy ? 'Signing in…' : 'Sign In'}
+        </button>
+      </form>
     </div>
   );
 }
 
+// ═══════════════════════════════════════════════════
+// SHELL
+// ═══════════════════════════════════════════════════
 function AdminApp({ adminEmail, onLogout }: { adminEmail: string; onLogout: () => void }) {
-  const { toggle } = useTheme();
+  const { theme, toggle } = useTheme();
   const [tab, setTab] = useState<Tab>('members');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const placeholder = `Search ${TABS.find((t) => t.key === tab)!.label.toLowerCase()}…`;
+  const q = search.trim().toLowerCase();
+
+  function switchTab(t: Tab) {
+    setTab(t);
+    setSearch('');
+    setSidebarOpen(false);
+  }
 
   async function handleLogout() {
     await signOutAdmin();
@@ -156,82 +165,178 @@ function AdminApp({ adminEmail, onLogout }: { adminEmail: string; onLogout: () =
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: '#07101a', color: '#f0f0f0' }}>
-      {/* Sidebar */}
-      <aside id="sidebar" className={sidebarOpen ? 'open' : ''}>
-        <div className="p-6">
-          <h1 className="font-display font-bold text-white text-lg mb-8">
-            IEC <span className="text-iec-blue">Admin</span>
-          </h1>
-          <nav className="space-y-1">
-            {TABS.map((t) => (
-              <button
-                key={t.key}
-                className={`tab-btn w-full ${tab === t.key ? 'active' : ''}`}
-                onClick={() => {
-                  setTab(t.key);
-                  setSidebarOpen(false);
-                }}
-              >
-                <span className="material-symbols-outlined">{t.icon}</span>
-                {t.label}
-              </button>
-            ))}
-          </nav>
-        </div>
-      </aside>
+    <>
       <div id="sidebar-overlay" className={sidebarOpen ? 'show' : ''} onClick={() => setSidebarOpen(false)} />
 
-      {/* Main */}
-      <div id="main" style={{ marginLeft: 220 }}>
-        <header className="flex items-center justify-between px-6 py-4 border-b border-white/6">
-          <button className="md:hidden p-2 text-white/60" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
-            <span className="material-symbols-outlined">menu</span>
+      <aside id="sidebar" className={`py-5 px-3 flex flex-col ${sidebarOpen ? 'open' : ''}`}>
+        <div className="px-3 mb-6">
+          <Link to="/" className="font-display font-bold text-white text-base">
+            IEC <span className="text-iec-blue">JKUAT</span>
+          </Link>
+          <p className="text-xs text-white/30 mt-0.5">Admin Console</p>
+        </div>
+        <nav className="flex flex-col gap-1 flex-1">
+          {TABS.map((t) => (
+            <button key={t.key} className={`tab-btn ${tab === t.key ? 'active' : ''}`} onClick={() => switchTab(t.key)}>
+              <span className="material-symbols-outlined">{t.icon}</span> {t.label}
+            </button>
+          ))}
+        </nav>
+        <div className="px-3 mt-auto pt-4 border-t border-white/6 flex flex-col gap-2">
+          <p className="px-4 text-[11px] text-white/30 truncate">{adminEmail}</p>
+          <button className="tab-btn" onClick={handleLogout}>
+            <span className="material-symbols-outlined">logout</span> Sign Out
           </button>
-          <div className="flex items-center gap-3 ml-auto">
-            <span className="text-xs text-white/40">{adminEmail}</span>
-            <button onClick={toggle} className="p-2 text-white/50 hover:text-white" title="Toggle theme" aria-label="Toggle theme">
-              <span className="material-symbols-outlined">dark_mode</span>
+          <Link to="/" className="tab-btn">
+            <span className="material-symbols-outlined">arrow_back</span> Back to Site
+          </Link>
+        </div>
+      </aside>
+
+      <div id="main" style={{ marginLeft: 220, minHeight: '100vh' }}>
+        <header
+          className="sticky top-0 z-30 flex items-center justify-between px-6 py-4"
+          style={{ background: 'rgba(7,16,26,0.8)', backdropFilter: 'blur(16px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}
+        >
+          <div className="flex items-center gap-4">
+            <button className="md:hidden p-2 text-white/50 hover:text-white" onClick={() => setSidebarOpen(true)} aria-label="Open menu">
+              <span className="material-symbols-outlined">menu</span>
             </button>
-            <button onClick={handleLogout} className="btn-ghost-sm">
-              <span className="material-symbols-outlined text-[13px]">logout</span> Logout
+            <div className="relative">
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-white/30 text-[16px]">search</span>
+              <input
+                type="text"
+                className="admin-input pl-9 h-9 text-sm w-56 md:w-80"
+                placeholder={placeholder}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <button onClick={toggle} className="p-2 text-white/40 hover:text-white transition-colors" title="Toggle theme" aria-label="Toggle theme">
+              <span className="material-symbols-outlined">{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
             </button>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'rgba(0,174,239,0.12)', border: '1px solid rgba(0,174,239,0.25)' }}>
+              <span className="material-symbols-outlined text-iec-blue text-[16px]">person</span>
+            </div>
           </div>
         </header>
 
-        <main className="p-6">
-          {tab === 'members' && <MembersTab />}
-          {tab === 'events' && <EventsTab />}
-          {tab === 'projects' && <ProjectsTab />}
-          {tab === 'products' && <ProductsTab />}
-          {tab === 'messages' && <MessagesTab />}
-          {tab === 'payments' && <PaymentsTab />}
-        </main>
+        <div className="p-6">
+          {tab === 'members' && <MembersTab q={q} />}
+          {tab === 'events' && <EventsTab q={q} />}
+          {tab === 'projects' && <ProjectsTab q={q} />}
+          {tab === 'products' && <ProductsTab q={q} />}
+          {tab === 'messages' && <MessagesTab q={q} />}
+          {tab === 'payments' && <PaymentsTab q={q} />}
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// SHARED PIECES
+// ═══════════════════════════════════════════════════
+function ViewHeader({ title, subtitle, children }: { title: string; subtitle: string; children?: ReactNode }) {
+  return (
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+      <div>
+        <h1 className="font-display font-bold text-white text-2xl">{title}</h1>
+        <p className="text-white/40 text-sm mt-0.5">{subtitle}</p>
+      </div>
+      {children && <div className="flex flex-wrap gap-2">{children}</div>}
+    </div>
+  );
+}
+
+function StatCard({ label, value, color }: { label: string; value: ReactNode; color: string }) {
+  return (
+    <div className="admin-card p-4">
+      <p className="text-white/35 text-xs uppercase tracking-wider mb-1">{label}</p>
+      <p className={`font-display font-bold text-2xl ${color}`}>{value}</p>
+    </div>
+  );
+}
+
+function EmptyRow({ cols, children }: { cols: number; children: ReactNode }) {
+  return (
+    <tr>
+      <td colSpan={cols} className="text-center py-10 text-white/25 text-sm">
+        {children}
+      </td>
+    </tr>
+  );
+}
+
+function Modal({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
+  return (
+    <div className="modal-backdrop" onClick={onClose}>
+      <div className="modal-box p-6 md:p-8" onClick={(e) => e.stopPropagation()}>
+        <div className="flex justify-between items-center mb-6">
+          <h2 className="font-display font-bold text-white text-xl">{title}</h2>
+          <button onClick={onClose} className="text-white/40 hover:text-white transition-colors" aria-label="Close">
+            <span className="material-symbols-outlined">close</span>
+          </button>
+        </div>
+        {children}
       </div>
     </div>
   );
 }
 
-// ─── Shared confirm-delete modal ───
+function ModalActions({ busy, onClose, label }: { busy: boolean; onClose: () => void; label: string }) {
+  return (
+    <div className="flex gap-3 pt-2">
+      <button type="submit" className="btn-primary flex-1 justify-center" disabled={busy}>
+        <span className="material-symbols-outlined text-[16px]">save</span> {busy ? 'Saving…' : label}
+      </button>
+      <button type="button" onClick={onClose} className="btn-ghost-sm px-6">
+        Cancel
+      </button>
+    </div>
+  );
+}
+
 function useConfirmDelete() {
+  const { toast } = useToast();
   const [pending, setPending] = useState<{ label: string; run: () => Promise<void> } | null>(null);
+  const [busy, setBusy] = useState(false);
   const modal = pending ? (
-    <div className="modal-backdrop" onClick={() => setPending(null)}>
-      <div className="modal-box p-6" onClick={(e) => e.stopPropagation()}>
-        <h3 className="font-display font-bold text-white text-lg mb-2">Confirm delete</h3>
-        <p className="text-white/60 text-sm mb-6">Delete "{pending.label}"? This cannot be undone.</p>
-        <div className="flex gap-3 justify-end">
-          <button className="btn-ghost-sm" onClick={() => setPending(null)}>
+    <div className="modal-backdrop" onClick={() => !busy && setPending(null)}>
+      <div className="modal-box p-6 max-w-sm text-center" onClick={(e) => e.stopPropagation()}>
+        <span className="material-symbols-outlined text-red-400 text-5xl mb-3 block" style={{ fontVariationSettings: "'FILL' 1" }}>
+          warning
+        </span>
+        <h3 className="font-display font-bold text-white text-lg mb-2">Confirm Delete</h3>
+        <p className="text-white/45 text-sm mb-6">Delete "{pending.label}"? This cannot be undone.</p>
+        <div className="flex gap-3">
+          <button onClick={() => setPending(null)} className="btn-ghost-sm flex-1 justify-center" disabled={busy}>
             Cancel
           </button>
           <button
-            className="btn-danger"
+            className="btn-danger flex-1 justify-center py-2"
+            disabled={busy}
             onClick={async () => {
-              await pending.run();
-              setPending(null);
+              setBusy(true);
+              try {
+                await pending.run();
+                toast('Deleted!', 'success');
+                setPending(null);
+              } catch (e) {
+                toast(errMsg(e), 'error');
+              } finally {
+                setBusy(false);
+              }
             }}
           >
-            Delete
+            {busy ? 'Deleting…' : 'Delete'}
           </button>
         </div>
       </div>
@@ -240,60 +345,263 @@ function useConfirmDelete() {
   return { confirmDelete: (label: string, run: () => Promise<void>) => setPending({ label, run }), modal };
 }
 
-// ═══ MEMBERS ═══
-function MembersTab() {
+// Media picker: uploads files to a Storage bucket and keeps a URL list.
+function MediaField({
+  label,
+  hint,
+  icon,
+  urls,
+  onChange,
+  bucket,
+  folder,
+  multiple,
+  accept,
+}: {
+  label: string;
+  hint: string;
+  icon: string;
+  urls: string[];
+  onChange: (urls: string[]) => void;
+  bucket: string;
+  folder: string;
+  multiple: boolean;
+  accept: string;
+}) {
   const { toast } = useToast();
-  const { confirmDelete, modal } = useConfirmDelete();
-  const [members, setMembers] = useState<Member[]>([]);
-  const [search, setSearch] = useState('');
-  const [editing, setEditing] = useState<Member | null>(null);
+  const [uploading, setUploading] = useState(0);
+  // Uploads finish asynchronously; read the latest list, not a stale closure.
+  const latest = useRef(urls);
+  latest.current = urls;
 
-  const load = useCallback(() => {
-    getMembers()
-      .then(setMembers)
-      .catch((e) => toast(e.message, 'error'));
-  }, [toast]);
-  useEffect(load, [load]);
-
-  const q = search.toLowerCase();
-  const filtered = members.filter(
-    (m) =>
-      !q ||
-      (m.full_name || '').toLowerCase().includes(q) ||
-      (m.reg_number || '').toLowerCase().includes(q) ||
-      (m.email || '').toLowerCase().includes(q) ||
-      (m.phone || '').toLowerCase().includes(q)
-  );
-  const active = members.filter((m) => m.membership_status === 'active').length;
-
-  async function activate(id: string) {
-    try {
-      await updateMember(id, { membership_status: 'active' });
-      toast('Member activated!', 'success');
-      load();
-    } catch (e) {
-      toast((e as Error).message, 'error');
+  async function handleFiles(e: ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    e.target.value = '';
+    for (const file of files) {
+      setUploading((n) => n + 1);
+      try {
+        const url = await uploadMedia(file, bucket, folder);
+        const next = multiple ? [...latest.current, url] : [url];
+        latest.current = next;
+        onChange(next);
+      } catch (err) {
+        toast('Upload failed: ' + errMsg(err), 'error');
+      } finally {
+        setUploading((n) => n - 1);
+      }
     }
   }
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
-        <div>
-          <h2 className="font-display font-bold text-white text-2xl">Members</h2>
-          <p className="text-white/40 text-sm">
-            {filtered.length} of {members.length} · {active} active
-          </p>
-        </div>
-        <input
-          className="admin-input max-w-xs"
-          placeholder="Search members…"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <label className={LABEL}>{label}</label>
+      <label
+        className="flex items-center gap-3 px-4 py-3 rounded-lg cursor-pointer hover:opacity-80 transition-opacity"
+        style={{ border: '2px dashed rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.02)' }}
+      >
+        <span className="material-symbols-outlined text-iec-blue text-[20px]">{icon}</span>
+        <span className="text-sm text-white/50">{hint}</span>
+        <input type="file" accept={accept} multiple={multiple} className="hidden" onChange={handleFiles} />
+      </label>
+      <div className="media-preview">
+        {urls.map((url) => (
+          <div key={url} className="media-thumb">
+            {isVideoUrl(url) ? <video src={url} className="w-full h-full object-cover" /> : <img src={url} className="w-full h-full object-cover" alt="" />}
+            <button type="button" className="remove-btn" onClick={() => onChange(latest.current.filter((u) => u !== url))} aria-label="Remove">
+              ✕
+            </button>
+          </div>
+        ))}
+        {Array.from({ length: uploading }, (_, i) => (
+          <div key={`up-${i}`} className="media-thumb">
+            <div className="w-full h-full flex items-center justify-center" style={{ background: 'rgba(255,255,255,0.05)' }}>
+              <span className="material-symbols-outlined animate-spin text-white/30 text-[18px]">sync</span>
+            </div>
+          </div>
+        ))}
       </div>
+    </div>
+  );
+}
+
+function Field({
+  label,
+  value,
+  onChange,
+  type = 'text',
+  required,
+  placeholder,
+  hint,
+  className,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  type?: string;
+  required?: boolean;
+  placeholder?: string;
+  hint?: string;
+  className?: string;
+}) {
+  return (
+    <div className={className}>
+      <label className={LABEL}>
+        {label}
+        {required ? ' *' : ''}
+        {hint && <span className="normal-case font-normal text-white/25"> {hint}</span>}
+      </label>
+      <input className="admin-input" type={type} value={value} onChange={(e) => onChange(e.target.value)} required={required} placeholder={placeholder} />
+    </div>
+  );
+}
+
+function SelectField({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+  required,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  placeholder?: string;
+  required?: boolean;
+}) {
+  return (
+    <div>
+      <label className={LABEL}>
+        {label}
+        {required ? ' *' : ''}
+      </label>
+      <select className="admin-input" value={value} onChange={(e) => onChange(e.target.value)} required={required}>
+        {placeholder !== undefined && <option value="">{placeholder}</option>}
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+const opts = (xs: string[]) => xs.map((x) => ({ value: x, label: x }));
+
+// ═══════════════════════════════════════════════════
+// MEMBERS
+// ═══════════════════════════════════════════════════
+function MembersTab({ q }: { q: string }) {
+  const { toast } = useToast();
+  const { confirmDelete, modal } = useConfirmDelete();
+  const [members, setMembers] = useState<Member[] | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [college, setCollege] = useState('');
+  const [year, setYear] = useState('');
+  const [status, setStatus] = useState('');
+  const [editing, setEditing] = useState<Member | null>(null);
+
+  const load = useCallback(() => {
+    getMembers()
+      .then((m) => {
+        setMembers(m);
+        setLoadError('');
+      })
+      .catch((e) => setLoadError(errMsg(e)));
+  }, []);
+  useEffect(load, [load]);
+
+  const all = members ?? [];
+  const filtered = useMemo(
+    () =>
+      all.filter(
+        (m) =>
+          (!q ||
+            (m.full_name || '').toLowerCase().includes(q) ||
+            (m.reg_number || '').toLowerCase().includes(q) ||
+            (m.email || '').toLowerCase().includes(q) ||
+            (m.phone || '').toLowerCase().includes(q)) &&
+          (!college || (m.college || '').includes(college)) &&
+          (!year || String(m.year_of_study) === year) &&
+          (!status || m.membership_status === status)
+      ),
+    [all, q, college, year, status]
+  );
+
+  const now = new Date();
+  const active = all.filter((m) => m.membership_status === 'active').length;
+  const thisMonth = all.filter((m) => {
+    const d = new Date(m.created_at || '');
+    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+  }).length;
+
+  async function activate(id: string) {
+    try {
+      await updateMember(id, { membership_status: 'active' });
+      setMembers((prev) => (prev ?? []).map((m) => (m.id === id ? { ...m, membership_status: 'active' } : m)));
+      toast('Member activated!', 'success');
+    } catch (e) {
+      toast(errMsg(e), 'error');
+    }
+  }
+
+  function exportCSV() {
+    const headers = ['Full Name', 'Reg Number', 'College', 'Course', 'Year', 'Phone', 'Email', 'Status', 'Joined'];
+    const rows = filtered.map((m) => [
+      m.full_name,
+      m.reg_number,
+      m.college,
+      m.course,
+      m.year_of_study,
+      m.phone,
+      m.email,
+      m.membership_status,
+      m.created_at ? new Date(m.created_at).toLocaleDateString('en-GB') : '',
+    ]);
+    const csv = [headers, ...rows].map((r) => r.map((v) => `"${String(v ?? '').replace(/"/g, '""')}"`).join(',')).join('\n');
+    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `iec-members-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  return (
+    <div>
+      <ViewHeader title="Members" subtitle="All registered IEC JKUAT members">
+        <select className="admin-input h-9 text-sm w-auto" value={college} onChange={(e) => setCollege(e.target.value)} aria-label="Filter by college">
+          <option value="">All Colleges</option>
+          {COLLEGES.map((c) => (
+            <option key={c}>{c}</option>
+          ))}
+        </select>
+        <select className="admin-input h-9 text-sm w-auto" value={year} onChange={(e) => setYear(e.target.value)} aria-label="Filter by year">
+          <option value="">All Years</option>
+          {YEARS.map((y) => (
+            <option key={y}>{y}</option>
+          ))}
+        </select>
+        <select className="admin-input h-9 text-sm w-auto" value={status} onChange={(e) => setStatus(e.target.value)} aria-label="Filter by status">
+          <option value="">All Statuses</option>
+          <option value="active">Active (Paid)</option>
+          <option value="registered">Registered (Unpaid)</option>
+        </select>
+        <button onClick={exportCSV} className="btn-ghost-sm">
+          <span className="material-symbols-outlined text-[15px]">download</span> Export CSV
+        </button>
+      </ViewHeader>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total" value={members ? all.length : '—'} color="text-iec-blue" />
+        <StatCard label="Active" value={members ? active : '—'} color="text-green-400" />
+        <StatCard label="Pending" value={members ? all.length - active : '—'} color="text-iec-gold" />
+        <StatCard label="This Month" value={members ? thisMonth : '—'} color="text-white" />
+      </div>
+
       <div className="admin-card overflow-x-auto">
-        <table className="admin-table w-full text-sm">
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Name</th>
@@ -302,17 +610,23 @@ function MembersTab() {
               <th>Course</th>
               <th>Year</th>
               <th>Phone</th>
+              <th>Email</th>
               <th>Status</th>
+              <th>Joined</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {loadError ? (
               <tr>
-                <td colSpan={8} className="text-center py-10 text-white/25 text-sm">
-                  No members found
+                <td colSpan={10} className="text-center py-8 text-red-400 text-sm">
+                  Failed to load: {loadError}
                 </td>
               </tr>
+            ) : !members ? (
+              <EmptyRow cols={10}>Loading members…</EmptyRow>
+            ) : filtered.length === 0 ? (
+              <EmptyRow cols={10}>No members found</EmptyRow>
             ) : (
               filtered.map((m) => {
                 const isActive = m.membership_status === 'active';
@@ -324,10 +638,12 @@ function MembersTab() {
                     <td className="text-white/60">{m.course || '—'}</td>
                     <td className="text-center">{m.year_of_study || '—'}</td>
                     <td className="text-white/60">{m.phone || '—'}</td>
+                    <td className="text-white/50 text-xs">{m.email || '—'}</td>
                     <td>
-                      <span className={`badge ${isActive ? 'badge-active' : 'badge-registered'}`}>
-                        {isActive ? '✓ Active' : 'Registered'}
-                      </span>
+                      <span className={`badge ${isActive ? 'badge-active' : 'badge-registered'}`}>{isActive ? '✓ Active' : 'Registered'}</span>
+                    </td>
+                    <td className="text-white/40 text-xs whitespace-nowrap">
+                      {m.created_at ? new Date(m.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '—'}
                     </td>
                     <td>
                       <div className="flex gap-1">
@@ -335,17 +651,17 @@ function MembersTab() {
                           <span className="material-symbols-outlined text-[13px]">edit</span>
                         </button>
                         {!isActive && (
-                          <button className="btn-ghost-sm" onClick={() => activate(m.id)} title="Mark active">
+                          <button className="btn-ghost-sm" onClick={() => activate(m.id)} title="Mark as active">
                             <span className="material-symbols-outlined text-[13px]">verified</span>
                           </button>
                         )}
                         <button
                           className="btn-danger"
+                          title="Delete"
                           onClick={() =>
                             confirmDelete(m.full_name, async () => {
                               await deleteMember(m.id);
-                              toast('Deleted!', 'success');
-                              load();
+                              setMembers((prev) => (prev ?? []).filter((x) => x.id !== m.id));
                             })
                           }
                         >
@@ -360,13 +676,19 @@ function MembersTab() {
           </tbody>
         </table>
       </div>
+      {members && (
+        <p className="text-white/25 text-xs mt-3">
+          Showing {filtered.length} of {all.length} members
+        </p>
+      )}
+
       {editing && (
         <MemberModal
           member={editing}
           onClose={() => setEditing(null)}
-          onSaved={() => {
+          onSaved={(updated) => {
+            setMembers((prev) => (prev ?? []).map((m) => (m.id === updated.id ? updated : m)));
             setEditing(null);
-            load();
           }}
         />
       )}
@@ -375,137 +697,159 @@ function MembersTab() {
   );
 }
 
-function MemberModal({ member, onClose, onSaved }: { member: Member; onClose: () => void; onSaved: () => void }) {
+function MemberModal({ member, onClose, onSaved }: { member: Member; onClose: () => void; onSaved: (m: Member) => void }) {
   const { toast } = useToast();
-  const [form, setForm] = useState(member);
+  const [f, setF] = useState({
+    full_name: member.full_name || '',
+    reg_number: member.reg_number || '',
+    phone: member.phone || '',
+    email: member.email || '',
+    college: member.college || '',
+    course: member.course || '',
+    year: member.year_of_study ? String(member.year_of_study) : '',
+    membership_status: member.membership_status || 'registered',
+  });
   const [busy, setBusy] = useState(false);
-  const set = (k: keyof Member) => (e: { target: { value: string } }) => setForm((f) => ({ ...f, [k]: e.target.value }));
+  const set = (k: keyof typeof f) => (v: string) => setF((p) => ({ ...p, [k]: v }));
 
   async function save(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      await updateMember(member.id, {
-        full_name: form.full_name,
-        reg_number: form.reg_number,
-        college: form.college,
-        course: form.course,
-        year_of_study: parseInt(String(form.year_of_study)) || undefined,
-        phone: form.phone,
-        email: form.email,
-        membership_status: form.membership_status,
-      });
+      const payload = {
+        full_name: f.full_name.trim(),
+        reg_number: f.reg_number.trim(),
+        college: f.college.trim(),
+        course: f.course.trim(),
+        phone: f.phone.trim(),
+        email: f.email.trim(),
+        membership_status: f.membership_status,
+        ...(f.year ? { year_of_study: parseInt(f.year, 10) } : {}),
+      };
+      await updateMember(member.id, payload);
       toast('Member updated!', 'success');
-      onSaved();
+      onSaved({ ...member, ...payload });
     } catch (err) {
-      toast((err as Error).message, 'error');
+      toast(errMsg(err), 'error');
       setBusy(false);
     }
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <form className="modal-box p-6" onClick={(e) => e.stopPropagation()} onSubmit={save}>
-        <h2 className="font-display font-bold text-white text-lg mb-5">Edit Member</h2>
+    <Modal title="Edit Member" onClose={onClose}>
+      <form onSubmit={save} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Full Name" value={form.full_name} onChange={set('full_name')} required />
-          <Field label="Reg Number" value={form.reg_number} onChange={set('reg_number')} required />
-          <Field label="College" value={form.college} onChange={set('college')} />
-          <Field label="Course" value={form.course} onChange={set('course')} />
-          <Field label="Year" type="number" value={String(form.year_of_study ?? '')} onChange={set('year_of_study')} />
-          <Field label="Phone" value={form.phone} onChange={set('phone')} />
-          <Field label="Email" type="email" value={form.email} onChange={set('email')} />
-          <div>
-            <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">Status</label>
-            <select className="admin-input" value={form.membership_status} onChange={set('membership_status')}>
-              <option value="registered">Registered</option>
-              <option value="active">Active</option>
-            </select>
-          </div>
+          <Field className="col-span-2" label="Full Name" value={f.full_name} onChange={set('full_name')} required />
+          <Field label="Reg Number" value={f.reg_number} onChange={set('reg_number')} required />
+          <Field label="Phone" value={f.phone} onChange={set('phone')} required />
+          <Field className="col-span-2" label="Email" type="email" value={f.email} onChange={set('email')} required />
+          <Field label="College" value={f.college} onChange={set('college')} />
+          <Field label="Course" value={f.course} onChange={set('course')} />
+          <SelectField label="Year" value={f.year} onChange={set('year')} options={opts(YEARS)} placeholder="Select" />
+          <SelectField
+            label="Status"
+            value={f.membership_status}
+            onChange={set('membership_status')}
+            options={[
+              { value: 'registered', label: 'Registered (Unpaid)' },
+              { value: 'active', label: 'Active (Paid)' },
+            ]}
+          />
         </div>
-        <div className="flex gap-3 justify-end mt-6">
-          <button type="button" className="btn-ghost-sm" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="submit" className="btn-primary" disabled={busy}>
-            {busy ? 'Saving…' : 'Save Changes'}
-          </button>
-        </div>
+        <ModalActions busy={busy} onClose={onClose} label="Save Changes" />
       </form>
-    </div>
+    </Modal>
   );
 }
 
-// ═══ EVENTS ═══
-function EventsTab() {
-  const { toast } = useToast();
+// ═══════════════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════════════
+function EventsTab({ q }: { q: string }) {
   const { confirmDelete, modal } = useConfirmDelete();
-  const [events, setEvents] = useState<EventRow[]>([]);
-  const [editing, setEditing] = useState<EventRow | null | 'new'>(null);
+  const [events, setEvents] = useState<EventRow[] | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [editing, setEditing] = useState<EventRow | 'new' | null>(null);
 
   const load = useCallback(() => {
+    // admin.js listed newest event first; getEvents() is oldest-first.
     getEvents()
-      .then(setEvents)
-      .catch((e) => toast(e.message, 'error'));
-  }, [toast]);
+      .then((rows) => {
+        setEvents([...rows].reverse());
+        setLoadError('');
+      })
+      .catch((e) => setLoadError(errMsg(e)));
+  }, []);
   useEffect(load, [load]);
+
+  const list = (events ?? []).filter((ev) => !q || (ev.title || '').toLowerCase().includes(q) || (ev.location || '').toLowerCase().includes(q));
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-display font-bold text-white text-2xl">Events</h2>
-        <button className="btn-primary" onClick={() => setEditing('new')}>
+      <ViewHeader title="Events" subtitle="Manage club events and programs">
+        <button onClick={() => setEditing('new')} className="btn-primary">
           <span className="material-symbols-outlined text-[16px]">add</span> New Event
         </button>
-      </div>
+      </ViewHeader>
       <div className="admin-card overflow-x-auto">
-        <table className="admin-table w-full text-sm">
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Title</th>
               <th>Date</th>
               <th>Category</th>
               <th>Location</th>
+              <th>Media</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {events.length === 0 ? (
+            {loadError ? (
               <tr>
-                <td colSpan={5} className="text-center py-10 text-white/25 text-sm">
-                  No events yet. Add your first event.
+                <td colSpan={6} className="text-center py-8 text-red-400 text-sm">
+                  {loadError}
                 </td>
               </tr>
+            ) : !events ? (
+              <EmptyRow cols={6}>Loading events…</EmptyRow>
+            ) : list.length === 0 ? (
+              <EmptyRow cols={6}>No events yet. Add your first event.</EmptyRow>
             ) : (
-              events.map((ev) => (
-                <tr key={ev.id}>
-                  <td className="font-medium">{ev.title}</td>
-                  <td className="text-white/60 text-sm whitespace-nowrap">
-                    {ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
-                  </td>
-                  <td>{(ev as { category?: string }).category ? <span className="badge badge-registered">{(ev as { category?: string }).category}</span> : '—'}</td>
-                  <td className="text-white/50 text-sm">{ev.location || '—'}</td>
-                  <td>
-                    <div className="flex gap-1">
-                      <button className="btn-ghost-sm" onClick={() => setEditing(ev)}>
-                        <span className="material-symbols-outlined text-[13px]">edit</span>
-                      </button>
-                      <button
-                        className="btn-danger"
-                        onClick={() =>
-                          confirmDelete(ev.title, async () => {
-                            await deleteEvent(ev.id);
-                            toast('Deleted!', 'success');
-                            load();
-                          })
-                        }
-                      >
-                        <span className="material-symbols-outlined text-[13px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+              list.map((ev) => {
+                const n = parseJsonList(ev.media_urls).length;
+                return (
+                  <tr key={ev.id}>
+                    <td className="font-medium">{ev.title}</td>
+                    <td className="text-white/60 text-sm whitespace-nowrap">
+                      {ev.event_date ? new Date(ev.event_date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'}
+                    </td>
+                    <td>{ev.category ? <span className="badge badge-registered">{ev.category}</span> : '—'}</td>
+                    <td className="text-white/50 text-sm">{ev.location || '—'}</td>
+                    <td className="text-white/40 text-xs">
+                      {n} file{n !== 1 ? 's' : ''}
+                    </td>
+                    <td>
+                      <div className="flex gap-1">
+                        <button className="btn-ghost-sm" onClick={() => setEditing(ev)} title="Edit">
+                          <span className="material-symbols-outlined text-[13px]">edit</span>
+                        </button>
+                        <button
+                          className="btn-danger"
+                          title="Delete"
+                          onClick={() =>
+                            confirmDelete(ev.title, async () => {
+                              await deleteEvent(ev.id);
+                              load();
+                            })
+                          }
+                        >
+                          <span className="material-symbols-outlined text-[13px]">delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -529,31 +873,25 @@ function EventModal({ event, onClose, onSaved }: { event: EventRow | null; onClo
   const { toast } = useToast();
   const [title, setTitle] = useState(event?.title || '');
   const [date, setDate] = useState(event?.event_date || '');
-  const [category, setCategory] = useState((event as { category?: string } | null)?.category || '');
+  const [category, setCategory] = useState(event?.category || '');
   const [location, setLocation] = useState(event?.location || '');
   const [description, setDescription] = useState(event?.description || '');
-  const [media, setMedia] = useState(() => {
-    try {
-      return (JSON.parse((event?.media_urls as string) || '[]') as string[]).join(', ');
-    } catch {
-      return '';
-    }
-  });
   const [embed, setEmbed] = useState(parseEmbedUrls(event?.embed_urls).join(', '));
+  const [media, setMedia] = useState<string[]>(parseJsonList(event?.media_urls));
   const [busy, setBusy] = useState(false);
 
   async function save(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      const payload: Partial<EventRow> & { category?: string | null } = {
+      const payload: Partial<EventRow> = {
         title: title.trim(),
         event_date: date,
         category: category || null,
-        location: location.trim() || undefined,
-        description: description.trim() || undefined,
-        media_urls: jsonArray(media),
-        embed_urls: jsonArray(embed),
+        location: location.trim() || null,
+        description: description.trim() || null,
+        media_urls: media,
+        embed_urls: splitList(embed),
       };
       if (event) {
         const { error } = await supabase.from('events').update(payload).eq('id', event.id);
@@ -565,58 +903,74 @@ function EventModal({ event, onClose, onSaved }: { event: EventRow | null; onClo
       }
       onSaved();
     } catch (err) {
-      toast((err as Error).message, 'error');
+      toast(errMsg(err), 'error');
       setBusy(false);
     }
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <form className="modal-box p-6" onClick={(e) => e.stopPropagation()} onSubmit={save}>
-        <h2 className="font-display font-bold text-white text-lg mb-5">{event ? 'Edit Event' : 'New Event'}</h2>
-        <div className="space-y-4">
-          <Field label="Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-            <Field label="Category" value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Hackathon" />
-          </div>
-          <Field label="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
-          <TextArea label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <Field label="Image/Media URLs (comma-separated)" value={media} onChange={(e) => setMedia(e.target.value)} />
-          <Field label="Embed Links (YouTube, etc.)" value={embed} onChange={(e) => setEmbed(e.target.value)} />
+    <Modal title={event ? 'Edit Event' : 'New Event'} onClose={onClose}>
+      <form onSubmit={save} className="space-y-4">
+        <Field label="Title" value={title} onChange={setTitle} required placeholder="e.g. IEC Innovation Night" />
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Date" type="date" value={date} onChange={setDate} required />
+          <SelectField label="Category" value={category} onChange={setCategory} options={opts(EVENT_CATEGORIES)} placeholder="Select" />
         </div>
+        <Field label="Location" value={location} onChange={setLocation} placeholder="e.g. JKUAT Innovation Hub" />
+        <div>
+          <label className={LABEL}>Description</label>
+          <textarea className="admin-input resize-none" rows={3} placeholder="What's this event about?" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <Field label="Embed Link" hint="(YouTube, Instagram, etc. — comma-separate several)" value={embed} onChange={setEmbed} placeholder="https://youtube.com/watch?v=..." />
+        <MediaField
+          label="Photos & Videos"
+          hint="Click to upload images or videos"
+          icon="upload"
+          urls={media}
+          onChange={setMedia}
+          bucket={STORAGE_BUCKETS.event}
+          folder="event"
+          multiple
+          accept="image/*,video/mp4,video/webm"
+        />
         <ModalActions busy={busy} onClose={onClose} label="Save Event" />
       </form>
-    </div>
+    </Modal>
   );
 }
 
-// ═══ PROJECTS ═══
-function ProjectsTab() {
-  const { toast } = useToast();
+// ═══════════════════════════════════════════════════
+// PROJECTS
+// ═══════════════════════════════════════════════════
+const STATUS_BADGE: Record<string, string> = { Ideation: 'badge-registered', Incubating: 'badge-active', 'MVP Live': 'badge-active' };
+
+function ProjectsTab({ q }: { q: string }) {
   const { confirmDelete, modal } = useConfirmDelete();
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [editing, setEditing] = useState<Project | null | 'new'>(null);
+  const [projects, setProjects] = useState<Project[] | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [editing, setEditing] = useState<Project | 'new' | null>(null);
 
   const load = useCallback(() => {
     getProjects()
-      .then(setProjects)
-      .catch((e) => toast(e.message, 'error'));
-  }, [toast]);
+      .then((rows) => {
+        setProjects(rows);
+        setLoadError('');
+      })
+      .catch((e) => setLoadError(errMsg(e)));
+  }, []);
   useEffect(load, [load]);
 
-  const statusColors: Record<string, string> = { Ideation: 'badge-registered', Incubating: 'badge-active', 'MVP Live': 'badge-active' };
+  const list = (projects ?? []).filter((p) => !q || (p.name || '').toLowerCase().includes(q) || (p.team_lead || '').toLowerCase().includes(q));
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-display font-bold text-white text-2xl">Projects</h2>
-        <button className="btn-primary" onClick={() => setEditing('new')}>
+      <ViewHeader title="Projects" subtitle="Incubated startups and ventures">
+        <button onClick={() => setEditing('new')} className="btn-primary">
           <span className="material-symbols-outlined text-[16px]">add</span> New Project
         </button>
-      </div>
+      </ViewHeader>
       <div className="admin-card overflow-x-auto">
-        <table className="admin-table w-full text-sm">
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Name</th>
@@ -624,54 +978,65 @@ function ProjectsTab() {
               <th>Category</th>
               <th>Status</th>
               <th>Progress</th>
+              <th>Media</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {projects.length === 0 ? (
+            {loadError ? (
               <tr>
-                <td colSpan={6} className="text-center py-10 text-white/25 text-sm">
-                  No projects yet.
+                <td colSpan={7} className="text-center py-8 text-red-400 text-sm">
+                  {loadError}
                 </td>
               </tr>
+            ) : !projects ? (
+              <EmptyRow cols={7}>Loading projects…</EmptyRow>
+            ) : list.length === 0 ? (
+              <EmptyRow cols={7}>No projects yet.</EmptyRow>
             ) : (
-              projects.map((p) => (
-                <tr key={p.id}>
-                  <td className="font-medium">{p.name}</td>
-                  <td className="text-white/60">{p.team_lead}</td>
-                  <td className="text-white/50 text-sm">{p.category || '—'}</td>
-                  <td>
-                    <span className={`badge ${statusColors[p.status || ''] || 'badge-registered'}`}>{p.status}</span>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)', maxWidth: '80px' }}>
-                        <div className="h-full rounded-full bg-iec-blue" style={{ width: `${p.progress || 0}%` }} />
+              list.map((p) => {
+                const n = parseJsonList(p.media_urls).length;
+                return (
+                  <tr key={p.id}>
+                    <td className="font-medium">{p.name}</td>
+                    <td className="text-white/60">{p.team_lead}</td>
+                    <td className="text-white/50 text-sm">{p.category || '—'}</td>
+                    <td>
+                      <span className={`badge ${STATUS_BADGE[p.status || ''] || 'badge-registered'}`}>{p.status}</span>
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1.5 rounded-full" style={{ background: 'rgba(255,255,255,0.1)', maxWidth: '80px' }}>
+                          <div className="h-full rounded-full bg-iec-blue" style={{ width: `${p.progress || 0}%` }} />
+                        </div>
+                        <span className="text-xs text-white/40">{p.progress || 0}%</span>
                       </div>
-                      <span className="text-xs text-white/40">{p.progress || 0}%</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex gap-1">
-                      <button className="btn-ghost-sm" onClick={() => setEditing(p)}>
-                        <span className="material-symbols-outlined text-[13px]">edit</span>
-                      </button>
-                      <button
-                        className="btn-danger"
-                        onClick={() =>
-                          confirmDelete(p.name, async () => {
-                            await deleteProject(p.id);
-                            toast('Deleted!', 'success');
-                            load();
-                          })
-                        }
-                      >
-                        <span className="material-symbols-outlined text-[13px]">delete</span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
+                    </td>
+                    <td className="text-white/40 text-xs">
+                      {n} file{n !== 1 ? 's' : ''}
+                    </td>
+                    <td>
+                      <div className="flex gap-1">
+                        <button className="btn-ghost-sm" onClick={() => setEditing(p)} title="Edit">
+                          <span className="material-symbols-outlined text-[13px]">edit</span>
+                        </button>
+                        <button
+                          className="btn-danger"
+                          title="Delete"
+                          onClick={() =>
+                            confirmDelete(p.name, async () => {
+                              await deleteProject(p.id);
+                              load();
+                            })
+                          }
+                        >
+                          <span className="material-symbols-outlined text-[13px]">delete</span>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
@@ -697,31 +1062,26 @@ function ProjectModal({ project, onClose, onSaved }: { project: Project | null; 
   const [lead, setLead] = useState(project?.team_lead || '');
   const [status, setStatus] = useState(project?.status || 'Ideation');
   const [category, setCategory] = useState(project?.category || '');
-  const [progress, setProgress] = useState(String(project?.progress ?? ''));
+  const [progress, setProgress] = useState(project?.progress ? String(project.progress) : '');
   const [description, setDescription] = useState(project?.description || '');
-  const [media, setMedia] = useState(() => {
-    try {
-      return (JSON.parse((project?.media_urls as string) || '[]') as string[]).join(', ');
-    } catch {
-      return '';
-    }
-  });
   const [embed, setEmbed] = useState(parseEmbedUrls(project?.embed_urls).join(', '));
+  const [media, setMedia] = useState<string[]>(parseJsonList(project?.media_urls));
   const [busy, setBusy] = useState(false);
 
   async function save(e: FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
+      const pct = Math.min(100, Math.max(0, parseInt(progress, 10) || 0));
       const payload: Partial<Project> = {
         name: name.trim(),
         team_lead: lead.trim(),
         status,
         category: category || undefined,
-        progress: parseInt(progress) || 0,
+        progress: pct,
         description: description.trim() || undefined,
-        media_urls: jsonArray(media),
-        embed_urls: jsonArray(embed),
+        media_urls: media,
+        embed_urls: splitList(embed),
       };
       if (project) {
         await updateProject(project.id, payload);
@@ -732,91 +1092,100 @@ function ProjectModal({ project, onClose, onSaved }: { project: Project | null; 
       }
       onSaved();
     } catch (err) {
-      toast((err as Error).message, 'error');
+      toast(errMsg(err), 'error');
       setBusy(false);
     }
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <form className="modal-box p-6" onClick={(e) => e.stopPropagation()} onSubmit={save}>
-        <h2 className="font-display font-bold text-white text-lg mb-5">{project ? 'Edit Project' : 'New Project'}</h2>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-            <Field label="Team Lead" value={lead} onChange={(e) => setLead(e.target.value)} required />
-          </div>
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">Status</label>
-              <select className="admin-input" value={status} onChange={(e) => setStatus(e.target.value)}>
-                <option>Ideation</option>
-                <option>Incubating</option>
-                <option>MVP Live</option>
-              </select>
-            </div>
-            <Field label="Category" value={category} onChange={(e) => setCategory(e.target.value)} />
-            <Field label="Progress %" type="number" value={progress} onChange={(e) => setProgress(e.target.value)} />
-          </div>
-          <TextArea label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <Field label="Image/Media URLs (comma-separated)" value={media} onChange={(e) => setMedia(e.target.value)} />
-          <Field label="Embed Links" value={embed} onChange={(e) => setEmbed(e.target.value)} />
+    <Modal title={project ? 'Edit Project' : 'New Project'} onClose={onClose}>
+      <form onSubmit={save} className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Project Name" value={name} onChange={setName} required placeholder="e.g. EcoTrack" />
+          <Field label="Team Lead" value={lead} onChange={setLead} required placeholder="Full name" />
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <SelectField label="Status" value={status} onChange={setStatus} options={opts(['Ideation', 'Incubating', 'MVP Live'])} required />
+          <SelectField label="Category" value={category} onChange={setCategory} options={opts(PROJECT_CATEGORIES)} placeholder="Select" />
+        </div>
+        <Field label="Progress (0–100)" type="number" value={progress} onChange={setProgress} placeholder="e.g. 65" />
+        <div>
+          <label className={LABEL}>Description</label>
+          <textarea className="admin-input resize-none" rows={3} placeholder="What problem does it solve?" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <Field label="Embed Link" hint="(YouTube, etc. — comma-separate several)" value={embed} onChange={setEmbed} placeholder="https://youtube.com/watch?v=..." />
+        <MediaField
+          label="Photos & Videos"
+          hint="Click to upload images or videos"
+          icon="upload"
+          urls={media}
+          onChange={setMedia}
+          bucket={STORAGE_BUCKETS.project}
+          folder="project"
+          multiple
+          accept="image/*,video/mp4,video/webm"
+        />
         <ModalActions busy={busy} onClose={onClose} label="Save Project" />
       </form>
-    </div>
+    </Modal>
   );
 }
 
-// ═══ PRODUCTS ═══
-function ProductsTab() {
-  const { toast } = useToast();
+// ═══════════════════════════════════════════════════
+// PRODUCTS
+// ═══════════════════════════════════════════════════
+function ProductsTab({ q }: { q: string }) {
   const { confirmDelete, modal } = useConfirmDelete();
-  const [products, setProducts] = useState<Product[]>([]);
-  const [editing, setEditing] = useState<Product | null | 'new'>(null);
+  const [products, setProducts] = useState<Product[] | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [editing, setEditing] = useState<Product | 'new' | null>(null);
 
   const load = useCallback(() => {
     getProducts()
-      .then(setProducts)
-      .catch((e) => toast(e.message, 'error'));
-  }, [toast]);
+      .then((rows) => {
+        setProducts(rows);
+        setLoadError('');
+      })
+      .catch((e) => setLoadError(errMsg(e)));
+  }, []);
   useEffect(load, [load]);
+
+  const list = (products ?? []).filter((p) => !q || (p.name || '').toLowerCase().includes(q) || (p.category || '').toLowerCase().includes(q));
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-display font-bold text-white text-2xl">Products</h2>
-        <button className="btn-primary" onClick={() => setEditing('new')}>
+      <ViewHeader title="Products" subtitle="Merchandise catalogue">
+        <button onClick={() => setEditing('new')} className="btn-primary">
           <span className="material-symbols-outlined text-[16px]">add</span> New Product
         </button>
-      </div>
+      </ViewHeader>
       <div className="admin-card overflow-x-auto">
-        <table className="admin-table w-full text-sm">
+        <table className="admin-table">
           <thead>
             <tr>
-              <th></th>
+              <th>Image</th>
               <th>Name</th>
               <th>Price</th>
               <th>Category</th>
               <th>Sizes</th>
+              <th>Members Only</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            {products.length === 0 ? (
+            {loadError ? (
               <tr>
-                <td colSpan={6} className="text-center py-10 text-white/25 text-sm">
-                  No products yet.
+                <td colSpan={7} className="text-center py-8 text-red-400 text-sm">
+                  {loadError}
                 </td>
               </tr>
+            ) : !products ? (
+              <EmptyRow cols={7}>Loading products…</EmptyRow>
+            ) : list.length === 0 ? (
+              <EmptyRow cols={7}>No products yet.</EmptyRow>
             ) : (
-              products.map((p) => {
-                let sizes: string[] = [];
-                try {
-                  sizes = JSON.parse((p.sizes as string) || '[]');
-                } catch {
-                  /* ignore */
-                }
+              list.map((p) => {
+                const sizes = parseJsonList(p.sizes);
                 return (
                   <tr key={p.id}>
                     <td>
@@ -832,17 +1201,18 @@ function ProductsTab() {
                     <td className="text-iec-blue font-semibold">KES {(p.price || 0).toLocaleString()}</td>
                     <td className="text-white/50 text-sm">{p.category}</td>
                     <td className="text-white/40 text-xs">{sizes.length ? sizes.join(', ') : '—'}</td>
+                    <td>{p.is_member_exclusive ? <span className="badge badge-active text-[10px]">Yes</span> : <span className="text-white/25 text-xs">No</span>}</td>
                     <td>
                       <div className="flex gap-1">
-                        <button className="btn-ghost-sm" onClick={() => setEditing(p)}>
+                        <button className="btn-ghost-sm" onClick={() => setEditing(p)} title="Edit">
                           <span className="material-symbols-outlined text-[13px]">edit</span>
                         </button>
                         <button
                           className="btn-danger"
+                          title="Delete"
                           onClick={() =>
                             confirmDelete(p.name, async () => {
                               await deleteProduct(p.id);
-                              toast('Deleted!', 'success');
                               load();
                             })
                           }
@@ -876,17 +1246,12 @@ function ProductsTab() {
 function ProductModal({ product, onClose, onSaved }: { product: Product | null; onClose: () => void; onSaved: () => void }) {
   const { toast } = useToast();
   const [name, setName] = useState(product?.name || '');
-  const [price, setPrice] = useState(String(product?.price ?? ''));
+  const [price, setPrice] = useState(product?.price ? String(product.price) : '');
   const [category, setCategory] = useState(product?.category || 'Apparel');
+  const [sizes, setSizes] = useState(parseJsonList(product?.sizes).join(','));
   const [description, setDescription] = useState(product?.description || '');
-  const [image, setImage] = useState(product?.image_url || '');
-  const [sizes, setSizes] = useState(() => {
-    try {
-      return (JSON.parse((product?.sizes as string) || '[]') as string[]).join(',');
-    } catch {
-      return '';
-    }
-  });
+  const [exclusive, setExclusive] = useState(Boolean(product?.is_member_exclusive));
+  const [image, setImage] = useState<string[]>(product?.image_url ? [product.image_url] : []);
   const [busy, setBusy] = useState(false);
 
   async function save(e: FormEvent) {
@@ -895,11 +1260,12 @@ function ProductModal({ product, onClose, onSaved }: { product: Product | null; 
     try {
       const payload: Partial<Product> = {
         name: name.trim(),
-        price: parseInt(price) || 0,
+        price: parseInt(price, 10),
         category,
-        description: description.trim() || undefined,
-        sizes: sizes.trim() ? JSON.stringify(sizes.split(',').map((s) => s.trim()).filter(Boolean)) : '[]',
-        image_url: image || undefined,
+        description: description.trim() || null,
+        is_member_exclusive: exclusive,
+        sizes: splitList(sizes),
+        image_url: image[0] || null,
       };
       if (product) {
         await updateProduct(product.id, payload);
@@ -910,58 +1276,79 @@ function ProductModal({ product, onClose, onSaved }: { product: Product | null; 
       }
       onSaved();
     } catch (err) {
-      toast((err as Error).message, 'error');
+      toast(errMsg(err), 'error');
       setBusy(false);
     }
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <form className="modal-box p-6" onClick={(e) => e.stopPropagation()} onSubmit={save}>
-        <h2 className="font-display font-bold text-white text-lg mb-5">{product ? 'Edit Product' : 'New Product'}</h2>
-        <div className="space-y-4">
-          <Field label="Name" value={name} onChange={(e) => setName(e.target.value)} required />
-          <div className="grid grid-cols-2 gap-4">
-            <Field label="Price (KES)" type="number" value={price} onChange={(e) => setPrice(e.target.value)} required />
-            <div>
-              <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">Category</label>
-              <select className="admin-input" value={category} onChange={(e) => setCategory(e.target.value)}>
-                <option>Apparel</option>
-                <option>Accessories</option>
-              </select>
-            </div>
-          </div>
-          <Field label="Sizes (comma-separated)" value={sizes} onChange={(e) => setSizes(e.target.value)} placeholder="S,M,L,XL" />
-          <TextArea label="Description" value={description} onChange={(e) => setDescription(e.target.value)} />
-          <Field label="Image URL" value={image} onChange={(e) => setImage(e.target.value)} />
+    <Modal title={product ? 'Edit Product' : 'New Product'} onClose={onClose}>
+      <form onSubmit={save} className="space-y-4">
+        <Field label="Product Name" value={name} onChange={setName} required placeholder="e.g. IEC Signature Hoodie" />
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Price (KES)" type="number" value={price} onChange={setPrice} required placeholder="e.g. 2500" />
+          <SelectField label="Category" value={category} onChange={setCategory} options={opts(['Apparel', 'Accessories'])} required />
         </div>
+        <Field label="Sizes" hint="(comma separated, e.g. S,M,L,XL)" value={sizes} onChange={setSizes} placeholder="S,M,L,XL,XXL" />
+        <div>
+          <label className={LABEL}>Description</label>
+          <textarea className="admin-input resize-none" rows={2} placeholder="Short product description" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </div>
+        <div className="flex items-center gap-3">
+          <input type="checkbox" id="product-exclusive" className="w-4 h-4 rounded accent-iec-blue" checked={exclusive} onChange={(e) => setExclusive(e.target.checked)} />
+          <label htmlFor="product-exclusive" className="text-sm text-white/60">
+            Members Only (exclusive drop)
+          </label>
+        </div>
+        <MediaField
+          label="Product Image"
+          hint="Click to upload product image"
+          icon="add_photo_alternate"
+          urls={image}
+          onChange={setImage}
+          bucket={STORAGE_BUCKETS.product}
+          folder="products"
+          multiple={false}
+          accept="image/*"
+        />
         <ModalActions busy={busy} onClose={onClose} label="Save Product" />
       </form>
-    </div>
+    </Modal>
   );
 }
 
-// ═══ MESSAGES ═══
-function MessagesTab() {
+// ═══════════════════════════════════════════════════
+// MESSAGES
+// ═══════════════════════════════════════════════════
+function MessagesTab({ q }: { q: string }) {
   const { toast } = useToast();
-  const [messages, setMessages] = useState<ContactMessage[]>([]);
+  const [messages, setMessages] = useState<ContactMessage[] | null>(null);
+  const [loadError, setLoadError] = useState('');
 
   const load = useCallback(() => {
     getContactMessages()
-      .then(setMessages)
-      .catch((e) => toast(e.message, 'error'));
-  }, [toast]);
+      .then((rows) => {
+        setMessages(rows);
+        setLoadError('');
+      })
+      .catch((e) => setLoadError(errMsg(e)));
+  }, []);
   useEffect(load, [load]);
 
-  const unread = messages.filter((m) => !m.is_read).length;
+  const all = messages ?? [];
+  const today = new Date().toISOString().split('T')[0];
+  const list = all.filter(
+    (m) => !q || [m.name, m.email, m.subject, m.message].some((v) => (v || '').toLowerCase().includes(q))
+  );
 
   async function toggleRead(m: ContactMessage) {
     try {
+      // Same as admin.js: only "mark read" is persisted.
       if (!m.is_read) await markMessageRead(m.id);
-      setMessages((prev) => prev.map((x) => (x.id === m.id ? { ...x, is_read: !m.is_read } : x)));
+      setMessages((prev) => (prev ?? []).map((x) => (x.id === m.id ? { ...x, is_read: !m.is_read } : x)));
       toast(m.is_read ? 'Marked as unread' : 'Marked as read', 'success');
     } catch (e) {
-      toast((e as Error).message, 'error');
+      toast(errMsg(e), 'error');
     }
   }
 
@@ -969,45 +1356,63 @@ function MessagesTab() {
     if (!window.confirm('Delete this message?')) return;
     try {
       await deleteContactMessage(id);
-      setMessages((prev) => prev.filter((m) => m.id !== id));
+      setMessages((prev) => (prev ?? []).filter((m) => m.id !== id));
       toast('Message deleted', 'success');
     } catch (e) {
-      toast((e as Error).message, 'error');
+      toast(errMsg(e), 'error');
     }
   }
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="font-display font-bold text-white text-2xl">Messages</h2>
-        <p className="text-white/40 text-sm">
-          {messages.length} total · {unread} unread
-        </p>
+      <ViewHeader title="Messages" subtitle="Contact form submissions">
+        <button onClick={load} className="btn-ghost-sm">
+          <span className="material-symbols-outlined text-[15px]">refresh</span> Refresh
+        </button>
+      </ViewHeader>
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+        <StatCard label="Total" value={messages ? all.length : '—'} color="text-iec-blue" />
+        <StatCard label="Unread" value={messages ? all.filter((m) => !m.is_read).length : '—'} color="text-iec-gold" />
+        <StatCard label="Today" value={messages ? all.filter((m) => (m.created_at || '').startsWith(today)).length : '—'} color="text-green-400" />
       </div>
-      {messages.length === 0 ? (
+
+      {loadError ? (
+        <div className="text-center py-10 text-red-400 text-sm">Failed to load messages: {loadError}</div>
+      ) : !messages ? (
+        <div className="text-center py-10 text-white/25 text-sm">Loading messages…</div>
+      ) : list.length === 0 ? (
         <div className="text-center py-16 text-white/25">
           <span className="material-symbols-outlined text-5xl mb-3 block opacity-40">inbox</span>
           <p className="text-sm">No messages yet</p>
         </div>
       ) : (
         <div className="space-y-3">
-          {messages.map((msg) => {
+          {list.map((msg) => {
             const isUnread = !msg.is_read;
-            const preview = (msg.message || '').substring(0, 120) + ((msg.message || '').length > 120 ? '…' : '');
+            const text = msg.message || '';
+            const preview = text.substring(0, 120) + (text.length > 120 ? '…' : '');
             return (
               <div key={msg.id} className={`msg-card ${isUnread ? 'unread' : ''}`}>
                 <div className="flex items-start justify-between gap-4 mb-2">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="msg-from font-semibold text-sm text-white">{msg.name}</span>
-                      <span className="text-white/25 text-xs">•</span>
-                      <span className="text-white/30 text-xs">{msg.email}</span>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0" style={{ background: isUnread ? 'rgba(0,174,239,0.12)' : 'rgba(255,255,255,0.06)' }}>
+                      <span className="material-symbols-outlined text-[16px]" style={{ color: isUnread ? '#18C8FF' : 'rgba(255,255,255,0.3)' }}>
+                        person
+                      </span>
                     </div>
-                    <p className="msg-subject text-sm font-medium mt-0.5" style={{ color: isUnread ? '#fff' : 'rgba(255,255,255,0.6)' }}>
-                      {msg.subject}
-                    </p>
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="msg-from font-semibold text-sm text-white">{msg.name}</span>
+                        <span className="text-white/25 text-xs">•</span>
+                        <span className="text-white/30 text-xs">{msg.email}</span>
+                      </div>
+                      <p className="msg-subject text-sm font-medium mt-0.5" style={{ color: isUnread ? '#fff' : 'rgba(255,255,255,0.6)' }}>
+                        {msg.subject}
+                      </p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
+                    <span className="text-white/25 text-xs whitespace-nowrap">{msg.created_at ? getTimeAgo(new Date(msg.created_at)) : ''}</span>
                     <button onClick={() => toggleRead(msg)} className="p-1.5 rounded hover:bg-white/5 transition-colors" title={isUnread ? 'Mark as read' : 'Mark as unread'}>
                       <span className="material-symbols-outlined text-[16px]" style={{ color: isUnread ? '#18C8FF' : 'rgba(255,255,255,0.3)' }}>
                         {isUnread ? 'mark_email_read' : 'mark_email_unread'}
@@ -1032,22 +1437,33 @@ function MessagesTab() {
   );
 }
 
-// ═══ PAYMENTS ═══
-function PaymentsTab() {
-  const { toast } = useToast();
-  const [payments, setPayments] = useState<Payment[]>([]);
+// ═══════════════════════════════════════════════════
+// PAYMENTS
+// ═══════════════════════════════════════════════════
+function PaymentsTab({ q }: { q: string }) {
+  const [payments, setPayments] = useState<Payment[] | null>(null);
+  const [loadError, setLoadError] = useState('');
 
-  useEffect(() => {
+  const load = useCallback(() => {
     getPayments()
-      .then(setPayments)
-      .catch((e) => toast(e.message, 'error'));
-  }, [toast]);
+      .then((rows) => {
+        setPayments(rows);
+        setLoadError('');
+      })
+      .catch((e) => setLoadError(errMsg(e)));
+  }, []);
+  useEffect(load, [load]);
 
-  const completed = payments.filter((p) => p.status === 'completed' || (p as { payment_status?: string }).payment_status === 'completed');
+  const all = payments ?? [];
+  const completed = all.filter((p) => p.payment_status === 'completed');
+  const pending = all.filter((p) => p.payment_status === 'pending');
+  const failed = all.filter((p) => p.payment_status !== 'completed' && p.payment_status !== 'pending');
   const collected = completed.reduce((s, p) => s + (Number(p.amount) || 0), 0);
+  const list = all.filter(
+    (p) => !q || [p.members?.full_name, p.members?.reg_number, p.phone, p.lipana_ref].some((v) => (v || '').toLowerCase().includes(q))
+  );
 
-  const statusOf = (p: Payment) => p.status || (p as { payment_status?: string }).payment_status || '';
-  const badge = (s: string) =>
+  const badge = (s?: string) =>
     s === 'completed' ? (
       <span className="badge badge-active">Paid</span>
     ) : s === 'pending' ? (
@@ -1060,38 +1476,47 @@ function PaymentsTab() {
 
   return (
     <div>
-      <div className="mb-6">
-        <h2 className="font-display font-bold text-white text-2xl">Payments</h2>
-        <p className="text-white/40 text-sm">
-          KES {collected.toLocaleString()} collected · {completed.length} paid
-        </p>
+      <ViewHeader title="Payments" subtitle="M-Pesa collections — who has paid the membership fee">
+        <button onClick={load} className="btn-ghost-sm">
+          <span className="material-symbols-outlined text-[15px]">refresh</span> Refresh
+        </button>
+      </ViewHeader>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Collected" value={payments ? `KES ${collected.toLocaleString()}` : '—'} color="text-iec-blue" />
+        <StatCard label="Completed" value={payments ? completed.length : '—'} color="text-green-400" />
+        <StatCard label="Pending" value={payments ? pending.length : '—'} color="text-iec-gold" />
+        <StatCard label="Failed" value={payments ? failed.length : '—'} color="text-red-400" />
       </div>
       <div className="admin-card overflow-x-auto">
-        <table className="admin-table w-full text-sm">
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Member</th>
               <th>Phone</th>
               <th>Amount</th>
               <th>Status</th>
-              <th>Ref</th>
+              <th>Reference</th>
               <th>Date</th>
             </tr>
           </thead>
           <tbody>
-            {payments.length === 0 ? (
+            {loadError ? (
               <tr>
-                <td colSpan={6} className="text-center py-10 text-white/25 text-sm">
-                  No payments yet.
+                <td colSpan={6} className="text-center py-8 text-red-400 text-sm">
+                  Failed to load: {loadError}
                 </td>
               </tr>
+            ) : !payments ? (
+              <EmptyRow cols={6}>Loading payments…</EmptyRow>
+            ) : list.length === 0 ? (
+              <EmptyRow cols={6}>No payments yet.</EmptyRow>
             ) : (
-              payments.map((p) => (
+              list.map((p) => (
                 <tr key={p.id}>
                   <td className="font-medium">
                     {p.members ? (
                       <>
-                        {p.members.full_name} <span className="text-white/25 text-xs">· {p.members.reg_number}</span>
+                        {p.members.full_name} <span className="text-white/25 text-xs">· {p.members.reg_number || ''}</span>
                       </>
                     ) : (
                       <span className="text-white/25 text-xs">—</span>
@@ -1099,9 +1524,9 @@ function PaymentsTab() {
                   </td>
                   <td className="text-white/60 text-sm">{p.phone || '—'}</td>
                   <td className="text-iec-blue font-semibold whitespace-nowrap">KES {(Number(p.amount) || 0).toLocaleString()}</td>
-                  <td>{badge(statusOf(p))}</td>
-                  <td className="text-white/40 text-xs font-mono truncate" style={{ maxWidth: '180px' }}>
-                    {(p as { lipana_ref?: string }).lipana_ref || '—'}
+                  <td>{badge(p.payment_status)}</td>
+                  <td className="text-white/40 text-xs font-mono truncate" style={{ maxWidth: '180px' }} title={p.lipana_ref || ''}>
+                    {p.lipana_ref || '—'}
                   </td>
                   <td className="text-white/40 text-xs whitespace-nowrap">
                     {p.created_at ? new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: '2-digit' }) : '—'}
@@ -1112,52 +1537,6 @@ function PaymentsTab() {
           </tbody>
         </table>
       </div>
-    </div>
-  );
-}
-
-// ─── Small form primitives ───
-function Field({
-  label,
-  value,
-  onChange,
-  type = 'text',
-  required,
-  placeholder,
-}: {
-  label: string;
-  value: string;
-  onChange: (e: { target: { value: string } }) => void;
-  type?: string;
-  required?: boolean;
-  placeholder?: string;
-}) {
-  return (
-    <div>
-      <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">{label}</label>
-      <input className="admin-input" type={type} value={value} onChange={onChange} required={required} placeholder={placeholder} />
-    </div>
-  );
-}
-
-function TextArea({ label, value, onChange }: { label: string; value: string; onChange: (e: { target: { value: string } }) => void }) {
-  return (
-    <div>
-      <label className="block text-xs font-semibold text-white/40 uppercase tracking-wider mb-1.5">{label}</label>
-      <textarea className="admin-input resize-none" rows={3} value={value} onChange={onChange} />
-    </div>
-  );
-}
-
-function ModalActions({ busy, onClose, label }: { busy: boolean; onClose: () => void; label: string }) {
-  return (
-    <div className="flex gap-3 justify-end mt-6">
-      <button type="button" className="btn-ghost-sm" onClick={onClose}>
-        Cancel
-      </button>
-      <button type="submit" className="btn-primary" disabled={busy}>
-        {busy ? 'Saving…' : label}
-      </button>
     </div>
   );
 }

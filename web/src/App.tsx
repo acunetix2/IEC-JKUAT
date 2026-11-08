@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import SiteLayout from './components/SiteLayout';
+import ScrollManager from './components/ScrollManager';
+import { usePageMeta } from './hooks/usePageMeta';
 import Home from './pages/Home';
 import Events from './pages/Events';
 import EventDetail from './pages/EventDetail';
@@ -15,8 +17,26 @@ import NotFound from './pages/NotFound';
 // Admin is the largest module and never needed on public routes.
 const Admin = lazy(() => import('./pages/Admin'));
 
+// Old static-site URLs (events.html, event.html?id=..., index.html#join)
+// are still in WhatsApp messages and bookmarks. Send them to the matching
+// route, keeping the query string and hash; anything else is a real 404.
+const LEGACY_PAGES = new Set(['index', 'events', 'event', 'showcase', 'project', 'merchandise', 'contact', 'privacy', 'terms', 'admin']);
+
+function NotFoundOrLegacy() {
+  const { pathname, search, hash } = useLocation();
+  const m = /^\/([a-z]+)\.html$/.exec(pathname);
+  if (m && LEGACY_PAGES.has(m[1])) {
+    const to = m[1] === 'index' ? '/' : `/${m[1]}`;
+    return <Navigate to={`${to}${search}${hash}`} replace />;
+  }
+  return <NotFound />;
+}
+
 export default function App() {
+  usePageMeta();
   return (
+    <>
+    <ScrollManager />
     <Routes>
       {/* Main routes share the public chrome via the SiteLayout layout route */}
       <Route element={<SiteLayout />}>
@@ -42,7 +62,8 @@ export default function App() {
       {/* Standalone routes */}
       <Route path="/privacy" element={<Privacy />} />
       <Route path="/terms" element={<Terms />} />
-      <Route path="*" element={<NotFound />} />
+      <Route path="*" element={<NotFoundOrLegacy />} />
     </Routes>
+    </>
   );
 }

@@ -56,7 +56,7 @@ export default function Events() {
   }, []);
 
   const filtered = useMemo(
-    () => (filter === 'all' ? events : events.filter((e) => trackKey(e.track ?? (e as { category?: string }).category) === filter)),
+    () => (filter === 'all' ? events : events.filter((e) => trackKey(e.category ?? undefined) === filter)),
     [events, filter]
   );
 
@@ -157,7 +157,7 @@ export default function Events() {
 }
 
 function EventCard({ event, index }: { event: EventRow; index: number }) {
-  const category = (event as { category?: string }).category || event.track;
+  const category = event.category || undefined;
   const date = event.event_date ? new Date(event.event_date) : null;
   const validDate = date && !isNaN(date.getTime());
   const day = validDate ? date!.getDate() : '—';
@@ -183,7 +183,7 @@ function EventCard({ event, index }: { event: EventRow; index: number }) {
       />
       <div className="absolute top-3 left-3 md:top-5 md:left-5 flex gap-2">
         <span
-          className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 md:px-3 md:py-1.5"
+          className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-white px-2.5 py-1 md:px-3 md:py-1.5"
           style={{ background: accentColor, color: '#000', borderRadius: '6px' }}
         >
           {categoryLabel}

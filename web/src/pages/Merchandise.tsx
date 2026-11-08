@@ -8,7 +8,9 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../context/ToastContext';
+import { useCart } from '../context/CartContext';
 import { getProducts } from '../lib/supabase';
+import { parseJsonList } from '../lib/media';
 import type { CartItem, Product } from '../types/db';
 
 const CLUB_WHATSAPP_NUMBER = '254768281797';
@@ -16,44 +18,30 @@ const CART_FALLBACK_IMG = 'https://images.unsplash.com/photo-1556821840-3a63f956
 
 type UIProduct = Product & { sizeList: string[] };
 
-function parseSizes(raw: unknown): string[] {
-  try {
-    if (Array.isArray(raw)) return raw as string[];
-    if (typeof raw === 'string') return JSON.parse(raw || '[]');
-  } catch {
-    /* ignore */
-  }
-  return [];
-}
-
-function loadCart(): CartItem[] {
-  try {
-    return JSON.parse(localStorage.getItem('iec-cart') || '[]');
-  } catch {
-    return [];
-  }
-}
-
 export default function Merchandise() {
   const { theme } = useTheme();
   const { toast } = useToast();
   const isLight = theme === 'light';
+  const { cart, count: cartCount, total: cartTotal, cartOpen, setCartOpen, add, remove, updateQuantity, clear } = useCart();
 
   const [products, setProducts] = useState<UIProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filter, setFilter] = useState('all');
   const [sort, setSort] = useState('default');
-  const [cart, setCart] = useState<CartItem[]>(loadCart);
-  const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+
+  // The bag can be opened from the nav; close it when leaving the page.
+  useEffect(() => () => setCartOpen(false), [setCartOpen]);
 
   useEffect(() => {
     let active = true;
     getProducts()
       .then((data) => {
         if (!active) return;
-        setProducts(data.map((p) => ({ ...p, sizeList: parseSizes(p.sizes) })));
+        // merchandise.js listed products oldest-first; getProducts() is newest-first.
+        const oldestFirst = [...data].reverse();
+        setProducts(oldestFirst.map((p) => ({ ...p, sizeList: parseJsonList(p.sizes) })));
       })
       .catch((err) => {
         if (active) setError(err instanceof Error ? err.message : 'Failed to load products');
@@ -65,11 +53,6 @@ export default function Merchandise() {
       active = false;
     };
   }, []);
-
-  // Persist cart to localStorage on change.
-  useEffect(() => {
-    localStorage.setItem('iec-cart', JSON.stringify(cart));
-  }, [cart]);
 
   // Lock body scroll while any modal is open.
   useEffect(() => {
@@ -92,7 +75,10 @@ export default function Merchandise() {
   }, []);
 
   const visible = useMemo(() => {
-    let list = filter === 'all' ? products : products.filter((p) => p.category === filter);
+    // Categories are stored capitalised ("Apparel"); the filter keys are
+    // lowercase. The old page compared them case-sensitively, so its
+    // Apparel/Accessories filters always came back empty.
+    let list = filter === 'all' ? products : products.filter((p) => (p.category || '').toLowerCase() === filter);
     list = [...list];
     if (sort === 'price-asc') list.sort((a, b) => (a.price || 0) - (b.price || 0));
     else if (sort === 'price-desc') list.sort((a, b) => (b.price || 0) - (a.price || 0));
@@ -100,42 +86,25 @@ export default function Merchandise() {
     return list;
   }, [products, filter, sort]);
 
-  const cartTotal = cart.reduce((s, i) => s + i.price * i.quantity, 0);
-  const cartCount = cart.reduce((c, i) => c + i.quantity, 0);
-
   const addToCart = useCallback(
     (product: UIProduct, size: string | null) => {
       if (product.sizeList.length > 0 && !size) {
         toast('Please select a size first', 'error');
         return false;
       }
-      setCart((prev) => {
-        const idx = prev.findIndex((i) => i.id === product.id && i.size === (size || undefined));
-        if (idx >= 0) {
-          const next = [...prev];
-          next[idx] = { ...next[idx], quantity: next[idx].quantity + 1 };
-          return next;
-        }
-        return [
-          ...prev,
-          {
-            id: product.id,
-            name: product.name,
-            price: product.price || 0,
-            size: size || undefined,
-            quantity: 1,
-            image_url: product.image_url,
-          },
-        ];
+      add({
+        id: product.id,
+        name: product.name,
+        price: product.price || 0,
+        size: size || undefined,
+        image_url: product.image_url || undefined,
       });
       return true;
     },
-    [toast]
+    [toast, add]
   );
 
-  const removeFromCart = (index: number) => setCart((prev) => prev.filter((_, i) => i !== index));
-  const updateQuantity = (index: number, delta: number) =>
-    setCart((prev) => prev.map((item, i) => (i === index ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item)));
+  const removeFromCart = remove;
 
   function handleWhatsAppOrder(name: string, phone: string) {
     const itemLines = cart
@@ -160,7 +129,7 @@ export default function Merchandise() {
       `I will send the M-Pesa confirmation once paid. Please confirm my order. Thank you!`;
 
     window.open(`https://wa.me/${CLUB_WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`, '_blank');
-    setCart([]);
+    clear();
     setCheckoutOpen(false);
     setCartOpen(false);
     toast('Order sent! Check WhatsApp to complete.', 'success');
@@ -168,23 +137,8 @@ export default function Merchandise() {
 
   return (
     <main style={{ paddingTop: '72px' }} data-theme-lock="dark" className="pb-20">
-      {/* Floating bag button (replaces the nav bag button from the source) */}
-      <button
-        onClick={() => setCartOpen(true)}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm shadow-2xl"
-        style={{ background: '#18C8FF', color: '#000' }}
-        aria-label="Open shopping bag"
-      >
-        <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
-        Bag
-        {cartCount > 0 && (
-          <span className="w-5 h-5 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-            {cartCount}
-          </span>
-        )}
-      </button>
-
-      {/* HERO — always dark */}
+      {/* HERO — always dark. Must stay main's first child: the light-mode
+          "keep hero dark" rules select main > section:first-child. */}
       <section className="mb-12 relative overflow-hidden px-6 md:px-16" style={{ minHeight: '360px', borderRadius: 0 }}>
         <div className="absolute inset-0 z-0">
           <img
@@ -196,6 +150,28 @@ export default function Merchandise() {
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to right, rgba(0,20,45,0.95) 40%, rgba(0,20,45,0.7) 70%, rgba(0,20,45,0.3) 100%)' }}
           />
+        </div>
+        {/* Mobile: single featured product image */}
+        <div
+          className="absolute right-4 top-1/2 -translate-y-1/2 w-28 h-36 md:hidden z-10 rounded-lg overflow-hidden shadow-2xl opacity-60"
+          style={{ border: '1px solid rgba(255,255,255,0.2)' }}
+        >
+          <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&h=380&fit=crop" className="w-full h-full object-cover" alt="" />
+        </div>
+        {/* Desktop: stacked product images */}
+        <div className="absolute right-0 top-0 bottom-0 w-1/2 hidden md:flex items-center justify-end pr-12 z-10">
+          <div className="relative w-64 h-64">
+            <div className="absolute -right-4 top-4 w-48 h-60 rounded-lg overflow-hidden shadow-2xl rotate-6 opacity-70">
+              <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&h=380&fit=crop" className="w-full h-full object-cover" alt="" />
+            </div>
+            <div className="absolute left-0 top-0 w-48 h-60 rounded-lg overflow-hidden shadow-2xl -rotate-3" style={{ border: '1px solid rgba(255,255,255,0.2)' }}>
+              <img src="https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=300&h=380&fit=crop" className="w-full h-full object-cover" alt="" />
+              <div className="absolute bottom-0 left-0 right-0 p-3" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.8), transparent)' }}>
+                <p className="text-white text-xs font-bold">IEC Snapback</p>
+                <p className="text-white/60 text-[10px]">KES 900</p>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="relative z-20 px-8 md:px-14 py-12 md:py-16 max-w-lg">
           <div className="flex items-center gap-2 mb-5">
@@ -284,6 +260,7 @@ export default function Merchandise() {
               ))}
             </div>
             <select
+              id="sort-select"
               value={sort}
               onChange={(e) => setSort(e.target.value)}
               className="text-sm font-medium px-3 py-2 rounded-lg cursor-pointer"
@@ -363,6 +340,21 @@ export default function Merchandise() {
         </div>
       </section>
 
+      {/* Phones only: the nav Bag button is hidden below 640px (as it was on
+          merchandise.html), so offer a way back to the bag once it has items. */}
+      {cartCount > 0 && (
+        <button
+          onClick={() => setCartOpen(true)}
+          className="sm:hidden fixed bottom-6 right-6 z-40 flex items-center gap-2 px-5 py-3 rounded-full font-bold text-sm shadow-2xl"
+          style={{ background: '#18C8FF', color: '#000' }}
+          aria-label="Open shopping bag"
+        >
+          <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
+          Bag
+          <span className="w-5 h-5 bg-black text-white text-[10px] font-bold rounded-full flex items-center justify-center">{cartCount}</span>
+        </button>
+      )}
+
       {cartOpen && (
         <CartModal
           cart={cart}
@@ -428,7 +420,8 @@ function ProductCard({
     >
       <div style={{ position: 'relative', aspectRatio: '4/5', overflow: 'hidden', background: 'rgba(255,255,255,0.05)' }}>
         <img
-          style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.5s' }}
+          className="product-img"
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           loading="lazy"
           src={product.image_url || ''}
           alt={product.name}

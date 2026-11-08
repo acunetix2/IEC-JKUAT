@@ -6,3 +6,6 @@ dist/
 
 # Dev server pid helper
 .devserver.pid
+
+# Agent workflow scratch files
+.agents/

@@ -56,11 +56,11 @@ export async function lookupMemberByReg(regNumber: string): Promise<MemberLookup
   return (data && (data as MemberLookup[])[0]) || null;
 }
 
-// Submit newsletter signup
-export async function submitNewsletter(email: string): Promise<unknown> {
-  const { data, error } = await supabase.from('newsletter').insert([{ email: email }]).select();
+// Submit newsletter signup. No `.select()`: RETURNING needs SELECT, which
+// the public role does not have on newsletter, so it would always fail.
+export async function submitNewsletter(email: string): Promise<void> {
+  const { error } = await supabase.from('newsletter').insert([{ email: email }]);
   if (error) throw error;
-  return data;
 }
 
 // Initiate M-Pesa payment via lipana.dev Edge Function

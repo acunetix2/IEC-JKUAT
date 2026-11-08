@@ -71,7 +71,7 @@ export default function Showcase() {
           grew beyond it.
         </p>
         <p className="text-white/30 text-xs mb-4">{filtered.length} projects</p>
-        <div className="flex flex-wrap justify-center gap-2" role="group" aria-label="Filter projects by category">
+        <div className="flex flex-wrap justify-center gap-2" id="project-filters" role="group" aria-label="Filter projects by category">
           {FILTERS.map((f) => (
             <button
               key={f.category}

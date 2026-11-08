@@ -28,13 +28,16 @@ export interface Project {
   created_at?: string;
 }
 
+// media_urls / embed_urls / sizes are JSONB. Rows from seed.sql hold real
+// arrays; rows saved by the old admin page hold a JSON *string* of an
+// array. Always read them through parseJsonList() (lib/media.ts).
 export interface EventRow {
   id: string;
   title: string;
-  description?: string;
+  description?: string | null;
   event_date?: string;
-  location?: string;
-  track?: string;
+  category?: string | null;
+  location?: string | null;
   media_urls?: string | string[] | null;
   embed_urls?: string | string[] | null;
   created_at?: string;
@@ -43,11 +46,12 @@ export interface EventRow {
 export interface Product {
   id: string;
   name: string;
-  description?: string;
+  description?: string | null;
   price?: number;
-  image_url?: string;
+  image_url?: string | null;
   category?: string;
   sizes?: string | string[] | null;
+  is_member_exclusive?: boolean;
   created_at?: string;
 }
 
@@ -63,12 +67,13 @@ export interface ContactMessage {
 
 export interface Payment {
   id: string;
-  member_id?: string;
+  member_id?: string | null;
   phone?: string;
   amount?: number;
-  status?: string;
+  payment_status?: 'pending' | 'completed' | 'failed' | 'cancelled' | string;
+  lipana_ref?: string | null;
   created_at?: string;
-  members?: { full_name: string; reg_number: string };
+  members?: { full_name: string; reg_number: string } | null;
 }
 
 export interface Admin {

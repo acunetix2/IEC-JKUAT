@@ -6,8 +6,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { EVENT_FALLBACK_IMG, parseJsonList as parseMedia, isPreviewImage as isImg, isVideoMedia as isVid } from '../lib/media';
 import { parseEmbedUrls } from '../lib/embeds';
-import { EVENT_FALLBACK_IMG } from '../lib/media';
 import EmbedList from '../components/EmbedList';
 import type { EventRow } from '../types/db';
 
@@ -20,24 +20,6 @@ const ACCENTS: Record<string, string> = {
   networking: '#ef4444',
   workshop: '#22c55e',
 };
-
-function isImg(u: string): boolean {
-  if (!u) return false;
-  const clean = String(u).split('?')[0].split('#')[0];
-  return /\.(jpg|jpeg|png|gif|webp|svg)$/i.test(clean);
-}
-function isVid(u: string): boolean {
-  return Boolean(u) && /\.(mp4|webm|mov|avi)$/i.test(u);
-}
-function parseMedia(raw: unknown): string[] {
-  try {
-    if (Array.isArray(raw)) return raw as string[];
-    if (typeof raw === 'string') return JSON.parse(raw || '[]');
-  } catch {
-    /* ignore */
-  }
-  return [];
-}
 
 export default function EventDetail() {
   const [params] = useSearchParams();
@@ -106,7 +88,7 @@ export default function EventDetail() {
 }
 
 function EventBody({ event }: { event: EventRow }) {
-  const category = (event as { category?: string }).category || event.track || 'Event';
+  const category = event.category || 'Event';
   const media = useMemo(() => parseMedia(event.media_urls), [event.media_urls]);
   const images = useMemo(() => {
     const imgs = media.filter(isImg);
@@ -218,6 +200,7 @@ function EventBody({ event }: { event: EventRow }) {
         </h1>
         <div className="mb-8">
           <p
+            id="ev-desc"
             className={`text-sm leading-relaxed whitespace-pre-line ${longDesc && !descOpen ? 'desc-collapsed' : longDesc ? 'desc-open' : ''}`}
             style={{ color: 'rgba(255,255,255,0.55)' }}
           >
