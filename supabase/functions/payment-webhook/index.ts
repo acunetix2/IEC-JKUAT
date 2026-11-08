@@ -10,7 +10,8 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 const supabaseUrl = Deno.env.get('SUPABASE_URL') || '';
 const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const lipanaSecret = Deno.env.get('LIPANA_WEBHOOK_SECRET') || '';
-const MEMBERSHIP_FEE = parseInt(Deno.env.get('MEMBERSHIP_FEE') || '200', 10);
+const _fee = parseInt(Deno.env.get('MEMBERSHIP_FEE') || '200', 10);
+const MEMBERSHIP_FEE = Number.isFinite(_fee) && _fee > 0 ? _fee : 200;
 // Callbacks older than this are rejected (replay protection).
 const MAX_CALLBACK_AGE_MS = 5 * 60 * 1000;
 
@@ -33,6 +34,53 @@ function secretsEqual(a: string, b: string): boolean {
   return diff === 0;
 }
 
+// Hex / base64 encoders for an HMAC digest.
+function toHex(buf: ArrayBuffer): string {
+  return Array.from(new Uint8Array(buf))
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+function toBase64(buf: ArrayBuffer): string {
+  let bin = '';
+  const bytes = new Uint8Array(buf);
+  for (let i = 0; i < bytes.length; i++) bin += String.fromCharCode(bytes[i]);
+  return btoa(bin);
+}
+
+// HMAC-SHA256 of the raw body with the shared secret.
+async function hmacSha256(secret: string, body: string): Promise<ArrayBuffer> {
+  const key = await crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign'],
+  );
+  return crypto.subtle.sign('HMAC', key, new TextEncoder().encode(body));
+}
+
+// Verify the webhook signature. Lipana's exact scheme isn't pinned down,
+// so we accept a match on EITHER:
+//   (a) the raw shared secret sent verbatim in the header, OR
+//   (b) HMAC-SHA256(rawBody, secret) encoded as hex or base64
+//       (the near-universal webhook pattern — Stripe/GitHub/Shopify).
+// A header may carry a "sha256=" prefix (GitHub style) which we strip.
+// Fails closed: no match on any form → rejected.
+async function verifySignature(signature: string, secret: string, rawBody: string): Promise<boolean> {
+  if (!signature || !secret) return false;
+  const sig = signature.replace(/^sha256=/i, '').trim();
+
+  // (a) verbatim shared secret
+  if (secretsEqual(sig, secret)) return true;
+
+  // (b) HMAC of the raw body, hex or base64
+  const digest = await hmacSha256(secret, rawBody);
+  if (secretsEqual(sig.toLowerCase(), toHex(digest))) return true;
+  if (secretsEqual(sig, toBase64(digest))) return true;
+
+  return false;
+}
+
 serve(async (req) => {
   if (req.method !== 'POST') {
     return new Response(JSON.stringify({ error: 'Method not allowed' }), { status: 405 });
@@ -42,16 +90,22 @@ serve(async (req) => {
     return new Response(JSON.stringify({ error: 'Webhook not configured' }), { status: 500 });
   }
 
-  // 1. Validate webhook secret
-  const signature = req.headers.get('x-lipana-signature') || '';
-  if (!secretsEqual(signature, lipanaSecret)) {
+  // Read the RAW body once — HMAC must be computed over the exact bytes
+  // the provider signed, so we can't use req.json() before verifying.
+  const rawBody = await req.text();
+
+  // 1. Validate webhook signature (verbatim secret OR HMAC of the body).
+  const signature = req.headers.get('x-lipana-signature')
+    || req.headers.get('x-signature')
+    || '';
+  if (!(await verifySignature(signature, lipanaSecret, rawBody))) {
     return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401 });
   }
 
-  // 2. Parse the callback
+  // 2. Parse the callback (from the raw body we already read)
   let payload: LipanaCallback;
   try {
-    payload = await req.json();
+    payload = JSON.parse(rawBody);
   } catch {
     return new Response(JSON.stringify({ error: 'Invalid JSON' }), { status: 400 });
   }
@@ -90,6 +144,13 @@ serve(async (req) => {
     if (!Number.isFinite(paidAmount)) {
       return new Response(JSON.stringify({ error: 'Malformed callback: amount' }), { status: 400 });
     }
+    // Phone must be a short string: the payments CHECK rejects overlong
+    // values with a 500 (which Lipana would retry forever). Reject junk
+    // as 400 instead — Lipana won't retry those.
+    const callbackPhone = typeof payload.phone === 'string' ? payload.phone.slice(0, 20) : '';
+    if (!callbackPhone) {
+      return new Response(JSON.stringify({ error: 'Malformed callback: phone' }), { status: 400 });
+    }
 
     if (payload.event === 'payment.success') {
       // Verify the correct amount was paid before activating membership
@@ -100,7 +161,7 @@ serve(async (req) => {
           await sb.from('payments').insert({
             member_id: memberId,
             amount: paidAmount,
-            phone: payload.phone,
+            phone: callbackPhone,
             payment_status: 'failed',
             lipana_ref: payload.transaction_ref,
           });
@@ -130,7 +191,7 @@ serve(async (req) => {
         const { error } = await sb.from('payments').insert({
           member_id: memberId,
           amount: paidAmount,
-          phone: payload.phone,
+          phone: callbackPhone,
           payment_status: 'completed',
           lipana_ref: payload.transaction_ref,
         });
@@ -165,7 +226,7 @@ serve(async (req) => {
           const { error } = await sb.from('payments').insert({
             member_id: memberId,
             amount: paidAmount,
-            phone: payload.phone,
+            phone: callbackPhone,
             payment_status: 'failed',
             lipana_ref: payload.transaction_ref,
           });

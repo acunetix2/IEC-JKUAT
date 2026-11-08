@@ -12,7 +12,8 @@ const LIPANA_API_KEY = Deno.env.get('LIPANA_SECRET_KEY') || '';
 const LIPANA_API_URL = Deno.env.get('LIPANA_ENVIRONMENT') === 'sandbox'
   ? 'https://api-sandbox.lipana.dev/v1'
   : 'https://api.lipana.dev/v1';
-const MEMBERSHIP_FEE = parseInt(Deno.env.get('MEMBERSHIP_FEE') || '200', 10);
+const _fee = parseInt(Deno.env.get('MEMBERSHIP_FEE') || '200', 10);
+const MEMBERSHIP_FEE = Number.isFinite(_fee) && _fee > 0 ? _fee : 200;
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
@@ -28,14 +29,36 @@ function normalisePhone(raw: unknown): string | null {
   return normalised;
 }
 
-const CORS_HEADERS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Content-Type': 'application/json',
-};
+// Allow the production site and local dev. Extra origins can be added via
+// the EXTRA_CORS_ORIGINS secret (comma-separated).
+const ALLOWED_ORIGINS = new Set<string>([
+  'https://iecjkuat.com',
+  'https://www.iecjkuat.com',
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'http://127.0.0.1:5500',
+  ...(Deno.env.get('EXTRA_CORS_ORIGINS') || '')
+    .split(',').map((s) => s.trim()).filter(Boolean),
+]);
+
+// Build CORS headers for a given request origin. Only echoes the origin
+// back when it's on the allow-list; unknown origins get no CORS grant
+// (the browser then blocks the response), while the server still works
+// for same-origin / non-browser callers.
+function corsHeaders(req: Request): Record<string, string> {
+  const origin = req.headers.get('origin') || '';
+  const headers: Record<string, string> = {
+    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Vary': 'Origin',
+    'Content-Type': 'application/json',
+  };
+  if (ALLOWED_ORIGINS.has(origin)) headers['Access-Control-Allow-Origin'] = origin;
+  return headers;
+}
 
 serve(async (req) => {
+  const CORS_HEADERS = corsHeaders(req);
   // CORS preflight (must not require auth/validation).
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: CORS_HEADERS });
@@ -171,9 +194,16 @@ serve(async (req) => {
       { status: 200, headers: CORS_HEADERS }
     );
   } catch (error) {
+    // `error` is unknown under strict TS — accessing .message directly
+    // fails `deno check` and therefore breaks deployment.
+    const message = error instanceof Error ? error.message : String(error);
+    // Everything that throws past the input-validation block above is an
+    // upstream-provider or database failure, not a client mistake — those
+    // already returned their own 400/429. Report 502 Bad Gateway so the
+    // status code is honest (a failed request isn't the caller's fault).
     return new Response(
-      JSON.stringify({ success: false, error: error.message }),
-      { status: 400, headers: CORS_HEADERS }
+      JSON.stringify({ success: false, error: message }),
+      { status: 502, headers: CORS_HEADERS }
     );
   }
 });
