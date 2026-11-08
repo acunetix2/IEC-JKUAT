@@ -130,36 +130,45 @@ serve(async (req) => {
     }
 
     // 1. Initiate STK Push via lipana.dev (bounded: never hang the edge worker).
-    const lipanaResponse = await fetch(`${LIPANA_API_URL}/stk-push`, {
+    //    Contract per the official Lipana SDK (lipana 1.0.1):
+    //      POST {base}/transactions/push-stk
+    //      auth header: x-api-key: <secret key>   (NOT Authorization: Bearer)
+    //      body: { phone, amount, accountReference?, transactionDesc? }
+    //      success body is wrapped: { data: {...}, message, code }
+    const lipanaResponse = await fetch(`${LIPANA_API_URL}/transactions/push-stk`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LIPANA_API_KEY}`,
+        'x-api-key': LIPANA_API_KEY,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         phone: cleanPhone,
         amount: MEMBERSHIP_FEE,
-        reference: `IEC-${member_id}-${Date.now()}`,
-        metadata: { member_id },
+        accountReference: `IEC-${member_id}`,
+        transactionDesc: 'IEC JKUAT membership fee',
       }),
       signal: AbortSignal.timeout(15000),
     });
 
     // Lipana may answer with non-JSON on gateway failures — never leak
     // raw upstream bodies to the client.
-    let lipanaData: Record<string, unknown> = {};
+    let lipanaBody: Record<string, unknown> = {};
     try {
-      lipanaData = await lipanaResponse.json();
+      lipanaBody = await lipanaResponse.json();
     } catch {
       throw new Error('Payment provider did not respond. Please try again.');
     }
 
     if (!lipanaResponse.ok) {
-      throw new Error(typeof lipanaData.message === 'string' ? lipanaData.message : 'Payment initiation failed');
+      throw new Error(typeof lipanaBody.message === 'string' ? lipanaBody.message : 'Payment initiation failed');
     }
 
     // 2. Record pending payment (webhook resolves it by lipana_ref).
-    const lipanaRef = (lipanaData.transactionId || lipanaData.reference) as string | undefined;
+    //    Unwrap the { data: {...} } envelope the API returns on success.
+    const lipanaData = (lipanaBody.data ?? lipanaBody) as Record<string, unknown>;
+    const lipanaRef = (lipanaData.transactionId
+      || lipanaData.id
+      || lipanaData.reference) as string | undefined;
     if (!lipanaRef) throw new Error('Payment provider gave no reference. Please try again.');
     const { data: paymentRecord, error: insertError } = await sb.from('payments').insert({
       member_id: member_id,
