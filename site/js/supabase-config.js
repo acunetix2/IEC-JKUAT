@@ -87,14 +87,31 @@ async function initiatePayment(phone, amount, memberId) {
   if (!sb) throw new Error('Supabase not loaded');
   
   const { data, error } = await sb.functions.invoke('stk-push', {
-    body: { 
+    body: {
       phone: phone.startsWith('0') ? '+254' + phone.slice(1) : phone,
       amount: amount,
       member_id: memberId
     }
   });
-  
-  if (error) throw error;
+
+  // On a non-2xx response the JS client gives a FunctionsHttpError whose
+  // message is the generic "Edge Function returned a non-2xx status code".
+  // The real reason (e.g. "Payments are temporarily unavailable",
+  // "Member not found") is in error.context — the Response object. Read
+  // its JSON body and surface that instead of the useless generic text.
+  if (error) {
+    let detail = '';
+    try {
+      const body = await error.context?.json?.();
+      detail = body?.error || '';
+    } catch (_) { /* body wasn't JSON — fall back to the generic message */ }
+    throw new Error(detail || error.message || 'Payment could not be started. Please try again.');
+  }
+
+  // The function can also return 200 with { success: false } in some paths.
+  if (data && data.success === false) {
+    throw new Error(data.error || 'Payment could not be started. Please try again.');
+  }
   return data;
 }
 
