@@ -48,10 +48,10 @@ export default function Hero3D() {
     nodeGeo.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
 
     const nodeMat = new THREE.PointsMaterial({
-      color: 0x00aeef,
-      size: 0.18,
+      color: 0x18c8ff,
+      size: 0.16,
       transparent: true,
-      opacity: 0.85,
+      opacity: 0.55,
       sizeAttenuation: true,
     });
 
@@ -87,9 +87,9 @@ export default function Hero3D() {
     edgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
 
     const edgeMat = new THREE.LineBasicMaterial({
-      color: 0x00aeef,
+      color: 0x18c8ff,
       transparent: true,
-      opacity: 0.12,
+      opacity: 0.07,
     });
 
     const edges = new THREE.LineSegments(edgeGeo, edgeMat);
@@ -108,9 +108,9 @@ export default function Hero3D() {
     accentGeo.setAttribute('position', new THREE.Float32BufferAttribute(accentPos, 3));
     const accentMat = new THREE.PointsMaterial({
       color: 0xfbb03b,
-      size: 0.45,
+      size: 0.4,
       transparent: true,
-      opacity: 0.9,
+      opacity: 0.5,
       sizeAttenuation: true,
     });
     const accentNodes = new THREE.Points(accentGeo, accentMat);
@@ -187,8 +187,8 @@ export default function Hero3D() {
           edgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
         }
 
-        // Pulse opacity on accent nodes
-        accentMat.opacity = 0.6 + Math.sin(frame * 0.07) * 0.3;
+        // Pulse opacity on accent nodes (kept subtle — atmosphere, not focus)
+        accentMat.opacity = 0.35 + Math.sin(frame * 0.07) * 0.2;
 
         renderer.render(scene, camera);
       };

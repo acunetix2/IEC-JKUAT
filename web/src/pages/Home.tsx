@@ -119,78 +119,61 @@ export default function Home() {
   );
 }
 
+const HERO_STATS = [
+  { value: '200+', label: 'Active members' },
+  { value: '30+', label: 'Projects built' },
+  { value: '20+', label: 'Events a\u00A0year' },
+];
+
 function HeroSection() {
   return (
     <section
       className="hero relative flex flex-col justify-center overflow-hidden noise"
-      style={{ minHeight: '100svh', maxHeight: '1000px', background: 'radial-gradient(ellipse 110% 90% at 70% 40%, rgba(0,46,80,0.7), transparent)' }}
+      style={{ minHeight: '100svh', maxHeight: '1100px' }}
     >
       <Hero3D />
-      <div className="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto w-full pt-8 pb-0 md:py-12 mt-12 md:mt-16">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 items-center">
-          <div>
-            <h1 className="font-display font-extrabold text-white mb-3 md:mb-4" style={{ fontSize: 'clamp(2rem, 3.8vw, 3.8rem)', lineHeight: 1.08, letterSpacing: '-0.03em' }}>
-              <span className="block overflow-hidden"><span className="block hero-animate" style={{ transitionDelay: '0.15s' }}>Ideas are</span></span>
-              <span className="block overflow-hidden"><span className="block text-iec-blue hero-animate" style={{ transitionDelay: '0.25s' }}>everywhere.</span></span>
-              <span className="block overflow-hidden"><span className="block hero-animate" style={{ transitionDelay: '0.35s' }}>Let's build</span></span>
-              <span className="block overflow-hidden"><span className="block hero-animate" style={{ transitionDelay: '0.45s' }}>them.</span></span>
-            </h1>
-            <p className="text-white/55 text-sm font-light max-w-md leading-relaxed mb-5 md:mb-6 hero-animate" style={{ transitionDelay: '0.6s' }}>
-              IEC JKUAT is a student community turning ideas into projects, businesses and solutions that matter.
-            </p>
-            <div className="flex flex-wrap gap-3 mb-5 md:mb-6 hero-animate" style={{ transitionDelay: '0.7s' }}>
-              <a href="#join" className="btn-primary" data-magnetic="0.3">
-                Join IEC <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-              </a>
-              <a href="#what-we-do" className="btn-ghost">
-                What we do <span className="material-symbols-outlined text-[18px]">expand_more</span>
-              </a>
-            </div>
-            <div className="flex flex-wrap gap-x-3 gap-y-2 md:gap-5 pt-5 border-t border-white/8 hero-animate" style={{ transitionDelay: '0.85s' }}>
-              {['Innovation', 'Entrepreneurship', 'Leadership', 'Community'].map((t, i) => (
-                <span key={t} className="contents">
-                  <span className="text-[10px] font-bold tracking-[0.16em] uppercase text-white/40">{t}</span>
-                  {i < 3 && <span className="text-white/10 hidden sm:inline">·</span>}
-                </span>
-              ))}
-            </div>
-            <div className="flex md:hidden gap-6 pt-5 hero-animate" style={{ transitionDelay: '0.95s' }}>
-              <div><p className="text-iec-blue font-extrabold font-display text-xl leading-none">200+</p><p className="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Members</p></div>
-              <div><p className="text-iec-blue font-extrabold font-display text-xl leading-none">30+</p><p className="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Projects</p></div>
-              <div><p className="text-iec-gold font-extrabold font-display text-xl leading-none">20+</p><p className="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Events / yr</p></div>
-            </div>
-            <div className="md:hidden mt-5 -mx-6 overflow-hidden hero-animate" style={{ transitionDelay: '1.05s' }}>
-              <img src="/uploads/iec-12.jpg" alt="IEC JKUAT members at a club event" className="block w-full aspect-video object-cover" style={{ filter: 'saturate(1.0) brightness(0.95)' }} />
-            </div>
-          </div>
+      {/* Vignette: darkens edges so the big type always has contrast over the particle field. */}
+      <div className="absolute inset-0 z-[1] pointer-events-none" style={{ background: 'radial-gradient(ellipse 90% 70% at 50% 45%, transparent 30%, rgba(7,16,26,0.6) 100%)' }} />
+      <div className="absolute inset-x-0 bottom-0 h-40 z-[1] pointer-events-none" style={{ background: 'linear-gradient(to top, #07101a, transparent)' }} />
 
-          <div className="hidden md:flex flex-col items-end gap-3 relative hero-animate" style={{ transitionDelay: '0.4s', maxHeight: 'calc(100svh - 200px)' }}>
-            <div className="rounded px-5 py-3 text-right self-end" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)', backdropFilter: 'blur(12px)' }}>
-              <p className="text-iec-blue font-extrabold font-display text-2xl leading-none">200+</p>
-              <p className="text-white/50 text-xs mt-0.5 uppercase tracking-wider font-medium">Active Members</p>
-            </div>
-            <div className="relative w-full rounded overflow-hidden flex-1" style={{ minHeight: 0, maxWidth: '420px' }}>
-              <img src="/uploads/iec-12.jpg" alt="IEC JKUAT members at a club event" className="w-full h-full object-cover" style={{ filter: 'saturate(1.0) brightness(0.95)' }} />
-              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(0,174,239,0.15) 0%, transparent 50%)' }} />
-              <div className="absolute bottom-3 left-4 right-4">
-                <p className="text-white/80 text-xs font-semibold uppercase tracking-widest">Silicon Savannah</p>
-                <p className="text-white/50 text-[10px] mt-0.5">JKUAT, Kenya</p>
-              </div>
-            </div>
-            <div className="flex gap-3 w-full" style={{ maxWidth: '420px' }}>
-              <div className="flex-1 rounded px-4 py-3" style={{ background: 'rgba(0,174,239,0.08)', border: '1px solid rgba(0,174,239,0.2)', backdropFilter: 'blur(12px)' }}>
-                <p className="text-iec-blue font-extrabold font-display text-2xl leading-none">30+</p>
-                <p className="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Projects</p>
-              </div>
-              <div className="flex-1 rounded px-4 py-3" style={{ background: 'rgba(251,176,59,0.08)', border: '1px solid rgba(251,176,59,0.2)', backdropFilter: 'blur(12px)' }}>
-                <p className="text-iec-gold font-extrabold font-display text-2xl leading-none">20+</p>
-                <p className="text-white/50 text-[10px] mt-1 uppercase tracking-wider">Events / yr</p>
-              </div>
-            </div>
+      <div className="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto w-full pt-24 pb-12 md:pt-28 md:pb-24">
+        <div className="max-w-5xl">
+          <p className="hero-animate mb-6 md:mb-8 text-[10px] md:text-xs font-bold tracking-[0.18em] md:tracking-[0.28em] uppercase text-iec-blue" style={{ transitionDelay: '0.1s' }}>
+            Innovation &amp; Entrepreneurship Club · JKUAT
+          </p>
+
+          <h1 className="font-display font-black text-white" style={{ fontSize: 'clamp(2.25rem, 8.5vw, 7.5rem)', lineHeight: 1, letterSpacing: '-0.035em' }}>
+            <span className="block overflow-hidden"><span className="block hero-animate" style={{ transitionDelay: '0.18s' }}>Ideas are</span></span>
+            <span className="block overflow-hidden"><span className="block text-iec-blue hero-animate" style={{ transitionDelay: '0.3s' }}>everywhere.</span></span>
+            <span className="block overflow-hidden"><span className="block hero-animate" style={{ transitionDelay: '0.42s' }}>Let's build them.</span></span>
+          </h1>
+
+          <p className="text-white/70 text-base md:text-xl font-light max-w-xl leading-relaxed mt-8 md:mt-10 hero-animate" style={{ transitionDelay: '0.6s' }}>
+            A student community at JKUAT turning ideas into projects, businesses and solutions that matter.
+          </p>
+        </div>
+
+        <div className="mt-8 md:mt-10 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:pt-8 lg:border-t lg:border-white/10 hero-animate" style={{ transitionDelay: '0.72s' }}>
+          <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-4">
+            <a href="#join" className="btn-primary w-full min-w-0 justify-center whitespace-nowrap px-3 sm:w-auto sm:px-8" data-magnetic="0.3">
+              Join IEC <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
+            </a>
+            <a href="#what-we-do" className="btn-ghost w-full min-w-0 justify-center whitespace-nowrap px-3 sm:w-auto sm:px-8">
+              What we do <span className="material-symbols-outlined text-[18px] hidden sm:inline">expand_more</span>
+            </a>
           </div>
+          <dl className="grid grid-cols-3 gap-3 mt-8 pt-6 border-t border-white/10 sm:flex sm:gap-x-10 sm:pt-8 lg:mt-0 lg:pt-0 lg:border-t-0">
+            {HERO_STATS.map((s) => (
+              <div key={s.label} className="min-w-0 flex flex-col-reverse gap-1.5 sm:gap-2">
+                <dt className="text-white/50 text-[9px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.14em] leading-snug">{s.label}</dt>
+                <dd className="font-display font-extrabold text-white text-2xl sm:text-4xl leading-none tracking-tight">{s.value}</dd>
+              </div>
+            ))}
+          </dl>
         </div>
       </div>
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 opacity-30">
+
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 opacity-40 z-10">
         <span className="text-[10px] font-semibold tracking-widest uppercase text-white">Scroll</span>
         <div className="w-px h-8 bg-white/30 relative overflow-hidden">
           <div className="absolute top-0 w-full h-1/2 bg-white animate-bounce"></div>

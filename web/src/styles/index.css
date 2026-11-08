@@ -1078,9 +1078,16 @@ html.light section:has(#hero-canvas) {
 }
 html.light section:has(#hero-canvas) .text-white,
 html.light section:has(#hero-canvas) h1,
-html.light section:has(#hero-canvas) p { color: #fff !important; }
-html.light section:has(#hero-canvas) .text-white\/55,
-html.light section:has(#hero-canvas) .text-white\/45 { color: rgba(255,255,255,0.65) !important; }
+html.light section:has(#hero-canvas) dd { color: #fff !important; }
+html.light section:has(#hero-canvas) .text-white\/70 { color: rgba(255,255,255,0.72) !important; }
+html.light section:has(#hero-canvas) .text-white\/50 { color: rgba(255,255,255,0.6) !important; }
+
+/* Hero stays dark in both themes: keep its buttons and accent on dark-mode styling. */
+html.light section:has(#hero-canvas) .btn-primary { background: #18C8FF !important; color: #000 !important; }
+html.light section:has(#hero-canvas) .btn-primary:hover { box-shadow: 0 0 32px rgba(0,174,239,0.4) !important; }
+html.light section:has(#hero-canvas) .btn-ghost { background: transparent !important; color: rgba(255,255,255,0.7) !important; border-color: rgba(255,255,255,0.15) !important; }
+html.light section:has(#hero-canvas) .btn-ghost:hover { background: rgba(255,255,255,0.06) !important; color: #fff !important; }
+html.light section:has(#hero-canvas) .text-iec-blue { color: #18C8FF !important; }
 
 /* ── "What we do" cards ──────────────────────────────────── */
 html.light .do-card {
