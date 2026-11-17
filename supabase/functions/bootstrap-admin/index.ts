@@ -81,7 +81,9 @@ serve(async (req) => {
 
   const db = serviceClient();
   if (body.action === 'status') {
-    if (BOOTSTRAP_SECRET.length < 32) return respond({ data: { available: false } }, 200, headers);
+    if (BOOTSTRAP_SECRET.length < 32) {
+      return respond({ error: 'First-administrator setup is not configured.' }, 503, headers);
+    }
     const { count, error } = await db.from('admins').select('user_id', { count: 'exact', head: true });
     if (error) {
       console.error('Could not check first-admin setup status:', error.message);

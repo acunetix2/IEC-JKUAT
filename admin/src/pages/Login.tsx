@@ -87,9 +87,13 @@ export default function Login({ error, onError }: { error: string; onError: (mes
         if (statusError) {
           throw new Error(await functionErrorMessage(statusError, 'Could not check first-admin setup.'));
         }
+        const available = data?.data?.available;
+        if (typeof available !== 'boolean') {
+          throw new Error('Could not determine first-admin setup status.');
+        }
         if (!cancelled) {
-          setSetupAvailable(Boolean(import.meta.env.DEV || data?.data?.available === true));
-          if (!import.meta.env.DEV && data?.data?.available !== true) {
+          setSetupAvailable(Boolean(import.meta.env.DEV || available));
+          if (!import.meta.env.DEV && !available) {
             setSetupCheckError('The first-admin setup is already complete.');
           }
         }
