@@ -51,6 +51,7 @@ export interface Product {
   image_url?: string | null;
   category?: string;
   sizes?: string | string[] | null;
+  colors?: string | string[] | null;
   is_member_exclusive?: boolean;
   created_at?: string;
 }
@@ -86,6 +87,7 @@ export interface MerchOrderItem {
   unit_price: number;
   quantity: number;
   size?: string | null;
+  color?: string | null;
 }
 
 export interface MerchOrder {
@@ -128,5 +130,7 @@ export interface CartItem {
   price: number;
   image_url?: string;
   size?: string;
+  color?: string;
+  colorOptions?: string[];
   quantity: number;
 }

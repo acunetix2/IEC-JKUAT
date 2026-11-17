@@ -53,7 +53,9 @@ export default function Showcase() {
   return (
     <main className="catalog-page projects-page">
       <section className="catalog-hero projects-hero">
-        <div className="catalog-hero-copy">
+        <PhotoSlideshow images={['/uploads/iec-08.jpg', '/uploads/iec-07.jpg', '/uploads/iec-04.jpg', '/uploads/iec-12.jpg']} />
+        <div className="projects-hero-shade" aria-hidden="true" />
+        <div className="catalog-hero-copy projects-hero-copy">
           <p className="section-label">Innovations · JKUAT</p>
           <h1>Student ideas, built into something real.</h1>
           <p>Meet the teams turning questions into prototypes, ventures and useful work across our community.</p>
@@ -62,10 +64,7 @@ export default function Showcase() {
             <Link to="/activities" className="catalog-hero-action">How we build <FiArrowRight aria-hidden="true" /></Link>
           </div>
         </div>
-        <figure className="catalog-hero-image photo-overlay-container catalog-hero-slideshow">
-          <PhotoSlideshow images={['/uploads/iec-08.jpg', '/uploads/iec-07.jpg', '/uploads/iec-04.jpg', '/uploads/iec-12.jpg']} />
-          <figcaption className="photo-reveal"><strong>Make it, test it, learn</strong><span>Every project starts somewhere.</span></figcaption>
-        </figure>
+        <p className="projects-hero-caption"><strong>Make it, test it, learn</strong><span>Every project starts somewhere.</span></p>
       </section>
 
       <section className="catalog-section projects-section" aria-labelledby="projects-heading">

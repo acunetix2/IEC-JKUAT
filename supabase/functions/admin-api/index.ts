@@ -369,6 +369,13 @@ async function handleAction(
       const sizes = Array.isArray(input.sizes)
         ? input.sizes.filter((item): item is string => typeof item === 'string').slice(0, 20)
         : [];
+      const colors = Array.isArray(input.colors)
+        ? [...new Set(input.colors
+          .filter((item): item is string => typeof item === 'string')
+          .slice(0, 20)
+          .map((item) => text(item, 'Product color', 40))
+          .filter(Boolean))]
+        : [];
       const product = {
         id: productId,
         name: text(input.name, 'Product name', 120, true),
@@ -377,6 +384,7 @@ async function handleAction(
         category: text(input.category || 'Apparel', 'Category', 60, true),
         image_url: imageUrl,
         sizes,
+        colors,
         is_member_exclusive: input.is_member_exclusive === true,
       };
       const { data, error } = await db.from('products').upsert(product).select('*').single();

@@ -1,14 +1,19 @@
 import { useState, type FormEvent } from 'react';
 import { normalizeKenyanPhone, validateKenyanPhone, validatePersonName } from '../lib/validation';
+import type { CartItem } from '../types/db';
 
 export default function MerchCheckout({
   itemCount,
   total,
+  items,
+  onColorChange,
   onClose,
   onSubmit,
 }: {
   itemCount: number;
   total: number;
+  items: CartItem[];
+  onColorChange: (index: number, color: string) => void;
   onClose: () => void;
   onSubmit: (name: string, phone: string) => Promise<void>;
 }) {
@@ -24,6 +29,10 @@ export default function MerchCheckout({
     const fieldErrors = { name: validatePersonName(name), phone: validateKenyanPhone(phone) };
     setErrors(fieldErrors);
     if (Object.values(fieldErrors).some(Boolean)) return;
+    if (items.some((item) => item.colorOptions?.length && !item.color)) {
+      setSubmitError('Choose a color for each item before placing your order.');
+      return;
+    }
     const normalizedPhone = normalizeKenyanPhone(phone);
     if (!normalizedPhone) return;
 
@@ -45,6 +54,31 @@ export default function MerchCheckout({
         <p>Submit your order to the IEC team. We’ll follow up to confirm collection and payment.</p>
       </header>
       <form noValidate onSubmit={submitOrder} className="merch-checkout-form">
+            {items.some((item) => item.colorOptions?.length) && (
+              <fieldset className="merch-checkout-variants">
+                <legend>Item colors</legend>
+                {items.map((item, index) => item.colorOptions?.length ? (
+                  <label className="merch-checkout-variant" key={`${item.id}-${item.size ?? ''}-${index}`}>
+                    <span>
+                      <strong>{item.name}</strong>
+                      {item.size && <small>Size {item.size}</small>}
+                    </span>
+                    <select
+                      className="merch-checkout-select"
+                      value={item.color ?? ''}
+                      aria-label={`Color for ${item.name}`}
+                      onChange={(event) => {
+                        setSubmitError('');
+                        onColorChange(index, event.target.value);
+                      }}
+                    >
+                      {!item.color && <option value="" disabled>Choose a color</option>}
+                      {item.colorOptions.map((color) => <option key={color} value={color}>{color}</option>)}
+                    </select>
+                  </label>
+                ) : null)}
+              </fieldset>
+            )}
             <div>
               <label htmlFor="merch-order-name" className="merch-checkout-label">Your name</label>
               <input

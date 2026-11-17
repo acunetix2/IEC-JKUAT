@@ -236,6 +236,7 @@ export interface ProductRecord {
   category: string;
   image_url: string | null;
   sizes: string[] | string | null;
+  colors: string[] | string | null;
   is_member_exclusive: boolean;
   created_at?: string;
 }
@@ -250,6 +251,7 @@ export interface MerchOrderItem {
   unit_price: number;
   quantity: number;
   size: string | null;
+  color: string | null;
 }
 
 export interface MerchOrder {

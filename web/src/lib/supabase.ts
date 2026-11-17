@@ -264,7 +264,7 @@ export async function getPayments(): Promise<import('../types/db').Payment[]> {
 export async function createMerchOrder(
   customerName: string,
   customerPhone: string,
-  items: { product_id: string; quantity: number; size?: string }[]
+  items: { product_id: string; quantity: number; size?: string; color?: string }[]
 ): Promise<{ id: string; totalAmount: number }> {
   const { data, error } = await supabase.rpc('create_merch_order', {
     p_customer_name: customerName,

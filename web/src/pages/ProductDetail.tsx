@@ -6,15 +6,17 @@ import { useToast } from '../context/ToastContext';
 import { getProducts } from '../lib/supabase';
 import { parseJsonList } from '../lib/media';
 import type { Product } from '../types/db';
+import ProductColorPicker from '../components/ProductColorPicker';
 
-type ProductWithSizes = Product & { sizeList: string[] };
+type ProductWithOptions = Product & { sizeList: string[]; colorList: string[] };
 
 export default function ProductDetail() {
   const { id } = useParams<{ id: string }>();
   const { add } = useCart();
   const { toast } = useToast();
-  const [product, setProduct] = useState<ProductWithSizes | null>(null);
+  const [product, setProduct] = useState<ProductWithOptions | null>(null);
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -24,6 +26,7 @@ export default function ProductDetail() {
     setError('');
     setProduct(null);
     setSelectedSize(null);
+    setSelectedColor(null);
 
     getProducts()
       .then((products) => {
@@ -33,7 +36,11 @@ export default function ProductDetail() {
           setError('This product could not be found.');
           return;
         }
-        setProduct({ ...found, sizeList: parseJsonList(found.sizes) });
+        setProduct({
+          ...found,
+          sizeList: parseJsonList(found.sizes),
+          colorList: parseJsonList(found.colors),
+        });
         document.title = `${found.name} | IEC JKUAT`;
       })
       .catch((cause: unknown) => {
@@ -54,12 +61,18 @@ export default function ProductDetail() {
       toast('Please select a size first', 'error');
       return;
     }
+    if (product.colorList.length > 0 && !selectedColor) {
+      toast('Please select a color first', 'error');
+      return;
+    }
 
     add({
       id: product.id,
       name: product.name,
       price: product.price || 0,
       size: selectedSize || undefined,
+      color: selectedColor || undefined,
+      colorOptions: product.colorList.length ? product.colorList : undefined,
       image_url: product.image_url || undefined,
     });
     toast(`${product.name} added to cart`, 'success');
@@ -117,6 +130,7 @@ export default function ProductDetail() {
                   </div>
                 </fieldset>
               )}
+              <ProductColorPicker colors={product.colorList} value={selectedColor} onChange={setSelectedColor} />
 
               {product.is_member_exclusive && (
                 <p className="product-detail-exclusive"><FiCheck aria-hidden="true" /> Member-exclusive product</p>

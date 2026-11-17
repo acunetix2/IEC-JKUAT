@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiArrowUpRight, FiCompass, FiLayers, FiUsers } from 'react-icons/fi';
+import PhotoSlideshow from '../components/PhotoSlideshow';
 import { supabase } from '../lib/supabase';
 
 type LeadershipLevel = 'advisor' | 'executive' | 'lead';
@@ -89,6 +90,8 @@ export default function About() {
   return (
     <main className="about-page">
       <section className="about-hero">
+        <PhotoSlideshow images={['/uploads/iec-01.jpg', '/uploads/iec-08.jpg', '/uploads/iec-07.jpg', '/uploads/iec-04.jpg']} />
+        <div className="about-hero-shade" aria-hidden="true" />
         <div className="about-hero-copy">
           <p className="about-kicker">INNOVATION &amp; ENTREPRENEURSHIP CLUB · JKUAT</p>
           <h1>Good ideas move forward <span>together.</span></h1>
@@ -101,10 +104,6 @@ export default function About() {
           </div>
           <div className="about-hero-note"><span>JKUAT Main Campus</span><i /> Student-led · Open to every discipline</div>
         </div>
-        <figure className="about-hero-photo photo-overlay-container">
-          <img src="/uploads/iec-01.jpg" alt="IEC JKUAT students sharing ideas at a club activity" />
-          <figcaption className="photo-reveal"><strong>Curiosity becomes momentum.</strong><span>Ideas are better when we build them together.</span></figcaption>
-        </figure>
       </section>
 
       <section className="about-story">

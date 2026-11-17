@@ -13,6 +13,7 @@ interface CartContextValue {
   add: (item: Omit<CartItem, 'quantity'>) => void;
   remove: (index: number) => void;
   updateQuantity: (index: number, delta: number) => void;
+  updateColor: (index: number, color: string) => void;
   clear: () => void;
 }
 
@@ -40,7 +41,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const add = useCallback((item: Omit<CartItem, 'quantity'>) => {
     setCart((prev) => {
-      const idx = prev.findIndex((i) => i.id === item.id && i.size === item.size);
+      const idx = prev.findIndex((i) => i.id === item.id && i.size === item.size && i.color === item.color);
       if (idx >= 0) {
         const next = [...prev];
         next[idx] = { ...next[idx], quantity: next[idx].quantity + 1 };
@@ -56,6 +57,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       setCart((prev) => prev.map((it, i) => (i === index ? { ...it, quantity: Math.max(1, it.quantity + delta) } : it))),
     []
   );
+  const updateColor = useCallback(
+    (index: number, color: string) =>
+      setCart((prev) => prev.map((item, i) => (
+        i === index && item.colorOptions?.includes(color) ? { ...item, color } : item
+      ))),
+    []
+  );
   const clear = useCallback(() => setCart([]), []);
 
   const value = useMemo<CartContextValue>(
@@ -66,9 +74,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
       add,
       remove,
       updateQuantity,
+      updateColor,
       clear,
     }),
-    [cart, add, remove, updateQuantity, clear]
+    [cart, add, remove, updateQuantity, updateColor, clear]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

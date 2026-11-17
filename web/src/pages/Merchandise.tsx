@@ -10,10 +10,11 @@ import { getProducts } from '../lib/supabase';
 import { parseJsonList } from '../lib/media';
 import type { CartItem, Product } from '../types/db';
 import CustomSelect from '../components/CustomSelect';
+import ProductColorPicker from '../components/ProductColorPicker';
 
 const CART_FALLBACK_IMG = 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=80&h=80&fit=crop';
 
-type UIProduct = Product & { sizeList: string[] };
+type UIProduct = Product & { sizeList: string[]; colorList: string[] };
 type SortKey = 'default' | 'price-asc' | 'price-desc' | 'name';
 
 function animateProductToCart(imageUrl: string, source: HTMLButtonElement) {
@@ -94,7 +95,11 @@ export default function Merchandise() {
         if (!active) return;
         // merchandise.js listed products oldest-first; getProducts() is newest-first.
         const oldestFirst = [...data].reverse();
-        setProducts(oldestFirst.map((p) => ({ ...p, sizeList: parseJsonList(p.sizes) })));
+        setProducts(oldestFirst.map((p) => ({
+          ...p,
+          sizeList: parseJsonList(p.sizes),
+          colorList: parseJsonList(p.colors),
+        })));
       })
       .catch((err) => {
         if (active) setError(err instanceof Error ? err.message : 'Failed to load products');
@@ -126,9 +131,13 @@ export default function Merchandise() {
   const featuredProduct = products.find((product) => product.image_url) ?? null;
 
   const addToCart = useCallback(
-    (product: UIProduct, size: string | null, source: HTMLButtonElement) => {
+    (product: UIProduct, size: string | null, color: string | null, source: HTMLButtonElement) => {
       if (product.sizeList.length > 0 && !size) {
         toast('Please select a size first', 'error');
+        return false;
+      }
+      if (product.colorList.length > 0 && !color) {
+        toast('Please select a color first', 'error');
         return false;
       }
       add({
@@ -136,6 +145,8 @@ export default function Merchandise() {
         name: product.name,
         price: product.price || 0,
         size: size || undefined,
+        color: color || undefined,
+        colorOptions: product.colorList.length ? product.colorList : undefined,
         image_url: product.image_url || undefined,
       });
       requestAnimationFrame(() => animateProductToCart(product.image_url || '', source));
@@ -335,13 +346,14 @@ function ProductCard({
   onAdd,
 }: {
   product: UIProduct;
-  onAdd: (p: UIProduct, size: string | null, source: HTMLButtonElement) => boolean;
+  onAdd: (p: UIProduct, size: string | null, color: string | null, source: HTMLButtonElement) => boolean;
 }) {
   const [size, setSize] = useState<string | null>(null);
+  const [color, setColor] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
 
   function handleAdd(event: MouseEvent<HTMLButtonElement>) {
-    const ok = onAdd(product, size, event.currentTarget);
+    const ok = onAdd(product, size, color, event.currentTarget);
     if (ok) {
       setAdded(true);
       setTimeout(() => setAdded(false), 1500);
@@ -362,7 +374,7 @@ function ProductCard({
       }}
     >
       <Link to={`/products/${encodeURIComponent(product.id)}`} className="product-card-details-link">
-        <div className="product-image-frame photo-overlay-container" style={{ position: 'relative', aspectRatio: '4/3', overflow: 'hidden', background: '#f1f4f7', padding: '8px' }}>
+        <div className="product-image-frame" style={{ height: '160px', boxSizing: 'border-box', overflow: 'hidden', background: '#f1f4f7', padding: '8px' }}>
           <img
             className="product-img"
             style={{ width: '100%', height: '100%', objectFit: 'contain' }}
@@ -370,62 +382,50 @@ function ProductCard({
             src={product.image_url || ''}
             alt={product.name}
           />
-          <div className="photo-reveal">
-            <strong>{product.name}</strong>
-            <span>View details</span>
-          </div>
         </div>
         <div className="product-card-copy" style={{ padding: '12px 13px 0' }}>
-          <h3 style={{ fontFamily: "'Plus Jakarta Sans',sans-serif", fontWeight: 750, fontSize: '14px', color: '#10213b', lineHeight: 1.35, marginBottom: '4px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+          <h3 className="product-card-name">
             {product.name}
           </h3>
-          <p style={{ fontWeight: 800, fontSize: '14px', color: '#0b1f3a', marginBottom: '7px' }}>
+          <p className="product-card-price">
             KES {(product.price || 0).toLocaleString()}
           </p>
-          <p
-            style={{
-              fontSize: '11px',
-              color: '#657386',
-              lineHeight: 1.45,
-              marginBottom: '9px',
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
+          <p className="product-card-description">
             {product.description || 'View product details'}
           </p>
         </div>
       </Link>
-      <div className="product-card-controls" style={{ padding: '0 13px 13px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        {product.sizeList.length > 0 && (
-          <div className="mb-2">
-            <p style={{ fontSize: '9px', fontWeight: 750, letterSpacing: '0.08em', textTransform: 'uppercase', color: '#657386', marginBottom: '5px' }}>
-              Size
-            </p>
-            <div className="flex flex-wrap gap-1 size-group">
-              {product.sizeList.map((s) => {
-                const selected = size === s;
-                return (
-                  <button
-                    key={s}
-                    className="size-btn text-[10px] font-bold px-2 py-1 transition-colors duration-150"
-                    style={{
-                      border: `1px solid ${selected ? '#0b1f3a' : '#d6dee7'}`,
-                      color: selected ? '#fff' : '#475569',
-                      background: selected ? '#0b1f3a' : '#fff',
-                      borderRadius: '5px',
-                      cursor: 'pointer',
-                    }}
-                    aria-pressed={selected}
-                    onClick={() => setSize(s)}
-                  >
-                    {s}
-                  </button>
-                );
-              })}
-            </div>
+      <div className="product-card-controls" style={{ padding: '0 13px 13px', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {(product.sizeList.length > 0 || product.colorList.length > 0) && (
+          <div className="product-card-variants">
+            {product.sizeList.length > 0 && (
+              <div className="product-card-size-options" role="group" aria-label={`Choose a size for ${product.name}`}>
+                <span className="product-card-variant-label">Size</span>
+                <div className="size-group">
+                  {product.sizeList.map((s) => {
+                    const selected = size === s;
+                    return (
+                      <button
+                        key={s}
+                        className="size-btn"
+                        style={{
+                          border: `1px solid ${selected ? '#0b1f3a' : '#d6dee7'}`,
+                          color: selected ? '#fff' : '#475569',
+                          background: selected ? '#0b1f3a' : '#fff',
+                          borderRadius: '5px',
+                          cursor: 'pointer',
+                        }}
+                        aria-pressed={selected}
+                        onClick={() => setSize(s)}
+                      >
+                        {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            <ProductColorPicker colors={product.colorList} value={color} onChange={setColor} compact />
           </div>
         )}
         <button

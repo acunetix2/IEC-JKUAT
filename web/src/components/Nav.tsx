@@ -20,9 +20,13 @@ export default function Nav({ onMenuOpen }: { onMenuOpen: () => void }) {
   const [indicatorX, setIndicatorX] = useState<number | null>(null);
   const [animateIndicator, setAnimateIndicator] = useState(false);
   const isProductPage = pathname === '/products' || pathname === '/merchandise' || pathname.startsWith('/products/');
-  const isActive = (to: string) => to === '/products'
-    ? isProductPage
-    : SECTIONS[to]?.includes(pathname) ?? pathname === to;
+  const isActive = (to: string) => {
+    if (to === '/products') return isProductPage;
+    const sectionPaths = SECTIONS[to];
+    return sectionPaths
+      ? sectionPaths.some((path) => pathname === path || pathname.startsWith(`${path}/`))
+      : pathname === to;
+  };
 
   useLayoutEffect(() => {
     const navLinks = navLinksRef.current;

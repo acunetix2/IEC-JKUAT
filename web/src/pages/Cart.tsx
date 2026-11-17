@@ -7,7 +7,7 @@ import { useToast } from '../context/ToastContext';
 import { submitMerchOrder } from '../lib/merchOrder';
 
 export default function Cart() {
-  const { cart, count, total, remove, updateQuantity, clear } = useCart();
+  const { cart, count, total, remove, updateQuantity, updateColor, clear } = useCart();
   const { toast } = useToast();
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [submittedReference, setSubmittedReference] = useState('');
@@ -45,6 +45,8 @@ export default function Cart() {
           <MerchCheckout
             itemCount={count}
             total={total}
+            items={cart}
+            onColorChange={updateColor}
             onClose={() => setCheckoutOpen(false)}
             onSubmit={placeOrder}
           />
@@ -65,7 +67,7 @@ export default function Cart() {
               </div>
               <div className="cart-page-item-list">
                 {cart.map((item, index) => (
-                  <article className="cart-page-item" key={`${item.id}-${item.size ?? ''}`}>
+                  <article className="cart-page-item" key={`${item.id}-${item.size ?? ''}-${item.color ?? ''}`}>
                     {item.image_url ? (
                       <img src={item.image_url} alt={item.name} className="cart-page-item-image" />
                     ) : (
@@ -75,6 +77,7 @@ export default function Cart() {
                       <p className="cart-page-item-category">IEC MERCHANDISE</p>
                       <h3>{item.name}</h3>
                       {item.size && <p className="cart-page-item-size">Size: {item.size}</p>}
+                      {item.color && <p className="cart-page-item-size">Color: {item.color}</p>}
                       <p className="cart-page-item-price">KES {item.price.toLocaleString()}</p>
                     </div>
                     <div className="cart-page-item-actions">
