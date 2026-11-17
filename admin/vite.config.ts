@@ -2,8 +2,10 @@ import { readFileSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 
+const isCloudflarePages = process.env.CF_PAGES === '1';
+
 export default defineConfig({
-  base: '/admin/',
+  base: isCloudflarePages ? '/' : '/admin/',
   publicDir: '../web/public',
   plugins: [
     react(),
@@ -20,7 +22,7 @@ export default defineConfig({
   ],
   server: { port: 5174 },
   build: {
-    outDir: '../web/dist/admin',
+    outDir: isCloudflarePages ? 'dist' : '../web/dist/admin',
     emptyOutDir: true,
     sourcemap: false,
     copyPublicDir: false,
