@@ -1,28 +1,26 @@
 <!DOCTYPE html>
-<html class="scroll-smooth" lang="en">
+<html class="scroll-smooth light" lang="en">
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <!-- Theme flash prevention — must run before first paint -->
+    <!-- The public website uses a light-only theme. -->
     <script>
       (function () {
-        var t = localStorage.getItem('iec-theme');
-        var preferLight = t === 'light' || (!t && !window.matchMedia('(prefers-color-scheme: dark)').matches);
-        document.documentElement.classList.toggle('light', preferLight);
-        document.documentElement.classList.toggle('dark', !preferLight);
+        document.documentElement.classList.add('light');
+        document.documentElement.classList.remove('dark');
       })();
     </script>
-    <title>IEC JKUAT — Innovation & Entrepreneurship Club</title>
+    <title>IEC JKUAT | Innovation & Entrepreneurship Club</title>
     <meta name="description" content="IEC JKUAT is a student community at JKUAT for innovation, entrepreneurship and leadership. Join us to build, compete, connect and lead." />
     <!-- Link previews (WhatsApp, Facebook) read these without running JS, so
          every route shares the home page's card. Per-route title/description
          for search engines is set in src/hooks/usePageMeta.ts. -->
-    <meta property="og:title" content="IEC JKUAT — Ideas Are Everywhere. Let's Build Them." />
+    <meta property="og:title" content="IEC JKUAT | Ideas Are Everywhere. Let's Build Them." />
     <meta property="og:description" content="A student community turning ideas into projects, businesses and solutions that matter." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://iecjkuat.com/" />
-    <meta name="theme-color" content="#18C8FF" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>" />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/png" href="/uploads/iec-mark.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,700;0,800;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />

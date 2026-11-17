@@ -1,9 +1,7 @@
-// IEC JKUAT — Theme context.
-// The no-flash script in index.html sets the initial light/dark class before
-// first paint; this provider mirrors that class into React state and owns the
-// toggle. It does NOT write the class on mount (no reconciliation flicker).
+// Public routes stay light; the legacy admin route retains its saved theme.
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useLayoutEffect, useState, type ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 
 type Theme = 'light' | 'dark';
 
@@ -14,15 +12,39 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+function isAdminPath(pathname: string) {
+  return pathname === '/admin' || pathname.startsWith('/admin/');
+}
+
+function applyTheme(theme: Theme) {
+  document.documentElement.classList.toggle('light', theme === 'light');
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+}
+
+function getSavedTheme(): Theme {
+  try {
+    return localStorage.getItem('iec-theme') === 'dark' ? 'dark' : 'light';
+  } catch {
+    return 'light';
+  }
+}
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  const { pathname } = useLocation();
+  const isAdminRoute = isAdminPath(pathname);
   const [theme, setTheme] = useState<Theme>(() =>
-    document.documentElement.classList.contains('light') ? 'light' : 'dark'
+    isAdminPath(window.location.pathname) ? getSavedTheme() : 'light'
   );
+
+  useLayoutEffect(() => {
+    const next = isAdminRoute ? getSavedTheme() : 'light';
+    applyTheme(next);
+    setTheme(next);
+  }, [isAdminRoute]);
 
   const toggle = () => {
     const next: Theme = theme === 'light' ? 'dark' : 'light';
-    document.documentElement.classList.toggle('light', next === 'light');
-    document.documentElement.classList.toggle('dark', next === 'dark');
+    applyTheme(next);
     try {
       localStorage.setItem('iec-theme', next);
     } catch {

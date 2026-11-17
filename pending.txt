@@ -1,0 +1,4 @@
+on mobile the humberger menu should be on the top right corner to center, also active tab in desktop should change the color of the font to midnight blue. inn the events page add a nice designed calender with clickable events scheduled. also we need a dedicated cart page embedded well
+every page at the top should have background images like the home page contact us, blog. also the about page should have vision mission and core values section styled like in the image but with our colors and content
+the merch /products card should not be long like that use ecommerce dsign and size and also when a user adds to cart when they click the button they see the product floating to the cart icon and also when a product is ordered after confirmaing it should go with details and the admin should see orders so add a page in the admin for that and we need a good merch page too. its not bag its cart and use midnight blue
+

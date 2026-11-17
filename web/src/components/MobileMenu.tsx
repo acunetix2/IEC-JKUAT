@@ -5,6 +5,7 @@
 // SiteLayout; closing is delegated via onClose.
 
 import { Link } from 'react-router-dom';
+import { FiArrowRight, FiBookOpen, FiCalendar, FiHome, FiInfo, FiLayers, FiMail, FiPackage, FiX } from 'react-icons/fi';
 
 interface MobileMenuProps {
   open: boolean;
@@ -29,36 +30,43 @@ export default function MobileMenu({ open, onClose }: MobileMenuProps) {
           <span className="font-display font-bold menu-brand">
             IEC <span>JKUAT</span>
           </span>
-          <button onClick={onClose} className="menu-close p-2" aria-label="Close menu">
-            <span className="material-symbols-outlined">close</span>
+          <button type="button" onClick={onClose} className="menu-close p-2" aria-label="Close menu">
+            <FiX aria-hidden="true" />
           </button>
         </div>
         <nav className="p-6 flex flex-col gap-1 flex-1 overflow-y-auto">
           <Link to="/" onClick={onClose}>
-            <span className="material-symbols-outlined">home</span>
+            <FiHome aria-hidden="true" />
             Home
           </Link>
+          <Link to="/showcase" onClick={onClose}>
+            <FiLayers aria-hidden="true" />
+            Innovations
+          </Link>
+          <Link to="/about" onClick={onClose}>
+            <FiInfo aria-hidden="true" />
+            About
+          </Link>
+          <Link to="/products" onClick={onClose}>
+            <FiPackage aria-hidden="true" />
+            Products
+          </Link>
           <Link to="/events" onClick={onClose}>
-            <span className="material-symbols-outlined">event</span>
+            <FiCalendar aria-hidden="true" />
             Events
           </Link>
-          <Link to="/showcase" onClick={onClose}>
-            <span className="material-symbols-outlined">rocket_launch</span>
-            Projects
+          <Link to="/blog" onClick={onClose}>
+            <FiBookOpen aria-hidden="true" />
+            Blog
           </Link>
           <Link to="/contact" onClick={onClose}>
-            <span className="material-symbols-outlined">mail</span>
-            Contact
-          </Link>
-          <Link to="/merchandise" onClick={onClose}>
-            <span className="material-symbols-outlined">shopping_bag</span>
-            Merchandise
+            <FiMail aria-hidden="true" />
+            Contact us
           </Link>
         </nav>
         <div className="menu-foot p-6">
           <Link to="/#join" onClick={onClose} className="menu-join">
-            <span className="material-symbols-outlined text-[18px]">person_add</span>
-            Join the Hub
+            Join the club <FiArrowRight aria-hidden="true" />
           </Link>
         </div>
       </div>

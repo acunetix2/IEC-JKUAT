@@ -1,108 +1,93 @@
-// IEC JKUAT — top navigation.
-// Ports the <nav id="nav"> markup from the source pages verbatim (classes,
-// data-magnetic, structure), swapping <a> for react-router <Link> and wiring
-// the theme toggle to the ThemeContext and the mobile button to an
-// onMenuOpen callback. useNavScroll (owned by SiteLayout) toggles .scrolled.
-
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
+import { FiArrowRight, FiMenu, FiShoppingCart } from 'react-icons/fi';
+import ClubLogo from './ClubLogo';
 import { useCart } from '../context/CartContext';
 
-// Same two link styles the old pages hard-coded: the current section was
-// blue with an underline, the rest white/60. Detail pages light up their
-// list page (event.html lit "Events", project.html lit "Projects"). Home
-// was never highlighted on index.html, so it is not here either.
-const LINK = 'text-sm font-medium text-white/60 hover:text-white transition-colors';
-const ACTIVE = 'text-sm font-medium text-iec-blue border-b border-iec-blue pb-0.5';
 const SECTIONS: Record<string, string[]> = {
+  '/about': ['/about'],
+  '/products': ['/products', '/merchandise'],
   '/events': ['/events', '/event'],
   '/showcase': ['/showcase', '/project'],
+  '/blog': ['/blog'],
   '/contact': ['/contact'],
 };
 
 export default function Nav({ onMenuOpen }: { onMenuOpen: () => void }) {
-  const { theme, toggle } = useTheme();
-  const isLight = theme === 'light';
   const { pathname } = useLocation();
-  const { count, setCartOpen } = useCart();
-  const onMerch = pathname === '/merchandise';
-  const cls = (to: string) => (SECTIONS[to]?.includes(pathname) ? ACTIVE : LINK);
+  const { count } = useCart();
+  const navLinksRef = useRef<HTMLDivElement>(null);
+  const [indicatorX, setIndicatorX] = useState<number | null>(null);
+  const [animateIndicator, setAnimateIndicator] = useState(false);
+  const isProductPage = pathname === '/products' || pathname === '/merchandise' || pathname.startsWith('/products/');
+  const isActive = (to: string) => to === '/products'
+    ? isProductPage
+    : SECTIONS[to]?.includes(pathname) ?? pathname === to;
+
+  useLayoutEffect(() => {
+    const navLinks = navLinksRef.current;
+    if (!navLinks) return;
+
+    const updateIndicator = () => {
+      const activeLink = navLinks.querySelector<HTMLAnchorElement>('.active');
+      if (activeLink) {
+        setIndicatorX(activeLink.offsetLeft + activeLink.offsetWidth / 2 - 12);
+      }
+    };
+
+    updateIndicator();
+    const animationFrame = window.requestAnimationFrame(() => setAnimateIndicator(true));
+    const resizeObserver = new ResizeObserver(updateIndicator);
+    resizeObserver.observe(navLinks);
+
+    return () => {
+      window.cancelAnimationFrame(animationFrame);
+      resizeObserver.disconnect();
+    };
+  }, [pathname]);
 
   return (
-    <nav id="nav">
-      <div className="flex justify-between items-center px-6 md:px-16 py-5 max-w-screen-xl mx-auto">
-        {/* Logo */}
-        <Link to="/" className="font-display font-bold text-white text-lg tracking-tight">
-          IEC <span className="text-iec-blue">JKUAT</span>
+    <nav id="nav" className="site-nav">
+      <div className="site-nav-inner">
+        <Link to="/" className="site-brand" aria-label="IEC JKUAT home">
+          <ClubLogo className="site-brand-mark" />
+          <span className="site-brand-copy">
+            <strong>IEC</strong>
+            <small>Innovation and Entrepreneurship<br />Club • JKUAT</small>
+          </span>
         </Link>
 
-        {/* Desktop links */}
-        <div className="hidden md:flex items-center gap-10">
-          <Link className={LINK} to="/">
-            Home
-          </Link>
-          <Link className={cls('/events')} to="/events">
-            Events
-          </Link>
-          <Link className={cls('/showcase')} to="/showcase">
-            Projects
-          </Link>
-          <Link className={cls('/contact')} to="/contact">
-            Contact
-          </Link>
+        <div className="site-nav-links" ref={navLinksRef}>
+          <Link className={isActive('/') ? 'active' : ''} to="/">Home</Link>
+          <Link className={isActive('/showcase') ? 'active' : ''} to="/showcase">Innovations</Link>
+          <Link className={isActive('/about') ? 'active' : ''} to="/about">About</Link>
+          <Link className={isActive('/products') ? 'active' : ''} to="/products">Products</Link>
+          <Link className={isActive('/events') ? 'active' : ''} to="/events">Events</Link>
+          <Link className={isActive('/blog') ? 'active' : ''} to="/blog">Blog</Link>
+          <Link className={isActive('/contact') ? 'active' : ''} to="/contact">Contact us</Link>
+          <span
+            className={`site-nav-indicator${animateIndicator ? ' is-animated' : ''}`}
+            aria-hidden="true"
+            style={indicatorX === null ? undefined : { transform: `translateX(${indicatorX}px)` }}
+          />
         </div>
 
-        {/* CTAs */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {onMerch ? (
-            // merchandise.html's nav: plain "Join IEC" link + Bag button with a count badge
-            <>
-              <Link to="/#join" className="hidden md:block text-sm font-medium text-white/50 hover:text-white transition-colors">
-                Join IEC
-              </Link>
-              <button
-                onClick={() => setCartOpen(true)}
-                className="hidden sm:flex items-center gap-1.5 text-sm font-semibold text-white/70 hover:text-white transition-colors relative px-4 py-2"
-                style={{ border: '1px solid rgba(255,255,255,0.12)', borderRadius: '4px' }}
-                aria-label="Open shopping bag"
-              >
-                <span className="material-symbols-outlined text-[18px]">shopping_bag</span> Bag
-                {count > 0 && (
-                  <span className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">
-                    {count}
-                  </span>
-                )}
-              </button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/merchandise"
-                className="hidden md:block text-sm font-medium text-white/50 hover:text-white transition-colors"
-              >
-                Merch
-              </Link>
-              <Link to="/#join" className="hidden sm:inline-flex btn-primary text-sm py-2 px-5" data-magnetic="0.3">
-                Join IEC
-              </Link>
-            </>
+        <div className="site-nav-actions">
+          {isProductPage && (
+            <Link
+              to="/cart"
+              className="site-nav-cart"
+              data-cart-target
+              aria-label={`View cart${count ? `, ${count} ${count === 1 ? 'item' : 'items'}` : ''}`}
+            >
+              <FiShoppingCart aria-hidden="true" />
+              <span>Cart</span>
+              {count > 0 && <span className="site-cart-count">{count}</span>}
+            </Link>
           )}
-          <button
-            onClick={toggle}
-            className="flex p-2 text-white/50 hover:text-white transition-colors"
-            title="Toggle theme"
-            aria-label="Toggle dark/light mode"
-            style={{ lineHeight: 1 }}
-          >
-            {/* Old pages showed the mode you switch TO: moon in light, sun in dark */}
-            <span className="material-symbols-outlined">{isLight ? 'dark_mode' : 'light_mode'}</span>
-          </button>
-          <button
-            className="md:hidden p-2 text-white/60 hover:text-white transition-colors"
-            onClick={onMenuOpen}
-            aria-label="Open menu"
-          >
-            <span className="material-symbols-outlined">menu</span>
+          <Link to="/#join" className="site-nav-join">Get involved <FiArrowRight aria-hidden="true" /></Link>
+          <button type="button" className="site-menu-toggle" onClick={onMenuOpen} aria-label="Open menu">
+            <FiMenu aria-hidden="true" />
           </button>
         </div>
       </div>

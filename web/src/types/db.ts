@@ -76,6 +76,28 @@ export interface Payment {
   members?: { full_name: string; reg_number: string } | null;
 }
 
+export type MerchOrderStatus = 'pending' | 'confirmed' | 'fulfilled' | 'cancelled';
+
+export interface MerchOrderItem {
+  id: string;
+  order_id: string;
+  product_id?: string | null;
+  product_name: string;
+  unit_price: number;
+  quantity: number;
+  size?: string | null;
+}
+
+export interface MerchOrder {
+  id: string;
+  customer_name: string;
+  customer_phone: string;
+  total_amount: number;
+  status: MerchOrderStatus;
+  created_at: string;
+  items?: MerchOrderItem[];
+}
+
 export interface Admin {
   id: string;
   email: string;

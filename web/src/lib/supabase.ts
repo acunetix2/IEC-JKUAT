@@ -10,11 +10,16 @@ import type {
   ContactMessage,
   MemberForm,
   MemberLookup,
+  MerchOrder,
+  MerchOrderStatus,
 } from '../types/db';
 
-const SUPABASE_URL = 'https://utdcvzeteiijxwgmzwcs.supabase.co';
-const SUPABASE_ANON_KEY =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV0ZGN2emV0ZWlpanh3Z216d2NzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg0Mjg5NzAsImV4cCI6MjEwNDAwNDk3MH0.Ob-R78VBHZ_vHzTU7iwlgyxH07gufwQnY6jsIkZ66oY';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  throw new Error('Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for the website.');
+}
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -252,6 +257,54 @@ export async function getPayments(): Promise<import('../types/db').Payment[]> {
     .limit(200);
   if (error) throw error;
   return (data ?? []) as import('../types/db').Payment[];
+}
+
+// Create the order through a database function so prices are read from the
+// catalogue, not trusted from the visitor's local cart.
+export async function createMerchOrder(
+  customerName: string,
+  customerPhone: string,
+  items: { product_id: string; quantity: number; size?: string }[]
+): Promise<{ id: string; totalAmount: number }> {
+  const { data, error } = await supabase.rpc('create_merch_order', {
+    p_customer_name: customerName,
+    p_customer_phone: customerPhone,
+    p_items: items,
+  });
+  if (error) throw error;
+
+  const row: unknown = Array.isArray(data) ? data[0] : null;
+  if (
+    !row ||
+    typeof row !== 'object' ||
+    !('order_id' in row) ||
+    typeof row.order_id !== 'string' ||
+    !('total_amount' in row) ||
+    (typeof row.total_amount !== 'number' && typeof row.total_amount !== 'string')
+  ) {
+    throw new Error('The order was saved, but its confirmation details could not be loaded.');
+  }
+
+  const totalAmount = Number(row.total_amount);
+  if (!Number.isSafeInteger(totalAmount) || totalAmount <= 0) {
+    throw new Error('The order was saved, but its total could not be verified.');
+  }
+  return { id: row.order_id, totalAmount };
+}
+
+export async function getMerchOrders(): Promise<MerchOrder[]> {
+  const { data, error } = await supabase
+    .from('merch_orders')
+    .select('*, items:merch_order_items(*)')
+    .order('created_at', { ascending: false })
+    .limit(200);
+  if (error) throw error;
+  return (data ?? []) as MerchOrder[];
+}
+
+export async function updateMerchOrderStatus(id: string, status: MerchOrderStatus): Promise<void> {
+  const { error } = await supabase.from('merch_orders').update({ status }).eq('id', id);
+  if (error) throw error;
 }
 
 // ===== Admin auth =====

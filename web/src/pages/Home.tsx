@@ -1,70 +1,57 @@
-// IEC JKUAT — Home. Ported from index.html.
-// Hero (Hero3D canvas + two-column content), What is IEC, What we do (6-cell
-// grid), photo marquee, the pinned horizontal Journey, Who can join, Upcoming
-// events (from Supabase), Have-an-idea split, and the Join section with the
-// two-step Registration / Activation flow. Motion comes from useHomeMotion +
-// useReveal; the hero entrance uses a double-rAF to add .go after first paint.
+// IEC JKUAT homepage. Membership registration and M-Pesa activation share
+// the same API flow as the previous homepage.
 
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
-import Hero3D from '../components/Hero3D';
-import { useReveal, splitWords } from '../hooks/useReveal';
-import { useHomeMotion } from '../hooks/useHomeMotion';
+import {
+  FiArrowRight,
+  FiArrowUpRight,
+  FiAlertCircle,
+  FiBookOpen,
+  FiCheck,
+  FiCompass,
+  FiCreditCard,
+  FiLayers,
+  FiMapPin,
+  FiUsers,
+} from 'react-icons/fi';
+import { useReveal } from '../hooks/useReveal';
 import { useToast } from '../context/ToastContext';
 import { supabase, submitMemberRegistration, lookupMemberByReg, initiatePayment } from '../lib/supabase';
+import CustomSelect from '../components/CustomSelect';
+import {
+  normalizeKenyanPhone,
+  validateEmail,
+  validateKenyanPhone,
+  validatePersonName,
+  validateRegistrationNumber,
+  validateRequiredText,
+} from '../lib/validation';
 import type { MemberLookup } from '../types/db';
 
 const DO_CARDS = [
-  { n: '01', icon: 'construction', color: 'text-iec-blue', photo: 'iec-01.jpg', title: 'Build', text: 'Turn an idea into something people can actually use. Prototypes, MVPs, real products.' },
-  { n: '02', icon: 'emoji_events', color: 'text-iec-gold', photo: 'iec-02.jpg', title: 'Compete', text: 'Hackathons, innovation challenges and competitions. Represent JKUAT, win things, prove what you\'ve got.' },
-  { n: '03', icon: 'school', color: 'text-iec-blue', photo: 'iec-03.jpg', title: 'Learn', text: 'Workshops, founder talks and practical sessions on things your lecturers won\'t cover.' },
-  { n: '04', icon: 'hub', color: 'text-iec-gold', photo: 'iec-05.jpg', title: 'Connect', text: 'Meet students, founders, mentors and professionals. Your network will matter more than your GPA.' },
-  { n: '05', icon: 'record_voice_over', color: 'text-iec-blue', photo: 'iec-07.jpg', title: 'Lead', text: 'Take responsibility. Organise events, run projects, and grow into the kind of person others follow.' },
-  { n: '06', icon: 'public', color: 'text-iec-gold', photo: 'iec-08.jpg', title: 'Impact', text: 'Build solutions that address real problems around us. Not just for the marks.' },
+  { n: '01', icon: FiLayers, photo: 'iec-08.jpg', title: 'Build', text: 'Turn early ideas into prototypes, products and ventures with a team.' },
+  { n: '02', icon: FiCompass, photo: 'iec-03.jpg', title: 'Explore', text: 'Take part in challenges, pitch sessions and competitions across JKUAT.' },
+  { n: '03', icon: FiBookOpen, photo: 'iec-07.jpg', title: 'Learn', text: 'Build practical skills through workshops, peer learning and founder talks.' },
+  { n: '04', icon: FiUsers, photo: 'iec-05.jpg', title: 'Connect', text: 'Meet collaborators, mentors and people who are working on meaningful ideas.' },
 ];
 
 const JOURNEY = [
-  { n: '01', title: 'Discover', text: 'Find problems worth solving. Ask questions. Look around. The best ideas start with noticing something that doesn\'t work.' },
-  { n: '02', title: 'Create', text: 'Sketch it out. Brainstorm with others. Shape a vague idea into something that has a direction.' },
-  { n: '03', title: 'Build', text: 'Work with a team. Make something tangible. A working prototype beats a perfect plan every time.' },
-  { n: '04', title: 'Test', text: 'Get feedback from real users. Break it. Fix it. Learn more in a week of testing than a semester of theory.' },
-  { n: '05', title: 'Launch', text: 'Take your project beyond the classroom. Into the real world. Into the hands of the people it was built for.' },
+  { n: '01', title: 'Notice', text: 'Observe campus and community needs, then ask useful questions.' },
+  { n: '02', title: 'Shape', text: 'Test assumptions and decide what a first version could look like.' },
+  { n: '03', title: 'Build', text: 'Work with a team to create a prototype, service or first experiment.' },
+  { n: '04', title: 'Learn', text: 'Share the work, collect feedback and improve what you have made.' },
+  { n: '05', title: 'Share', text: 'Present your progress and agree on the next practical step.' },
 ];
-
-const MARQUEE = ['iec-12.jpg','iec-06.jpg','iec-16.jpg','iec-04.jpg','iec-14.jpg','iec-07.jpg','iec-03.jpg','iec-19.jpg','iec-05.jpg','iec-08.jpg','iec-18.jpg','iec-02.jpg','iec-17.jpg','iec-01.jpg','iec-09.jpg','iec-10.jpg','iec-11.jpg','iec-13.jpg','iec-15.jpg','iec.jpeg'];
 
 const DISCIPLINES = ['Designer','Engineer','Business student','Developer','Artist','Agriculture student','Health Sciences','Law student','Still figuring it out'];
 
-// Recurring meetups — the "when do you meet?" answer. Edit freely.
-const SCHEDULE = [
-  { day: 'Every Thursday', time: '5:00 PM', title: 'General Meetup', place: 'Gandhi Wing, JKUAT', color: 'text-iec-blue' },
-  { day: 'Saturdays', time: '10:00 AM', title: 'Build Sessions', place: 'Innovation Lab', color: 'text-iec-gold' },
-  { day: 'Monthly', time: 'Varies', title: 'Founder Talks', place: 'Main Campus', color: 'text-iec-blue' },
-];
-
-// What members actually get. Pairs the icon with the payoff.
 const BENEFITS = [
-  { icon: 'groups', title: 'A network that matters', text: 'Students, founders, mentors and professionals you\'d never meet in a lecture hall.' },
-  { icon: 'build', title: 'Hands-on workshops', text: 'Practical sessions on building, pitching and shipping — not theory you\'ll forget.' },
-  { icon: 'rocket_launch', title: 'Project support', text: 'Tools, space and people to take an idea from sketch to working prototype.' },
-  { icon: 'military_tech', title: 'Compete & represent', text: 'Hackathons and innovation challenges where JKUAT shows up and wins.' },
+  { icon: FiUsers, title: 'A collaborative community', text: 'Find teammates, exchange skills and get honest feedback from fellow students.' },
+  { icon: FiBookOpen, title: 'Practical learning', text: 'Develop skills in entrepreneurship, product thinking, teamwork and pitching.' },
+  { icon: FiLayers, title: 'Room to experiment', text: 'Move a project forward with peer support, structured sessions and shared tools.' },
+  { icon: FiCompass, title: 'Opportunities to grow', text: 'Represent JKUAT at showcases, competitions and conversations with founders.' },
 ];
-
-// Exec team. Swap `photo` for a real file in /uploads when portraits exist;
-// leave it undefined to show the styled initials tile.
-interface TeamMember { name: string; role: string; photo?: string; }
-const TEAM: TeamMember[] = [
-  { name: 'Chairperson', role: 'Club Lead' },
-  { name: 'Vice Chair', role: 'Operations' },
-  { name: 'Secretary', role: 'Coordination' },
-  { name: 'Treasurer', role: 'Finance' },
-  { name: 'Projects Lead', role: 'Builds & Prototypes' },
-  { name: 'Events Lead', role: 'Programs & Partnerships' },
-];
-
-function initials(name: string): string {
-  return name.split(/\s+/).map((w) => w[0]).join('').slice(0, 2).toUpperCase();
-}
 
 const MONTHS = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
 const CAT_COLORS: Record<string, string> = {
@@ -82,152 +69,128 @@ interface HomeEvent {
 
 export default function Home() {
   useReveal();
-  useHomeMotion();
-
-  // Hero entrance: add .go after first paint (double rAF), mirroring source.
-  useEffect(() => {
-    const id1 = requestAnimationFrame(() => {
-      const id2 = requestAnimationFrame(() => {
-        document.querySelectorAll('.hero-animate').forEach((el) => el.classList.add('go'));
-      });
-      return () => cancelAnimationFrame(id2);
-    });
-    return () => cancelAnimationFrame(id1);
-  }, []);
 
   return (
-    <>
+    <main className="home-page">
       <HeroSection />
+      <AtAGlanceSection />
       <WhatIsSection />
-      <hr className="rule mx-6 md:mx-16" />
       <WhatWeDoSection />
-      <hr className="rule mx-6 md:mx-16" />
-      <BenefitsSection />
-      <hr className="rule mx-6 md:mx-16" />
-      <Marquee />
+      <PhotoGallery />
       <JourneySection />
-      <hr className="rule mx-6 md:mx-16" />
       <WhoCanJoinSection />
-      <TeamSection />
-      <hr className="rule mx-6 md:mx-16" />
-      <ScheduleSection />
+      <BenefitsSection />
       <UpcomingEventsSection />
       <IdeaSection />
-      <hr className="rule mx-6 md:mx-16" />
       <JoinSection />
-    </>
+      <PartnersSection />
+    </main>
   );
 }
 
-const HERO_STATS = [
-  { value: '200+', label: 'Active members' },
-  { value: '30+', label: 'Projects built' },
-  { value: '20+', label: 'Events a\u00A0year' },
+const AT_A_GLANCE = [
+  { value: '2025', label: 'Established' },
+  { value: '2025', label: 'Launched' },
+  { value: 'JKUAT students', label: 'Who can join?' },
+  { value: 'Student-led', label: 'Projects' },
+  { value: 'Learn by doing', label: 'Our approach' },
+];
+
+const HERO_SLIDES = [
+  { src: '/uploads/iec-07.jpg' },
+  { src: '/uploads/iec-04.jpg' },
+  { src: '/uploads/iec-01.jpg' },
+  { src: '/uploads/iec-12.jpg' },
+  { src: '/uploads/iec-14.jpg' },
+  { src: '/uploads/iec-16.jpg' },
 ];
 
 function HeroSection() {
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  useEffect(() => {
+    const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    motionPreference.addEventListener('change', updatePreference);
+    return () => motionPreference.removeEventListener('change', updatePreference);
+  }, []);
+
+  useEffect(() => {
+    if (reducedMotion) return undefined;
+    const timer = window.setInterval(() => {
+      setActiveSlide((current) => (current + 1) % HERO_SLIDES.length);
+    }, 6500);
+    return () => window.clearInterval(timer);
+  }, [reducedMotion]);
+
   return (
-    <section
-      className="hero relative flex flex-col justify-center overflow-hidden noise"
-      style={{ minHeight: '100svh', maxHeight: '1100px' }}
-    >
-      <Hero3D />
-      {/* Vignette: darkens edges so the big type always has contrast over the particle field. */}
-      <div className="absolute inset-0 z-[1] pointer-events-none" style={{ background: 'radial-gradient(ellipse 90% 70% at 50% 45%, transparent 30%, rgba(7,16,26,0.6) 100%)' }} />
-      <div className="absolute inset-x-0 bottom-0 h-40 z-[1] pointer-events-none" style={{ background: 'linear-gradient(to top, #07101a, transparent)' }} />
-
-      <div className="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto w-full pt-24 pb-12 md:pt-28 md:pb-24">
-        <div className="max-w-5xl">
-          <p className="hero-animate mb-6 md:mb-8 text-[10px] md:text-xs font-bold tracking-[0.18em] md:tracking-[0.28em] uppercase text-iec-blue" style={{ transitionDelay: '0.1s' }}>
-            Innovation &amp; Entrepreneurship Club · JKUAT
-          </p>
-
-          <h1 className="font-display font-black text-white" style={{ fontSize: 'clamp(2.25rem, 8.5vw, 7.5rem)', lineHeight: 1, letterSpacing: '-0.035em' }}>
-            <span className="block overflow-hidden"><span className="block hero-animate" style={{ transitionDelay: '0.18s' }}>Ideas are</span></span>
-            <span className="block overflow-hidden"><span className="block text-iec-blue hero-animate" style={{ transitionDelay: '0.3s' }}>everywhere.</span></span>
-            <span className="block overflow-hidden"><span className="block hero-animate" style={{ transitionDelay: '0.42s' }}>Let's build them.</span></span>
-          </h1>
-
-          <p className="text-white/70 text-base md:text-xl font-light max-w-xl leading-relaxed mt-8 md:mt-10 hero-animate" style={{ transitionDelay: '0.6s' }}>
-            A student community at JKUAT turning ideas into projects, businesses and solutions that matter.
-          </p>
-        </div>
-
-        <div className="mt-8 md:mt-10 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:pt-8 lg:border-t lg:border-white/10 hero-animate" style={{ transitionDelay: '0.72s' }}>
-          <div className="grid grid-cols-2 gap-3 sm:flex sm:gap-4">
-            <a href="#join" className="btn-primary w-full min-w-0 justify-center whitespace-nowrap px-3 sm:w-auto sm:px-8" data-magnetic="0.3">
-              Join IEC <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-            </a>
-            <a href="#what-we-do" className="btn-ghost w-full min-w-0 justify-center whitespace-nowrap px-3 sm:w-auto sm:px-8">
-              What we do <span className="material-symbols-outlined text-[18px] hidden sm:inline">expand_more</span>
-            </a>
-          </div>
-          <dl className="grid grid-cols-3 gap-3 mt-8 pt-6 border-t border-white/10 sm:flex sm:gap-x-10 sm:pt-8 lg:mt-0 lg:pt-0 lg:border-t-0">
-            {HERO_STATS.map((s) => (
-              <div key={s.label} className="min-w-0 flex flex-col-reverse gap-1.5 sm:gap-2">
-                <dt className="text-white/50 text-[9px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.14em] leading-snug">{s.label}</dt>
-                <dd className="font-display font-extrabold text-white text-2xl sm:text-4xl leading-none tracking-tight">{s.value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
+    <section className="home-hero">
+      <div className="home-hero-backdrop" aria-hidden="true">
+        {HERO_SLIDES.map((slide, index) => (
+          <img
+            key={slide.src}
+            className={index === activeSlide ? 'is-active' : ''}
+            src={slide.src}
+            alt=""
+            loading={index === 0 ? 'eager' : 'lazy'}
+            decoding="async"
+          />
+        ))}
       </div>
-
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 hidden sm:flex flex-col items-center gap-2 opacity-40 z-10">
-        <span className="text-[10px] font-semibold tracking-widest uppercase text-white">Scroll</span>
-        <div className="w-px h-8 bg-white/30 relative overflow-hidden">
-          <div className="absolute top-0 w-full h-1/2 bg-white animate-bounce"></div>
+      <div className="home-hero-shade" aria-hidden="true" />
+      <div className="home-hero-copy">
+        <p className="section-label">IEC JKUAT</p>
+        <h1>Ideas are everywhere.<br /><span>Let’s build them.</span></h1>
+        <p className="home-hero-intro">
+          A student-led community for learning by doing, building with others and bringing useful ideas to life.
+        </p>
+        <div className="home-hero-actions">
+          <a href="#join" className="btn-primary home-hero-cta">Become a member <FiArrowRight aria-hidden="true" /></a>
+          <a href="#what-we-do" className="home-text-link">Explore the club <FiArrowUpRight aria-hidden="true" /></a>
         </div>
       </div>
     </section>
   );
 }
 
+function AtAGlanceSection() {
+  return (
+    <section className="home-glance" aria-label="IEC JKUAT at a glance">
+      <dl className="home-glance-grid">
+        {AT_A_GLANCE.map((fact) => (
+          <div key={fact.label}>
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
+  );
+}
+
 function WhatIsSection() {
   return (
-    <section className="pt-4 pb-8 md:py-12 px-6 md:px-16 max-w-screen-xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-24 items-center">
+    <section id="about" className="home-section home-about">
+      <div className="home-section-heading">
+        <p className="section-label">About IEC JKUAT</p>
+        <h2>A place to turn curiosity into action.</h2>
+      </div>
+      <div className="home-about-content">
+        <p>
+          The Innovation and Entrepreneurship Club brings JKUAT students together to explore problems, test ideas and learn how to build solutions that matter.
+        </p>
         <div>
-          <p className="section-label mb-6" data-reveal="fade">What is IEC?</p>
-          <h2 className="font-display font-bold text-white leading-tight mb-8" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.6rem)' }} data-split data-reveal="up">
-            {splitWords('A student movement. Not a lecture.').map((w, i, all) => (
-              <span key={i}>
-                <span className="split-word" style={w.style}>{w.word}</span>
-                {i < all.length - 1 ? ' ' : ''}
-              </span>
-            ))}
-          </h2>
-          <p className="text-white/55 text-base leading-relaxed mb-6" data-reveal="up" style={{ transitionDelay: '0.15s' }}>
-            IEC JKUAT isn't a class you sit in. It's a space where students from every discipline at JKUAT come together to experiment, build things, solve real problems and grow beyond their degree.
-          </p>
-          <p className="text-white/55 text-base leading-relaxed mb-10" data-reveal="up" style={{ transitionDelay: '0.25s' }}>
-            Whether you have a startup idea, a skill you want to apply, or you're still figuring out what you're about — there's a place for you here.
-          </p>
-          <div className="md:hidden mt-2 rounded-xl overflow-hidden" data-reveal="up">
-            <img loading="lazy" src="/uploads/iec.jpeg" alt="IEC award handover in front of the club banner" className="w-full h-60 object-cover" />
-          </div>
+          <p>We make space for students from every course and year to share skills, find collaborators and learn through real projects.</p>
+          <Link to="/about#team" className="home-text-link">Meet the leadership <FiArrowRight aria-hidden="true" /></Link>
         </div>
-        <div className="relative h-[520px] hidden md:block" data-reveal="right" style={{ transitionDelay: '0.2s' }}>
-          <div className="absolute inset-0 rounded-sm overflow-hidden">
-            <img loading="lazy" src="/uploads/iec.jpeg" alt="IEC award handover in front of the club banner" className="w-full h-full object-cover" />
-            <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(10,10,10,0.25) 0%, transparent 55%, rgba(0,174,239,0.08) 100%)' }} />
-          </div>
-          <div className="absolute top-6 right-6 w-44 rounded overflow-hidden shadow-2xl border border-white/10" style={{ transform: 'rotate(3deg)' }}>
-            <img loading="lazy" src="/uploads/iec-06.jpg" alt="IEC recruitment desk" className="w-full h-28 object-cover" />
-            <div className="bg-[#0f0f0f] px-3 py-2">
-              <p className="text-white text-[11px] font-bold">Recruitment Drive</p>
-              <p className="text-white/40 text-[10px]">JKUAT Main Campus</p>
-            </div>
-          </div>
-          <div className="absolute bottom-12 left-6 px-5 py-4 rounded shadow-xl" style={{ background: 'rgba(0,174,239,0.15)', border: '1px solid rgba(0,174,239,0.3)', backdropFilter: 'blur(12px)' }}>
-            <p className="text-iec-blue font-extrabold text-2xl font-display leading-none">Est. 2020</p>
-            <p className="text-white/40 text-xs mt-1">Building since day one</p>
-          </div>
-          <div className="absolute bottom-6 right-8 w-36 h-24 rounded overflow-hidden shadow-xl border border-white/8" style={{ transform: 'rotate(-2deg)' }}>
-            <img loading="lazy" src="/uploads/iec-14.jpg" alt="IEC members group photo" className="w-full h-full object-cover opacity-100" />
-          </div>
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,174,239,0.15), transparent 70%)', filter: 'blur(30px)' }} />
-        </div>
+        <figure className="home-about-image photo-overlay-container">
+          <img loading="lazy" src="/uploads/iec.jpeg" alt="IEC members and mentors at a club event" />
+          <figcaption className="photo-reveal">
+            <strong>Students, mentors and partners</strong>
+            <span>Building useful ideas together.</span>
+          </figcaption>
+        </figure>
       </div>
     </section>
   );
@@ -235,21 +198,63 @@ function WhatIsSection() {
 
 function WhatWeDoSection() {
   return (
-    <section id="what-we-do" className="py-10 md:py-16">
-      <div className="px-6 md:px-16 max-w-screen-xl mx-auto mb-8">
-        <p className="section-label mb-4" data-reveal="fade">What we do</p>
-        <h2 className="font-display font-bold text-white leading-tight" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.4rem)' }} data-reveal="up">
-          Six ways to show up.
-        </h2>
+    <section id="what-we-do" className="home-section home-what-we-do">
+      <div className="home-section-heading">
+        <p className="section-label">What we do</p>
+        <h2>Learn by making things happen.</h2>
+        <p>Practical ways to explore innovation and entrepreneurship while you study.</p>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3" style={{ borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        {DO_CARDS.map((c, i) => (
-          <div key={c.n} className="do-card" data-reveal="up" style={{ transitionDelay: `${0.05 * (i + 1)}s` }}>
-            <img className="do-card-photo" loading="lazy" src={`/uploads/${c.photo}`} alt="" />
-            <span className="do-number">{c.n}</span>
-            <span className={`do-icon material-symbols-outlined ${c.color}`} style={{ fontSize: '32px', fontVariationSettings: "'FILL' 1" }}>{c.icon}</span>
-            <h3 className="font-display font-bold text-white text-xl mb-3">{c.title}</h3>
-            <p className="text-white/60 text-sm leading-relaxed">{c.text}</p>
+      <div className="home-activity-grid">
+        {DO_CARDS.map(({ n, icon: Icon, photo, title, text }) => (
+          <article key={n} className="home-activity-card" data-reveal="up">
+            <div className="home-activity-image photo-overlay-container">
+              <img loading="lazy" src={`/uploads/${photo}`} alt="" />
+              <div className="photo-reveal">
+                <strong>{title}</strong>
+                <span>{text}</span>
+              </div>
+            </div>
+            <div className="home-activity-copy">
+              <Icon aria-hidden="true" />
+              <span>{n}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PhotoGallery() {
+  const photos = [
+    { src: 'iec-12.jpg', title: 'The IEC community', text: 'Students and guests sharing a club gathering.', alt: 'IEC JKUAT members and guests at a club gathering' },
+    { src: 'iec-14.jpg', title: 'Learning together', text: 'Students and mentors exchanging ideas.', alt: 'IEC students and mentors together at an event' },
+    { src: 'iec-16.jpg', title: 'Campus events', text: 'Students representing the club at JKUAT.', alt: 'Students representing IEC JKUAT at a campus event' },
+    { src: 'iec-18.jpg', title: 'Shared moments', text: 'The community behind every activity.', alt: 'IEC JKUAT community sharing a moment after an activity' },
+    { src: 'iec-03.jpg', title: 'Working together', text: 'Members collaborating on club activities.', alt: 'IEC members collaborating during a club activity' },
+    { src: 'iec-05.jpg', title: 'Making connections', text: 'Students finding collaborators and support.', alt: 'Students connecting through IEC JKUAT' },
+  ];
+  return (
+    <section className="home-photo-gallery" aria-labelledby="home-photo-gallery-heading">
+      <p className="section-label" id="home-photo-gallery-heading">Our community</p>
+      <div className="home-photo-gallery-track">
+        {[false, true].map((duplicate) => (
+          <div
+            className="home-photo-gallery-group"
+            key={duplicate ? 'duplicate' : 'gallery'}
+            aria-hidden={duplicate}
+          >
+            {photos.map((photo) => (
+              <figure className="home-photo-gallery-item photo-overlay-container" key={photo.src}>
+                <img loading="lazy" src={`/uploads/${photo.src}`} alt={duplicate ? '' : photo.alt} />
+                <figcaption className="photo-reveal">
+                  <strong>{photo.title}</strong>
+                  <span>{photo.text}</span>
+                </figcaption>
+              </figure>
+            ))}
           </div>
         ))}
       </div>
@@ -257,77 +262,44 @@ function WhatWeDoSection() {
   );
 }
 
-function Marquee() {
-  const all = [...MARQUEE, ...MARQUEE];
-  return (
-    <div className="py-6 overflow-hidden" style={{ background: 'rgba(255,255,255,0.015)' }}>
-      <div className="marquee-track">
-        {all.map((img, i) => (
-          <img
-            key={i}
-            className="marquee-photo"
-            loading="lazy"
-            src={`/uploads/${img}`}
-            alt={i < MARQUEE.length ? 'IEC club photo' : ''}
-            aria-hidden={i >= MARQUEE.length}
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
 function JourneySection() {
   return (
-    <div id="journey-section">
-      <div className="journey-sticky">
-        <div className="px-6 md:px-16 mb-12 max-w-screen-xl mx-auto w-full">
-          <p className="section-label mb-4" data-reveal="fade">The IEC journey</p>
-          <h2 className="font-display font-bold text-white" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
-            From idea to impact.
-          </h2>
-        </div>
-        <div id="journey-track" className="flex overflow-visible pl-6 md:pl-16 pb-4" style={{ willChange: 'transform' }}>
-          {JOURNEY.map((s, i) => (
-            <div
-              key={s.n}
-              className={`journey-step ${i === 0 ? 'journey-active' : ''} ${i === JOURNEY.length - 1 ? 'journey-step-last' : ''}`}
-            >
-              <div className="font-display font-extrabold text-iec-blue text-5xl md:text-6xl mb-6 leading-none">{s.n}</div>
-              <h3 className="font-display font-bold text-white text-2xl mb-3">{s.title}</h3>
-              <p className="text-white/60 text-sm leading-relaxed max-w-xs">{s.text}</p>
-            </div>
-          ))}
-        </div>
+    <section className="home-section home-journey">
+      <div className="home-section-heading">
+        <p className="section-label">How we work</p>
+        <h2>From first question to first version.</h2>
       </div>
-    </div>
+      <div className="home-journey-grid">
+        {JOURNEY.map((step) => (
+          <article key={step.n} className="home-journey-step">
+            <span>{step.n}</span>
+            <h3>{step.title}</h3>
+            <p>{step.text}</p>
+          </article>
+        ))}
+      </div>
+    </section>
   );
 }
 
 function WhoCanJoinSection() {
   return (
-    <section className="py-10 md:py-16 relative overflow-hidden">
-      <div className="absolute inset-0 z-0">
-        <img loading="lazy" src="/uploads/iec-07.jpg" alt="" className="w-full h-full object-cover" style={{ filter: 'saturate(0.9) brightness(0.65)' }} />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, rgba(10,10,10,0.88) 20%, rgba(10,10,10,0.5) 60%, rgba(10,10,10,0.75) 100%)' }} />
-      </div>
-      <div className="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto">
-        <div className="max-w-2xl mb-8">
-          <p className="section-label mb-6" data-reveal="fade">Who can join?</p>
-          <h2 className="font-display font-black text-white leading-tight" style={{ fontSize: 'clamp(2.5rem, 5.5vw, 4.2rem)', letterSpacing: '-0.03em' }} data-reveal="up">
-            You don't have<br />to be a techie.
-          </h2>
-        </div>
-        <div className="flex gap-2 mb-10 overflow-x-auto scrollbar-hide pb-1" data-reveal="up" style={{ transitionDelay: '0.15s' }}>
-          {DISCIPLINES.map((d) => (
-            <span key={d} className="discipline-tag shrink-0">{d}</span>
-          ))}
-        </div>
-        <div className="border-l-2 border-iec-blue pl-8 max-w-xl" data-reveal="left" style={{ transitionDelay: '0.25s' }}>
-          <p className="text-white/70 text-lg md:text-xl font-light leading-relaxed italic">"Great ideas rarely come from one discipline."</p>
-          <p className="text-white/50 text-sm mt-3 font-medium">— IEC JKUAT</p>
+    <section className="home-section home-welcome">
+      <div className="home-welcome-copy">
+        <p className="section-label">Who can join?</p>
+        <h2>Every discipline.<br /><span>Every starting point.</span></h2>
+        <p>Designers, engineers, business students and curious beginners all bring something different to the table.</p>
+        <div className="home-discipline-list">
+          {DISCIPLINES.map((discipline) => <span key={discipline}>{discipline}</span>)}
         </div>
       </div>
+      <figure className="home-welcome-image photo-overlay-container">
+        <img loading="lazy" src="/uploads/iec-01.jpg" alt="IEC members talking with students at a campus recruitment event" />
+        <figcaption className="photo-reveal">
+          <strong>Every discipline belongs</strong>
+          <span>Bring a different perspective and find a team to build with.</span>
+        </figcaption>
+      </figure>
     </section>
   );
 }
@@ -355,201 +327,113 @@ function UpcomingEventsSection() {
   }, []);
 
   return (
-    <section className="py-10 md:py-16" style={{ background: 'rgba(255,255,255,0.02)' }}>
-      <div className="px-6 md:px-16 max-w-screen-xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between md:items-end gap-6 mb-12">
-          <div>
-            <p className="section-label mb-4" data-reveal="fade">What's happening?</p>
-            <h2 className="font-display font-bold text-white" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
-              Upcoming events
-            </h2>
-          </div>
-          <Link to="/events" className="btn-ghost text-sm self-start md:self-auto" data-reveal="fade">
-            All events <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-          </Link>
+    <section className="home-section home-events">
+      <div className="home-events-heading">
+        <div className="home-section-heading">
+          <p className="section-label">On the calendar</p>
+          <h2>Upcoming events</h2>
         </div>
+        <Link to="/events" className="home-text-link">View all events <FiArrowRight aria-hidden="true" /></Link>
+      </div>
 
         {events === null && !failed ? (
-          <div className="py-16 text-center text-white/30 text-sm">
-            <span className="material-symbols-outlined animate-spin inline-block mb-2" style={{ fontSize: '24px' }}>sync</span>
+          <div className="home-event-empty">
             <p>Loading events…</p>
           </div>
         ) : failed ? (
-          <p className="text-white/20 text-sm text-center py-8">Could not load events.</p>
+          <p className="home-event-empty" role="status">Could not load events.</p>
         ) : events && events.length === 0 ? (
-          <div className="py-16 text-center">
-            <p className="text-white/25 text-sm">No events scheduled yet. Check back soon.</p>
+          <div className="home-event-empty">
+            <p>No events scheduled yet. Check back soon.</p>
           </div>
         ) : (
-          <div>
+          <div className="home-event-list">
             {events!.map((ev) => {
               const d = new Date(ev.event_date);
               const validDate = !isNaN(d.getTime());
               const cat = (ev.category || '').toLowerCase();
               const col = CAT_COLORS[cat] || 'text-iec-blue';
               return (
-                <Link key={ev.id} to={`/event?id=${ev.id}`} className="event-item group revealed">
-                  <div className="text-center shrink-0">
-                    <div className="font-display font-extrabold text-white text-2xl leading-none">{validDate ? d.getDate() : '—'}</div>
-                    <div className="text-white/40 text-[10px] font-bold tracking-widest">{validDate ? MONTHS[d.getMonth()] : ''}</div>
+                <Link key={ev.id} to={`/event?id=${ev.id}`} className="home-event-card">
+                  <div className="home-event-date">
+                    <span>{validDate ? d.getDate() : '—'}</span>
+                    <small>{validDate ? MONTHS[d.getMonth()] : ''}</small>
                   </div>
-                  <div className="min-w-0">
-                    <p className="font-display font-semibold text-white text-base leading-tight truncate group-hover:text-iec-blue transition-colors">{ev.title}</p>
-                    <div className="flex items-center gap-3 mt-1.5">
-                      {ev.category && <span className={`text-[11px] font-bold uppercase tracking-wider ${col}`}>{ev.category}</span>}
-                      {ev.location && <span className="text-white/40 text-[11px]">{ev.location}</span>}
+                  <div className="home-event-copy">
+                    <h3>{ev.title}</h3>
+                    <div className="home-event-meta">
+                      {ev.category && <span className={col}>{ev.category}</span>}
+                      {ev.location && <span><FiMapPin aria-hidden="true" />{ev.location}</span>}
                     </div>
                   </div>
-                  <span className="material-symbols-outlined text-white/15 group-hover:text-iec-blue group-hover:translate-x-1 transition-all text-[20px] shrink-0">arrow_forward</span>
+                  <FiArrowUpRight className="home-event-arrow" aria-hidden="true" />
                 </Link>
               );
             })}
           </div>
         )}
-      </div>
     </section>
   );
 }
 
 function BenefitsSection() {
   return (
-    <section className="py-10 md:py-16 px-6 md:px-16 max-w-screen-xl mx-auto">
-      <div className="mb-8 max-w-2xl">
-        <p className="section-label mb-4" data-reveal="fade">Why join</p>
-        <h2 className="font-display font-bold text-white leading-tight" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
-          What you actually get.
-        </h2>
+    <section className="home-section home-benefits">
+      <div className="home-section-heading">
+        <p className="section-label">Why join</p>
+        <h2>Make your time at JKUAT count.</h2>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
-        {BENEFITS.map((b, i) => (
-          <div
-            key={b.title}
-            className="flex gap-4 p-5 md:p-6 rounded"
-            data-reveal="up"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', transitionDelay: `${0.05 * (i + 1)}s` }}
-          >
-            <span
-              className={`material-symbols-outlined ${i % 2 === 0 ? 'text-iec-blue' : 'text-iec-gold'} shrink-0`}
-              style={{ fontSize: '28px', fontVariationSettings: "'FILL' 1" }}
-            >
-              {b.icon}
-            </span>
-            <div className="min-w-0">
-              <h3 className="font-display font-bold text-white text-lg mb-1.5">{b.title}</h3>
-              <p className="text-white/60 text-sm leading-relaxed">{b.text}</p>
-            </div>
-          </div>
+      <div className="home-benefit-grid">
+        {BENEFITS.map(({ icon: Icon, title, text }) => (
+          <article key={title} className="home-benefit-card" data-reveal="up">
+            <Icon aria-hidden="true" />
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
         ))}
       </div>
-    </section>
-  );
-}
-
-function TeamSection() {
-  return (
-    <section className="py-10 md:py-16 px-6 md:px-16 max-w-screen-xl mx-auto">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-        <div className="max-w-2xl">
-          <p className="section-label mb-4" data-reveal="fade">The team</p>
-          <h2 className="font-display font-bold text-white leading-tight" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
-            The people behind IEC.
-          </h2>
-        </div>
-        <p className="text-white/45 text-sm max-w-xs" data-reveal="fade">
-          Students who run the club, organise the events and keep the projects moving.
-        </p>
-      </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
-        {TEAM.map((m, i) => (
-          <div key={m.name + i} className="team-card" data-reveal="up" style={{ transitionDelay: `${0.04 * (i + 1)}s` }}>
-            <div className="team-avatar">
-              {m.photo ? (
-                <img loading="lazy" src={`/uploads/${m.photo}`} alt={m.name} className="w-full h-full object-cover" />
-              ) : (
-                <span className="font-display font-extrabold text-iec-blue text-2xl">{initials(m.name)}</span>
-              )}
-            </div>
-            <h3 className="font-display font-bold text-white text-sm leading-tight">{m.name}</h3>
-            <p className="text-white/40 text-[11px] uppercase tracking-wider mt-0.5">{m.role}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function ScheduleSection() {
-  return (
-    <section className="py-10 md:py-16 px-6 md:px-16 max-w-screen-xl mx-auto">
-      <div className="mb-8 max-w-2xl">
-        <p className="section-label mb-4" data-reveal="fade">When we meet</p>
-        <h2 className="font-display font-bold text-white leading-tight" style={{ fontSize: 'clamp(2.3rem, 5vw, 3.2rem)' }} data-reveal="up">
-          A rhythm you can count on.
-        </h2>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
-        {SCHEDULE.map((s, i) => (
-          <div
-            key={s.title}
-            className="p-5 md:p-6 rounded"
-            data-reveal="up"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', transitionDelay: `${0.06 * (i + 1)}s` }}
-          >
-            <div className="flex items-baseline justify-between gap-3 mb-3">
-              <span className={`font-display font-extrabold ${s.color} text-lg`}>{s.day}</span>
-              <span className="text-white/50 text-xs font-bold uppercase tracking-wider">{s.time}</span>
-            </div>
-            <h3 className="font-display font-bold text-white text-base mb-1">{s.title}</h3>
-            <p className="text-white/45 text-sm flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-[15px]">place</span>{s.place}
-            </p>
-          </div>
-        ))}
-      </div>
-      <p className="text-white/35 text-xs mt-5" data-reveal="fade">
-        Times may shift during exams and holidays — check the events page or our socials for the latest.
-      </p>
     </section>
   );
 }
 
 function IdeaSection() {
   return (
-    <section className="py-10 md:py-16 relative overflow-hidden">
-      <div className="absolute top-1/2 left-1/4 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(0,174,239,0.08), transparent 70%)', filter: 'blur(60px)' }} />
-      <div className="absolute top-1/2 right-1/4 -translate-y-1/2 w-96 h-96 rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(251,176,59,0.08), transparent 70%)', filter: 'blur(60px)' }} />
-      <div className="relative z-10 px-6 md:px-16 max-w-screen-xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-0">
-          <div className="idea-card md:border-r border-white/8 md:pr-16 relative" data-reveal="left">
-            <div className="idea-photo absolute top-0 right-8 w-20 h-20 rounded overflow-hidden opacity-50 hidden md:block">
-              <img loading="lazy" src="/uploads/iec-14.jpg" alt="" className="w-full h-full object-cover" />
-            </div>
-            <p className="md:hidden font-display font-extrabold text-iec-blue text-sm tracking-[0.2em] mb-3">01</p>
-            <p className="font-display font-extrabold text-white leading-tight mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.4rem)' }}>
-              Have an<br /><span className="text-iec-blue">idea?</span>
-            </p>
-            <p className="text-white/60 text-base leading-relaxed">
-              Great. Let's find out if it's worth building. IEC gives you the people, tools and environment to take it seriously.
-            </p>
-            <a href="#join" className="btn-primary w-full justify-center mt-6 md:hidden">Join IEC <span className="material-symbols-outlined text-[18px]">arrow_forward</span></a>
-          </div>
-          <div className="idea-card md:pl-16 relative" data-reveal="right" style={{ transitionDelay: '0.15s' }}>
-            <div className="idea-photo absolute top-0 right-0 w-20 h-20 rounded overflow-hidden opacity-50 hidden md:block">
-              <img loading="lazy" src="/uploads/iec-05.jpg" alt="" className="w-full h-full object-cover" />
-            </div>
-            <p className="md:hidden font-display font-extrabold text-iec-gold text-sm tracking-[0.2em] mb-3">02</p>
-            <p className="font-display font-extrabold text-white leading-tight mb-4" style={{ fontSize: 'clamp(2.5rem, 5vw, 3.4rem)' }}>
-              Don't have<br /><span className="text-iec-gold">an idea?</span>
-            </p>
-            <p className="text-white/60 text-base leading-relaxed">
-              Also great. IEC isn't only for people who already have startups. It's for students who want to explore, experiment, meet people and figure out what they're capable of.
-            </p>
-            <a href="#join" className="btn-primary w-full justify-center mt-6 md:hidden">Join IEC <span className="material-symbols-outlined text-[18px]">arrow_forward</span></a>
-          </div>
+    <section className="home-join-prompt">
+      <div>
+        <p className="section-label">Start where you are</p>
+        <h2>Bring a question.<br />Leave with a next step.</h2>
+        <p>You don’t need a finished business plan. Bring your curiosity and we’ll help you find a way to get involved.</p>
+      </div>
+      <a href="#join" className="btn-primary">Join the club <FiArrowRight aria-hidden="true" /></a>
+    </section>
+  );
+}
+
+const PARTNERSHIP_ROUTES = [
+  { icon: FiUsers, title: 'Mentor a team', text: 'Share practical experience with students developing an idea or early-stage project.' },
+  { icon: FiLayers, title: 'Bring a challenge', text: 'Introduce a real problem students can explore through workshops and projects.' },
+  { icon: FiCompass, title: 'Create opportunities', text: 'Help make showcases, learning sessions and new collaborations possible.' },
+];
+
+function PartnersSection() {
+  return (
+    <section className="home-partners" aria-labelledby="home-partners-title">
+      <div className="home-partners-heading">
+        <div>
+          <p className="section-label">Partners &amp; collaborators</p>
+          <h2 id="home-partners-title">Good ideas grow stronger together.</h2>
+          <p>Work with IEC to help students turn curiosity into useful projects and new possibilities.</p>
         </div>
-        <div className="mt-8 pt-8 border-t border-white/6 text-center" data-reveal="up" style={{ transitionDelay: '0.3s' }}>
-          <p className="ghost-text font-display font-black uppercase tracking-[0.2em] text-sm">You just need curiosity.</p>
-        </div>
+        <Link to="/contact" className="home-partners-cta">Partner with IEC <FiArrowRight aria-hidden="true" /></Link>
+      </div>
+      <div className="home-partners-grid">
+        {PARTNERSHIP_ROUTES.map(({ icon: Icon, title, text }) => (
+          <article className="home-partner-card" key={title}>
+            <Icon aria-hidden="true" />
+            <h3>{title}</h3>
+            <p>{text}</p>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -562,18 +446,36 @@ function JoinSection() {
   const [preview, setPreview] = useState<MemberLookup | null>(null);
 
   const [reg, setReg] = useState({ fullName: '', regNumber: '', college: '', course: '', yearOfStudy: '', phone: '', email: '' });
+  const [regErrors, setRegErrors] = useState<Partial<Record<keyof typeof reg, string>>>({});
   const [regBusy, setRegBusy] = useState(false);
 
   const [payReg, setPayReg] = useState('');
   const [payPhone, setPayPhone] = useState('');
   const [payBusy, setPayBusy] = useState(false);
   const [lookupBusy, setLookupBusy] = useState(false);
+  const [payErrors, setPayErrors] = useState<{ reg?: string; phone?: string }>({});
   const [status, setStatus] = useState<{ ok: boolean; ref?: string; error?: string } | null>(null);
 
-  const setRegField = (k: keyof typeof reg) => (e: { target: { value: string } }) => setReg((r) => ({ ...r, [k]: e.target.value }));
+  const setRegField = (key: keyof typeof reg) => (event: { target: { value: string } }) => {
+    setReg((current) => ({ ...current, [key]: event.target.value }));
+    setRegErrors((current) => ({ ...current, [key]: undefined }));
+  };
 
   async function handleRegistration(e: FormEvent) {
     e.preventDefault();
+    const errors = {
+      fullName: validatePersonName(reg.fullName, 'Full name'),
+      regNumber: validateRegistrationNumber(reg.regNumber),
+      college: reg.college ? undefined : 'Choose your college.',
+      course: validateRequiredText(reg.course, 'Course', 2, 100),
+      yearOfStudy: ['1', '2', '3', '4', '5', '6'].includes(reg.yearOfStudy) ? undefined : 'Choose your year of study.',
+      phone: validateKenyanPhone(reg.phone),
+      email: validateEmail(reg.email),
+    };
+    setRegErrors(errors);
+    if (Object.values(errors).some(Boolean)) return;
+    const normalizedPhone = normalizeKenyanPhone(reg.phone);
+    if (!normalizedPhone) return;
     setRegBusy(true);
     try {
       const data = await submitMemberRegistration({
@@ -582,7 +484,7 @@ function JoinSection() {
         college: reg.college,
         course: reg.course.trim(),
         yearOfStudy: reg.yearOfStudy,
-        phone: reg.phone.trim(),
+        phone: normalizedPhone,
         email: reg.email.trim(),
       });
       setMemberId(data[0].id);
@@ -598,8 +500,9 @@ function JoinSection() {
 
   // Returns the member's id, or null if not found (and toasts why).
   async function lookupMember(): Promise<string | null> {
-    if (!payReg.trim()) {
-      toast('Enter a registration number first', 'error');
+    const regError = validateRegistrationNumber(payReg);
+    if (regError) {
+      setPayErrors((current) => ({ ...current, reg: regError }));
       return null;
     }
     setLookupBusy(true);
@@ -622,17 +525,18 @@ function JoinSection() {
 
   async function handlePayment(e: FormEvent) {
     e.preventDefault();
-    if (!payReg.trim()) {
-      toast('Enter your registration number first', 'error');
-      return;
-    }
+    const errors = { reg: validateRegistrationNumber(payReg), phone: validateKenyanPhone(payPhone) };
+    setPayErrors(errors);
+    if (Object.values(errors).some(Boolean)) return;
+    const normalizedPhone = normalizeKenyanPhone(payPhone);
+    if (!normalizedPhone) return;
     // Pay directly without pressing Find: look the member up once here.
     const id = memberId ?? (await lookupMember());
     if (!id) return;
     setPayBusy(true);
     setStatus(null);
     try {
-      const result = (await initiatePayment(payPhone.trim(), 200, id)) as { transactionRef?: string };
+      const result = (await initiatePayment(normalizedPhone, 200, id)) as { transactionRef?: string };
       setStatus({ ok: true, ref: result?.transactionRef });
       setMemberId(null);
     } catch (err) {
@@ -643,107 +547,109 @@ function JoinSection() {
   }
 
   return (
-    <section className="join-bg py-10 md:py-16 px-6 md:px-16" id="join">
-      <div className="max-w-screen-xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-8">
-          <p className="section-label mb-6" data-reveal="fade">Ready?</p>
-          <h2 className="font-display font-black text-white leading-none mb-6" style={{ fontSize: 'clamp(2.5rem, 6vw, 5rem)', letterSpacing: '-0.03em' }} data-reveal="up">
-            Ready to build<br />with us?
-          </h2>
-          <p className="text-white/45 text-base leading-relaxed" data-reveal="up" style={{ transitionDelay: '0.15s' }}>
-            Open to all JKUAT students. KES 200 per semester. Fill in your details, then complete activation via M-Pesa.
-          </p>
+    <section className="home-section home-membership" id="join">
+      <div className="home-membership-layout">
+        <div className="home-membership-intro">
+          <p className="section-label">Membership</p>
+          <h2>Make room for what you can build.</h2>
+          <p>Open to all JKUAT students. Register once, then activate your membership online.</p>
+          <ul className="home-membership-checklist">
+            <li><FiCheck aria-hidden="true" />Meet students who want to make things happen</li>
+            <li><FiCheck aria-hidden="true" />Join workshops, projects and club activities</li>
+            <li><FiCheck aria-hidden="true" />Start with an idea—or a willingness to learn</li>
+          </ul>
+          <p className="home-membership-help">Already registered? Choose <strong>Membership activation</strong> to continue.</p>
         </div>
 
-        <div className="max-w-2xl mx-auto" data-reveal="up" style={{ transitionDelay: '0.25s' }}>
-          <div style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '8px', overflow: 'visible' }}>
-            <div className="flex" style={{ borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-              <button className={`step-tab ${step === 1 ? 'active' : ''}`} onClick={() => setStep(1)}>01 — Registration</button>
-              <button className={`step-tab ${step === 2 ? 'active' : ''}`} onClick={() => setStep(2)}>02 — Activation</button>
+        <div className="home-membership-form">
+          <div className="membership-form-card">
+            <div className="home-membership-tabs" role="group" aria-label="Membership steps">
+              <button type="button" aria-pressed={step === 1} className={`step-tab ${step === 1 ? 'active' : ''}`} onClick={() => setStep(1)}>
+                <span>01</span> Registration
+              </button>
+              <button type="button" aria-pressed={step === 2} className={`step-tab ${step === 2 ? 'active' : ''}`} onClick={() => setStep(2)}>
+                <span>02</span> Activation
+              </button>
             </div>
 
             {step === 1 ? (
-              <div className="p-5 sm:p-8 md:p-10">
-                <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleRegistration}>
+              <div className="membership-form-panel">
+                <div className="membership-form-heading">
+                  <h3>Tell us a little about you.</h3>
+                  <p>Your JKUAT details help us set up your membership.</p>
+                </div>
+                <form noValidate className="membership-fields grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={handleRegistration}>
                   <div className="md:col-span-2">
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">Full Name *</label>
-                    <input className="iec-input" placeholder="Jane Mwangi" required type="text" value={reg.fullName} onChange={setRegField('fullName')} />
+                    <label className="block text-[13px] font-medium text-white/60 mb-1.5" htmlFor="member-full-name">Full name *</label>
+                    <input id="member-full-name" aria-invalid={Boolean(regErrors.fullName)} aria-describedby={regErrors.fullName ? 'member-full-name-error' : undefined} className="iec-input" placeholder="Jane Mwangi" required type="text" maxLength={120} value={reg.fullName} onChange={setRegField('fullName')} />
+                    <FieldError id="member-full-name-error" message={regErrors.fullName} />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">Reg Number *</label>
-                    <input className="iec-input" placeholder="SCT211-XXXX/20XX" required type="text" value={reg.regNumber} onChange={setRegField('regNumber')} />
+                    <label className="block text-[13px] font-medium text-white/60 mb-1.5" htmlFor="member-reg-number">Registration number *</label>
+                    <input id="member-reg-number" aria-invalid={Boolean(regErrors.regNumber)} aria-describedby={regErrors.regNumber ? 'member-reg-number-error' : undefined} className="iec-input" placeholder="SCT211-XXXX/20XX" required type="text" maxLength={50} value={reg.regNumber} onChange={setRegField('regNumber')} />
+                    <FieldError id="member-reg-number-error" message={regErrors.regNumber} />
                   </div>
-                  <div style={{ position: 'relative', zIndex: 50 }}>
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">College *</label>
-                    <select className="iec-input" required value={reg.college} onChange={setRegField('college')}>
-                      <option value="">Select college</option>
-                      <option>COPAS</option>
-                      <option>COETEC</option>
-                      <option>COHES</option>
-                      <option>COANRE</option>
-                      <option>COHRED</option>
-                    </select>
-                  </div>
+                  <CustomSelect id="member-college" label="College *" value={reg.college} options={['COPAS', 'COETEC', 'COHES', 'COANRE', 'COHRED']} placeholder="Select college" error={regErrors.college} onChange={(value) => {
+                    setReg((current) => ({ ...current, college: value }));
+                    setRegErrors((current) => ({ ...current, college: undefined }));
+                  }} />
                   <div>
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">Course *</label>
-                    <input className="iec-input" placeholder="e.g. BSc Computer Science" required type="text" value={reg.course} onChange={setRegField('course')} />
+                    <label className="block text-[13px] font-medium text-white/60 mb-1.5" htmlFor="member-course">Course *</label>
+                    <input id="member-course" aria-invalid={Boolean(regErrors.course)} aria-describedby={regErrors.course ? 'member-course-error' : undefined} className="iec-input" placeholder="e.g. BSc Computer Science" required type="text" maxLength={100} value={reg.course} onChange={setRegField('course')} />
+                    <FieldError id="member-course-error" message={regErrors.course} />
                   </div>
-                  <div style={{ position: 'relative', zIndex: 40 }}>
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">Year of Study *</label>
-                    <select className="iec-input" required value={reg.yearOfStudy} onChange={setRegField('yearOfStudy')}>
-                      <option value="">Select year</option>
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
-                      <option>5</option>
-                    </select>
-                  </div>
+                  <CustomSelect id="member-year" label="Year of study *" value={reg.yearOfStudy} options={['1', '2', '3', '4', '5', '6']} placeholder="Select year" error={regErrors.yearOfStudy} onChange={(value) => {
+                    setReg((current) => ({ ...current, yearOfStudy: value }));
+                    setRegErrors((current) => ({ ...current, yearOfStudy: undefined }));
+                  }} />
                   <div>
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">Phone *</label>
-                    <input className="iec-input" placeholder="07XXXXXXXX" required type="tel" value={reg.phone} onChange={setRegField('phone')} />
+                    <label className="block text-[13px] font-medium text-white/60 mb-1.5" htmlFor="member-phone">Phone number *</label>
+                    <input id="member-phone" aria-invalid={Boolean(regErrors.phone)} aria-describedby={regErrors.phone ? 'member-phone-error' : undefined} className="iec-input" placeholder="07XXXXXXXX" required type="tel" maxLength={16} value={reg.phone} onChange={setRegField('phone')} />
+                    <FieldError id="member-phone-error" message={regErrors.phone} />
                   </div>
                   <div className="md:col-span-2">
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">JKUAT Email *</label>
-                    <input className="iec-input" placeholder="user@students.jkuat.ac.ke" required type="email" value={reg.email} onChange={setRegField('email')} />
+                    <label className="block text-[13px] font-medium text-white/60 mb-1.5" htmlFor="member-email">JKUAT Email *</label>
+                    <input id="member-email" aria-invalid={Boolean(regErrors.email)} aria-describedby={regErrors.email ? 'member-email-error' : undefined} className="iec-input" placeholder="user@students.jkuat.ac.ke" required type="email" maxLength={254} value={reg.email} onChange={setRegField('email')} />
+                    <FieldError id="member-email-error" message={regErrors.email} />
                   </div>
                   <div className="md:col-span-2 mt-2">
                     <button className="btn-primary w-full justify-center" type="submit" disabled={regBusy}>
                       {regBusy ? (
-                        <>
-                          <span className="material-symbols-outlined animate-spin text-[18px]">refresh</span> Registering…
-                        </>
+                        'Registering…'
                       ) : (
-                        <>
-                          Register <span className="material-symbols-outlined text-[18px]">chevron_right</span>
-                        </>
+                        <>Continue to activation <FiArrowRight aria-hidden="true" /></>
                       )}
                     </button>
                   </div>
                 </form>
               </div>
             ) : (
-              <div className="p-5 sm:p-8 md:p-10">
+              <div className="membership-form-panel">
                 <div className="text-center mb-8">
-                  <div className="inline-flex w-14 h-14 rounded-full items-center justify-center mb-4" style={{ background: 'rgba(0,174,239,0.12)' }}>
-                    <span className="material-symbols-outlined text-iec-blue" style={{ fontSize: '28px', fontVariationSettings: "'FILL' 1" }}>payments</span>
+                  <div className="membership-payment-icon">
+                    <FiCreditCard aria-hidden="true" />
                   </div>
-                  <h3 className="font-display font-bold text-white text-xl mb-1">Activate Membership</h3>
-                  <p className="text-white/40 text-sm">New member or renewing for a new semester? Pay KES 200 via M-Pesa.</p>
+                  <h3 className="font-display font-bold text-white text-xl mb-1">Activate membership</h3>
+                  <p className="text-white/40 text-sm">Complete your membership activation securely using M‑Pesa.</p>
                 </div>
-                <form className="max-w-sm mx-auto space-y-4" onSubmit={handlePayment}>
+                <form noValidate className="membership-payment-fields" onSubmit={handlePayment}>
                   <div>
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">Registration Number *</label>
-                    <div className="flex gap-2">
+                    <label className="block text-[13px] font-medium text-white/60 mb-1.5" htmlFor="activation-reg-number">Registration number *</label>
+                    <div className="membership-registration-row">
                       <input
+                        id="activation-reg-number"
                         className="iec-input flex-1"
                         placeholder="SCT211-XXXX/20XX"
                         required
                         type="text"
+                        maxLength={50}
+                        aria-invalid={Boolean(payErrors.reg)}
+                        aria-describedby={payErrors.reg ? 'payment-reg-error' : undefined}
                         value={payReg}
                         onChange={(e) => {
                           // A looked-up member belongs to the old value; never pay for them by mistake.
                           setPayReg(e.target.value);
+                          setPayErrors((current) => ({ ...current, reg: undefined }));
                           setMemberId(null);
                           setPreview(null);
                         }}
@@ -752,75 +658,76 @@ function JoinSection() {
                         type="button"
                         onClick={lookupMember}
                         disabled={lookupBusy}
-                        className="px-4 py-2 text-sm font-bold rounded text-iec-blue shrink-0 hover:bg-white/5 transition-all"
+                        className="membership-find-button"
                         style={{ border: '1px solid rgba(0,174,239,0.4)' }}
                       >
-                        {lookupBusy ? '…' : 'Find'}
+                        {lookupBusy ? 'Finding…' : 'Find member'}
                       </button>
                     </div>
-                    <p className="text-white/40 text-xs mt-1.5">Enter your reg number and click Find, or just pay directly.</p>
+                    <FieldError id="payment-reg-error" message={payErrors.reg} />
+                    <p className="text-white/40 text-xs mt-1.5">We’ll confirm your membership before sending the payment prompt.</p>
                   </div>
 
                   {preview && (
-                    <div className="px-4 py-3 rounded flex items-center gap-3" style={{ background: 'rgba(0,174,239,0.08)', border: '1px solid rgba(0,174,239,0.2)' }}>
-                      <span className="material-symbols-outlined text-iec-blue text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>account_circle</span>
+                    <div className="membership-preview">
+                      <FiUsers className="membership-preview-icon" aria-hidden="true" />
                       <div className="min-w-0">
                         <p className="text-white text-sm font-semibold truncate">{preview.full_name || '—'}</p>
                         <p className="text-white/40 text-xs truncate">{preview.reg_number || '—'}</p>
                       </div>
-                      <span className="material-symbols-outlined text-iec-blue text-[16px] ml-auto shrink-0">check_circle</span>
+                      <FiCheck className="membership-preview-check" aria-hidden="true" />
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between px-4 py-3 rounded" style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                    <span className="text-white/35 text-xs uppercase tracking-widest">Amount Due</span>
+                  <div className="membership-amount">
+                    <span className="text-white/35 text-xs uppercase tracking-widest">Amount due</span>
                     <span className="font-display font-extrabold text-iec-blue text-2xl">KES 200</span>
                   </div>
 
                   <div>
-                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">M-Pesa Number *</label>
-                    <input className="iec-input" placeholder="07XXXXXXXX" required type="tel" value={payPhone} onChange={(e) => setPayPhone(e.target.value)} />
-                    <p className="text-white/40 text-xs mt-1.5">Can be any Safaricom number — yours or someone else's.</p>
+                    <label className="block text-[13px] font-medium text-white/60 mb-1.5">M‑Pesa number *</label>
+                    <input id="payment-phone" aria-invalid={Boolean(payErrors.phone)} aria-describedby={payErrors.phone ? 'payment-phone-error' : undefined} className="iec-input" placeholder="07XXXXXXXX" required type="tel" maxLength={16} value={payPhone} onChange={(e) => {
+                      setPayPhone(e.target.value);
+                      setPayErrors((current) => ({ ...current, phone: undefined }));
+                    }} />
+                    <FieldError id="payment-phone-error" message={payErrors.phone} />
+                    <p className="text-white/40 text-xs mt-1.5">Use any Safaricom number that can receive an M‑Pesa prompt.</p>
                   </div>
 
                   <button className="btn-primary w-full justify-center" type="submit" disabled={payBusy}>
                     {payBusy ? (
-                      <>
-                        <span className="material-symbols-outlined animate-spin text-[18px]">refresh</span> Processing…
-                      </>
+                    'Sending payment request…'
                     ) : (
-                      <>
-                        Pay via M-Pesa <span className="material-symbols-outlined text-[18px]">bolt</span>
-                      </>
+                    <>Pay securely with M‑Pesa <FiArrowRight aria-hidden="true" /></>
                     )}
                   </button>
                 </form>
 
                 {status && (
-                  <div className="mt-6 p-5 rounded text-center" style={{ background: status.ok ? 'rgba(0,174,239,0.08)' : 'rgba(239,68,68,0.08)', border: `1px solid ${status.ok ? 'rgba(0,174,239,0.2)' : 'rgba(239,68,68,0.2)'}` }}>
+                  <div className={`membership-status ${status.ok ? 'is-success' : 'is-error'}`}>
                     {status.ok ? (
                       <>
-                        <div className="flex items-center justify-center gap-2 text-iec-blue font-semibold text-sm">
-                          <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>check_circle</span>
+                        <div className="membership-status-success">
+                          <FiCheck aria-hidden="true" />
                           STK Push sent!
                         </div>
-                        <p className="text-white/40 text-xs mt-2">Check your phone for the M-Pesa prompt and enter your PIN.</p>
-                        <p className="text-white/40 text-xs mt-1">Ref: {status.ref || '—'}</p>
+                        <p>Check your phone for the M‑Pesa prompt and enter your PIN.</p>
+                        <p>Reference: {status.ref || '—'}</p>
                       </>
                     ) : (
                       <>
-                        <div className="flex items-center justify-center gap-2 text-red-400 font-semibold text-sm">
-                          <span className="material-symbols-outlined text-[18px]">error</span>
+                        <div className="membership-status-error">
+                          <FiAlertCircle aria-hidden="true" />
                           Payment failed
                         </div>
-                        <p className="text-white/40 text-xs mt-2">{status.error}</p>
+                        <p>{status.error}</p>
                       </>
                     )}
                   </div>
                 )}
 
-                <p className="text-center mt-6">
-                  <button onClick={() => setStep(1)} className="text-white/50 text-xs hover:text-white/70 transition-colors">
+                <p className="membership-register-link">
+                  <button type="button" onClick={() => setStep(1)}>
                     ← Register a new member instead
                   </button>
                 </p>
@@ -831,4 +738,9 @@ function JoinSection() {
       </div>
     </section>
   );
+}
+
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null;
+  return <p id={id} className="field-error" role="alert">{message}</p>;
 }

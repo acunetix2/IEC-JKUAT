@@ -1,10 +1,11 @@
 // IEC JKUAT — Events list. Ported from events.html + events.js.
-// Fetches events via getEvents(), renders alternating image/content cards
+// Fetches events via getEvents(), renders a filterable event-card grid,
 // (image left/right by index), supports track filters, and shows a community
 // gallery built from all event media (hidden when there are no photos).
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FiArrowUpRight, FiCalendar, FiChevronLeft, FiChevronRight, FiMapPin } from 'react-icons/fi';
 import { getEvents } from '../lib/supabase';
 import { parseMediaUrls, isPreviewImage, EVENT_FALLBACK_IMG } from '../lib/media';
 import type { EventRow } from '../types/db';
@@ -18,18 +19,28 @@ const FILTERS = [
   { track: 'networking', label: 'Networking' },
 ];
 
-const TRACK_ACCENT: Record<string, string> = {
-  fintech: '#18C8FF',
-  agtech: '#22c55e',
-  hackathon: '#18C8FF',
-  featured: '#18C8FF',
-  leadership: '#FBB03B',
-  networking: '#ef4444',
-  workshop: '#22c55e',
-};
-
 function trackKey(category?: string): string {
   return (category || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+}
+
+function dateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function eventDateKey(value?: string): string | null {
+  if (!value) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (match) return `${match[1]}-${match[2]}-${match[3]}`;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : dateKey(date);
+}
+
+function dateFromKey(key: string): Date {
+  const [year, month, day] = key.split('-').map(Number);
+  return new Date(year, month - 1, day);
 }
 
 export default function Events() {
@@ -71,22 +82,32 @@ export default function Events() {
   }, [events]);
 
   return (
-    <main style={{ paddingTop: '72px' }}>
-      {/* Header + filters */}
-      <section className="px-6 md:px-16 max-w-screen-xl mx-auto pt-10 pb-8 md:pt-14 md:pb-10 text-center">
-        <p className="section-label mb-4">What's Happening</p>
-        <h1
-          className="font-display font-extrabold text-white mb-4"
-          style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)', lineHeight: 1.05, letterSpacing: '-0.03em' }}
-        >
-          Events &amp; Programs
-        </h1>
-        <p className="text-white/60 text-base max-w-xl mx-auto leading-relaxed mb-6">
-          Hackathons, workshops, pitch nights and founder sessions. Stay connected with what's happening inside IEC
-          JKUAT.
-        </p>
-        <p className="text-white/30 text-xs mb-4">{filtered.length} events</p>
-        <div className="flex flex-wrap justify-center gap-2" id="event-filters" role="group" aria-label="Filter events by track">
+    <main className="catalog-page events-page">
+      <section className="catalog-hero events-hero">
+        <div className="catalog-hero-copy">
+          <p className="section-label">Meet · Learn · Make</p>
+          <h1>Good things happen when we get together.</h1>
+          <p>Workshops, founder conversations and hands-on sessions that bring the IEC JKUAT community into the room.</p>
+          <div className="catalog-hero-details">
+            <span><strong>{events.length}</strong> events listed</span>
+            <a href="#event-list" className="catalog-hero-action">Explore events <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+        <figure className="catalog-hero-image photo-overlay-container">
+          <img src="/uploads/iec-03.jpg" alt="Students meeting and sharing ideas at IEC JKUAT" />
+          <figcaption className="photo-reveal"><strong>Make time to connect</strong><span>See you at the next one.</span></figcaption>
+        </figure>
+      </section>
+
+      <section className="catalog-section events-section" id="event-list" aria-labelledby="events-heading">
+        <div className="catalog-section-heading">
+          <div>
+            <p className="section-label">What’s on</p>
+            <h2 id="events-heading">Events &amp; programs</h2>
+          </div>
+          <p>Find a session to learn something new, meet a collaborator or share what you’re working on.</p>
+        </div>
+        <div className="catalog-filter-row" id="event-filters" role="group" aria-label="Filter events by track">
           {FILTERS.map((f) => (
             <button
               key={f.track}
@@ -98,33 +119,30 @@ export default function Events() {
             </button>
           ))}
         </div>
-      </section>
-
-      {/* Event list */}
-      <section className="px-6 md:px-16 max-w-screen-xl mx-auto mb-20">
-        <hr className="section-divider" style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.07)', marginBottom: '2rem' }} />
-        <div className="space-y-4">
+        <EventsCalendar events={events} />
+        <p className="catalog-result-count">{filtered.length} {filtered.length === 1 ? 'event' : 'events'}</p>
+        <div className="events-catalog-grid">
           {loading ? (
-            <div className="py-16 text-center text-white/30">
-              <span className="material-symbols-outlined animate-spin inline-block text-3xl mb-3">sync</span>
-              <p className="text-sm">Loading events...</p>
+            <div className="catalog-empty-state">
+              <span className="material-symbols-outlined animate-spin" aria-hidden="true">sync</span>
+              <p>Loading events...</p>
             </div>
           ) : error ? (
-            <p className="text-red-500 py-16 text-center">Failed to load events: {error}</p>
+            <p className="catalog-empty-state" role="alert">Failed to load events: {error}</p>
           ) : filtered.length === 0 ? (
-            <div className="py-16 text-center" style={{ color: 'rgba(255,255,255,0.25)' }}>
-              <span className="material-symbols-outlined text-4xl mb-4 block">event_busy</span>
-              <p className="text-sm">No events scheduled yet. Check back soon.</p>
+            <div className="catalog-empty-state">
+              <span className="material-symbols-outlined" aria-hidden="true">event_busy</span>
+              <p>No events in this track right now. Check back soon for the next gathering.</p>
             </div>
           ) : (
-            filtered.map((event, index) => <EventCard key={event.id} event={event} index={index} />)
+            filtered.map((event) => <EventCard key={event.id} event={event} />)
           )}
         </div>
       </section>
 
       {/* Community gallery — only when there are photos */}
       {galleryImages.length > 0 && (
-        <section className="py-20 px-6 md:px-16 max-w-screen-xl mx-auto">
+        <section className="catalog-section events-gallery">
           <div className="mb-12">
             <p className="section-label mb-4">Community</p>
             <h2 className="font-display font-bold text-white" style={{ fontSize: 'clamp(1.8rem, 3vw, 2.5rem)' }}>
@@ -137,15 +155,19 @@ export default function Events() {
               return (
                 <div
                   key={i}
-                  className={`aspect-square overflow-hidden ${i < 2 ? '' : offset}`}
+                  className={`event-gallery-photo photo-overlay-container aspect-square overflow-hidden ${i < 2 ? '' : offset}`}
                   style={{ borderRadius: '12px', border: '1px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}
                 >
                   <img
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                    className="w-full h-full object-cover"
                     loading="lazy"
                     src={img}
                     alt={`Event photo ${i + 1}`}
                   />
+                  <div className="photo-reveal">
+                    <strong>From the IEC community</strong>
+                    <span>Real moments from IEC JKUAT events.</span>
+                  </div>
                 </div>
               );
             })}
@@ -156,7 +178,119 @@ export default function Events() {
   );
 }
 
-function EventCard({ event, index }: { event: EventRow; index: number }) {
+function EventsCalendar({ events }: { events: EventRow[] }) {
+  const todayKey = dateKey(new Date());
+  const [selectedDate, setSelectedDate] = useState(todayKey);
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), 1);
+  });
+
+  const eventsByDate = useMemo(() => {
+    const grouped = new Map<string, EventRow[]>();
+    events.forEach((event) => {
+      const key = eventDateKey(event.event_date);
+      if (!key) return;
+      grouped.set(key, [...(grouped.get(key) ?? []), event]);
+    });
+    return grouped;
+  }, [events]);
+
+  const firstDay = new Date(visibleMonth.getFullYear(), visibleMonth.getMonth(), 1);
+  const gridStart = new Date(firstDay.getFullYear(), firstDay.getMonth(), 1 - firstDay.getDay());
+  const calendarDays = Array.from({ length: 42 }, (_, index) => {
+    const day = new Date(gridStart.getFullYear(), gridStart.getMonth(), gridStart.getDate() + index);
+    return { day, key: dateKey(day), inMonth: day.getMonth() === visibleMonth.getMonth() };
+  });
+  const selectedEvents = eventsByDate.get(selectedDate) ?? [];
+  const selectedDateLabel = dateFromKey(selectedDate).toLocaleDateString('en-KE', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  });
+
+  function shiftMonth(delta: number) {
+    setVisibleMonth((month) => new Date(month.getFullYear(), month.getMonth() + delta, 1));
+  }
+
+  function selectDay(key: string) {
+    setSelectedDate(key);
+    const day = dateFromKey(key);
+    if (day.getMonth() !== visibleMonth.getMonth() || day.getFullYear() !== visibleMonth.getFullYear()) {
+      setVisibleMonth(new Date(day.getFullYear(), day.getMonth(), 1));
+    }
+  }
+
+  return (
+    <section className="events-calendar" aria-labelledby="events-calendar-title">
+      <div className="events-calendar-heading">
+        <div>
+          <p className="events-calendar-eyebrow"><FiCalendar aria-hidden="true" /> Event schedule</p>
+          <h3 id="events-calendar-title">Find a date to join us</h3>
+          <p>Scheduled events are marked on the calendar. Select a date to see what’s happening.</p>
+        </div>
+        <div className="events-calendar-month-nav">
+          <button type="button" onClick={() => shiftMonth(-1)} aria-label="Previous month">
+            <FiChevronLeft aria-hidden="true" />
+          </button>
+          <strong aria-live="polite">
+            {visibleMonth.toLocaleDateString('en-KE', { month: 'long', year: 'numeric' })}
+          </strong>
+          <button type="button" onClick={() => shiftMonth(1)} aria-label="Next month">
+            <FiChevronRight aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+
+      <div className="events-calendar-layout">
+        <div className="events-calendar-grid" role="group" aria-label="Event calendar">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+            <span className="events-calendar-weekday" key={day}>{day}</span>
+          ))}
+          {calendarDays.map(({ day, key, inMonth }) => {
+            const dayEvents = eventsByDate.get(key) ?? [];
+            const isSelected = selectedDate === key;
+            return (
+              <button
+                type="button"
+                key={key}
+                className={`events-calendar-day${inMonth ? '' : ' is-outside'}${isSelected ? ' is-selected' : ''}${key === todayKey ? ' is-today' : ''}${dayEvents.length ? ' has-events' : ''}`}
+                aria-pressed={isSelected}
+                aria-label={`${day.toLocaleDateString('en-KE', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}${dayEvents.length ? `, ${dayEvents.length} scheduled ${dayEvents.length === 1 ? 'event' : 'events'}` : ''}`}
+                onClick={() => selectDay(key)}
+              >
+                <span>{day.getDate()}</span>
+                {dayEvents.length > 0 && <span className="events-calendar-dots" aria-hidden="true">{dayEvents.length > 1 ? '••' : '•'}</span>}
+              </button>
+            );
+          })}
+        </div>
+
+        <aside className="events-calendar-agenda" aria-live="polite">
+          <p className="events-calendar-agenda-label">Selected day</p>
+          <h4>{selectedDateLabel}</h4>
+          {selectedEvents.length === 0 ? (
+            <p className="events-calendar-empty">Nothing scheduled for this date yet. Choose another marked day to explore an event.</p>
+          ) : (
+            <div className="events-calendar-event-list">
+              {selectedEvents.map((event) => (
+                <Link to={`/event?id=${event.id}`} className="events-calendar-event" key={event.id}>
+                  <span className="events-calendar-event-track">{event.category || 'IEC Event'}</span>
+                  <strong>{event.title}</strong>
+                  <span className="events-calendar-event-location"><FiMapPin aria-hidden="true" /> {event.location || 'JKUAT Main Campus'}</span>
+                  <span className="events-calendar-event-link">Event details <FiArrowUpRight aria-hidden="true" /></span>
+                </Link>
+              ))}
+            </div>
+          )}
+        </aside>
+      </div>
+    </section>
+  );
+}
+
+function EventCard({ event }: { event: EventRow }) {
   const category = event.category || undefined;
   const date = event.event_date ? new Date(event.event_date) : null;
   const validDate = date && !isNaN(date.getTime());
@@ -165,101 +299,39 @@ function EventCard({ event, index }: { event: EventRow; index: number }) {
   const year = validDate ? date!.getFullYear() : '';
   const isPast = Boolean(validDate && date! < new Date());
   const track = trackKey(category);
-  const imageRight = index % 2 !== 0;
-
   const mediaUrls = parseMediaUrls(event.media_urls);
   const previewImg = mediaUrls.find((u) => isPreviewImage(u)) || EVENT_FALLBACK_IMG;
-  const accentColor = TRACK_ACCENT[track] || '#18C8FF';
   const categoryLabel = category || 'Event';
-
-  const imageHalf = (
-    <div className={`w-full md:w-1/2 relative ${imageRight ? 'md:order-2' : 'md:order-1'}`} style={{ minHeight: '280px' }}>
-      <img
-        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        src={previewImg}
-        alt={event.title}
-        loading="lazy"
-        style={isPast ? { filter: 'grayscale(35%)', opacity: 0.8 } : undefined}
-      />
-      <div className="absolute top-3 left-3 md:top-5 md:left-5 flex gap-2">
-        <span
-          className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider text-white px-2.5 py-1 md:px-3 md:py-1.5"
-          style={{ background: accentColor, color: '#000', borderRadius: '6px' }}
-        >
-          {categoryLabel}
-        </span>
-        {isPast ? (
-          <span
-            className="text-[10px] md:text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 md:px-3 md:py-1.5"
-            style={{ color: '#ffffff', background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(6px)', borderRadius: '6px' }}
-          >
-            Past
-          </span>
-        ) : (
-          <span
-            className="text-[10px] md:text-[11px] font-bold px-2.5 py-1 md:px-3 md:py-1.5"
-            style={{
-              color: '#ffffff',
-              background: 'rgba(0,0,0,0.6)',
-              backdropFilter: 'blur(6px)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '6px',
-            }}
-          >
-            {day} {month} {year}
-          </span>
-        )}
-      </div>
-    </div>
-  );
-
-  const contentHalf = (
-    <div
-      className={`w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col justify-center ${imageRight ? 'md:order-1' : 'md:order-2'}`}
-      style={{ background: 'rgba(255,255,255,0.02)' }}
-    >
-      <p className="section-label mb-3 flex items-center gap-2">
-        <span className="material-symbols-outlined text-[14px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-          bolt
-        </span>
-        {categoryLabel}
-      </p>
-      <h2 className="event-title font-display font-bold mb-4" style={{ fontSize: 'clamp(1.5rem, 3vw, 2.2rem)', lineHeight: 1.1 }}>
-        {event.title}
-      </h2>
-      <p className="event-desc text-sm leading-relaxed mb-5 max-w-md line-clamp-3 sm:line-clamp-4">{event.description}</p>
-      {event.location && (
-        <p className="flex items-center gap-1.5 text-white/50 text-xs mb-5">
-          <span className="material-symbols-outlined text-[14px]">location_on</span>
-          {event.location}
-        </p>
-      )}
-      <div className="flex flex-wrap gap-3 justify-center">
-        <span className="btn-primary text-sm py-2.5">
-          View Details <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-        </span>
-      </div>
-    </div>
-  );
+  const imageDescription = event.title ? `${event.title} event` : 'IEC JKUAT event';
 
   return (
     <Link
       to={`/event?id=${event.id}`}
-      className="event-card group relative overflow-hidden flex flex-col md:flex-row"
+      className="event-card event-catalog-card group"
       data-track={track}
       aria-label={`View details for ${event.title}`}
-      style={{
-        minHeight: '320px',
-        display: 'flex',
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        borderRadius: '8px',
-        textDecoration: 'none',
-        color: 'inherit',
-      }}
     >
-      {imageHalf}
-      {contentHalf}
+      <div className="event-catalog-image">
+        <img src={previewImg} alt={imageDescription} loading="lazy" style={isPast ? { filter: 'grayscale(25%)' } : undefined} />
+        <span className="event-catalog-track">{categoryLabel}</span>
+        <span className="event-catalog-date"><strong>{day}</strong><span>{month || 'DATE'}{year ? ` · ${year}` : ''}</span></span>
+        {isPast && <span className="event-catalog-past">Past event</span>}
+        <div className="catalog-card-reveal" aria-hidden="true">
+          <strong>{event.title}</strong>
+          <p>{event.description || 'Details for this IEC JKUAT event will be shared soon.'}</p>
+          <small>{event.location || 'JKUAT Main Campus'} · {day} {month} {year}</small>
+          <span>Explore event <span aria-hidden="true">↗</span></span>
+        </div>
+      </div>
+      <div className="event-catalog-copy">
+        <p className="section-label">{categoryLabel}</p>
+        <h3>{event.title}</h3>
+        <p className="event-catalog-description">{event.description || 'Details for this IEC JKUAT event will be shared soon.'}</p>
+        <div className="event-catalog-footer">
+          <span>{event.location || 'JKUAT Main Campus'}</span>
+          <span>View event <span aria-hidden="true">↗</span></span>
+        </div>
+      </div>
     </Link>
   );
 }

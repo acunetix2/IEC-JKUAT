@@ -33,7 +33,9 @@ export default function SiteLayout() {
     <>
       <Nav onMenuOpen={() => setMenuOpen(true)} />
       <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <Outlet />
+      <div className="site-route-transition" key={location.pathname}>
+        <Outlet />
+      </div>
       <Footer />
     </>
   );

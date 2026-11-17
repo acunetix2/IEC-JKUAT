@@ -1,7 +1,7 @@
 {
   "version": 2,
-  "installCommand": "cd web && npm ci",
-  "buildCommand": "cd web && npm run build",
+  "installCommand": "cd web && npm ci && cd ../admin && npm ci",
+  "buildCommand": "cd web && npm run build && cd ../admin && npm run build",
   "outputDirectory": "web/dist",
   "framework": null,
   "cleanUrls": true,

@@ -2,7 +2,7 @@
 # `supabase functions deploy <name>` reads these, so a deploy without the
 # --no-verify-jwt flag can no longer switch JWT checking back on.
 
-project_id = "utdcvzeteiijxwgmzwcs"
+project_id = "ccnzdnkvyigrcwpaxqxq"
 
 # Called by the public site with the anon key. Abuse protection lives in
 # the function itself (fixed fee, member check, one pending push).
@@ -14,4 +14,14 @@ verify_jwt = false
 # payments never complete and memberships never activate. The function
 # authenticates callers itself with the x-lipana-signature HMAC.
 [functions.payment-webhook]
+verify_jwt = false
+
+# The admin portal uses signed-in Supabase Auth sessions. The function also
+# checks the caller against public.admins before using the service-role key.
+[functions.admin-api]
+verify_jwt = true
+
+# Public endpoint is protected by a one-time server-side setup secret and
+# closes automatically after the first owner account is created.
+[functions.bootstrap-admin]
 verify_jwt = false

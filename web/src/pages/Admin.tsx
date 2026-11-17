@@ -35,21 +35,24 @@ import {
   markMessageRead,
   deleteContactMessage,
   getPayments,
+  getMerchOrders,
+  updateMerchOrderStatus,
   supabase,
 } from '../lib/supabase';
 import { parseJsonList } from '../lib/media';
 import { parseEmbedUrls } from '../lib/embeds';
 import { uploadMedia, isVideoUrl, STORAGE_BUCKETS } from '../lib/storage';
-import { getTimeAgo } from '../lib/format';
-import type { Member, EventRow, Project, Product, ContactMessage, Payment } from '../types/db';
+import { formatMerchOrderReference, getTimeAgo } from '../lib/format';
+import type { Member, EventRow, Project, Product, ContactMessage, Payment, MerchOrder, MerchOrderStatus } from '../types/db';
 
-type Tab = 'members' | 'events' | 'projects' | 'products' | 'messages' | 'payments';
+type Tab = 'members' | 'events' | 'projects' | 'products' | 'orders' | 'messages' | 'payments';
 
 const TABS: { key: Tab; label: string; icon: string }[] = [
   { key: 'members', label: 'Members', icon: 'group' },
   { key: 'events', label: 'Events', icon: 'calendar_month' },
   { key: 'projects', label: 'Projects', icon: 'rocket_launch' },
-  { key: 'products', label: 'Products', icon: 'shopping_bag' },
+  { key: 'products', label: 'Products', icon: 'storefront' },
+  { key: 'orders', label: 'Orders', icon: 'receipt_long' },
   { key: 'messages', label: 'Messages', icon: 'mail' },
   { key: 'payments', label: 'Payments', icon: 'payments' },
 ];
@@ -228,6 +231,7 @@ function AdminApp({ adminEmail, onLogout }: { adminEmail: string; onLogout: () =
           {tab === 'events' && <EventsTab q={q} />}
           {tab === 'projects' && <ProjectsTab q={q} />}
           {tab === 'products' && <ProductsTab q={q} />}
+          {tab === 'orders' && <OrdersTab q={q} />}
           {tab === 'messages' && <MessagesTab q={q} />}
           {tab === 'payments' && <PaymentsTab q={q} />}
         </div>
@@ -760,6 +764,10 @@ function MemberModal({ member, onClose, onSaved }: { member: Member; onClose: ()
       </form>
     </Modal>
   );
+}
+
+function isMerchOrderStatus(value: string): value is MerchOrderStatus {
+  return value === 'pending' || value === 'confirmed' || value === 'fulfilled' || value === 'cancelled';
 }
 
 // ═══════════════════════════════════════════════════
@@ -1314,6 +1322,159 @@ function ProductModal({ product, onClose, onSaved }: { product: Product | null; 
         <ModalActions busy={busy} onClose={onClose} label="Save Product" />
       </form>
     </Modal>
+  );
+}
+
+// ═══════════════════════════════════════════════════
+// MERCHANDISE ORDERS
+// ═══════════════════════════════════════════════════
+function OrdersTab({ q }: { q: string }) {
+  const { toast } = useToast();
+  const [orders, setOrders] = useState<MerchOrder[] | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  const load = useCallback(() => {
+    getMerchOrders()
+      .then((rows) => {
+        setOrders(rows);
+        setLoadError('');
+      })
+      .catch((error) => setLoadError(errMsg(error)));
+  }, []);
+  useEffect(load, [load]);
+
+  const all = orders ?? [];
+  const pending = all.filter((order) => order.status === 'pending');
+  const confirmed = all.filter((order) => order.status === 'confirmed');
+  const fulfilled = all.filter((order) => order.status === 'fulfilled');
+  const list = all.filter((order) => {
+    if (!q) return true;
+    const itemText = (order.items ?? []).map((item) => `${item.product_name} ${item.size ?? ''}`).join(' ');
+    return [order.id, order.customer_name, order.customer_phone, itemText]
+      .some((value) => value.toLowerCase().includes(q));
+  });
+
+  async function changeStatus(order: MerchOrder, status: MerchOrderStatus) {
+    if (status === order.status) return;
+    setUpdatingId(order.id);
+    try {
+      await updateMerchOrderStatus(order.id, status);
+      setOrders((current) => (current ?? []).map((row) => row.id === order.id ? { ...row, status } : row));
+      toast('Order status updated', 'success');
+    } catch (error) {
+      toast(errMsg(error), 'error');
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  return (
+    <div>
+      <ViewHeader title="Merchandise Orders" subtitle="Customer details, ordered items, totals, and fulfilment status">
+        <button onClick={load} className="btn-ghost-sm">
+          <span className="material-symbols-outlined text-[15px]">refresh</span> Refresh
+        </button>
+      </ViewHeader>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <StatCard label="Total orders" value={orders ? all.length : '—'} color="text-iec-blue" />
+        <StatCard label="Pending confirmation" value={orders ? pending.length : '—'} color="text-iec-gold" />
+        <StatCard label="Confirmed" value={orders ? confirmed.length : '—'} color="text-green-400" />
+        <StatCard label="Fulfilled" value={orders ? fulfilled.length : '—'} color="text-white" />
+      </div>
+      <div className="admin-card overflow-x-auto">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Order</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {loadError ? (
+              <tr>
+                <td colSpan={6} className="text-center py-8 text-red-400 text-sm">
+                  Failed to load orders: {loadError}
+                </td>
+              </tr>
+            ) : !orders ? (
+              <EmptyRow cols={6}>Loading orders…</EmptyRow>
+            ) : list.length === 0 ? (
+              <EmptyRow cols={6}>No merchandise orders yet.</EmptyRow>
+            ) : (
+              list.map((order) => {
+                const reference = formatMerchOrderReference(order.id);
+                return (
+                  <tr key={order.id}>
+                    <td>
+                      <p className="font-semibold text-white">{reference}</p>
+                      <p className="text-white/30 text-[10px] font-mono">{order.id}</p>
+                    </td>
+                    <td>
+                      <p className="font-medium">{order.customer_name}</p>
+                      <a className="text-iec-blue text-xs hover:underline" href={`tel:${order.customer_phone}`}>
+                        {order.customer_phone}
+                      </a>
+                    </td>
+                    <td>
+                      <div className="space-y-1 min-w-[180px]">
+                        {(order.items ?? []).map((item) => (
+                          <p key={item.id} className="text-xs text-white/65">
+                            {item.quantity}× {item.product_name}
+                            {item.size ? <span className="text-white/35"> · Size {item.size}</span> : null}
+                            <span className="block text-white/35">KES {(item.unit_price * item.quantity).toLocaleString()}</span>
+                          </p>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="text-white font-semibold whitespace-nowrap">
+                      KES {Number(order.total_amount).toLocaleString()}
+                    </td>
+                    <td>
+                      <select
+                        className="admin-input h-9 text-xs min-w-[145px]"
+                        aria-label={`Update status for ${reference}`}
+                        value={order.status}
+                        disabled={updatingId === order.id}
+                        onChange={(event) => {
+                          const status = event.target.value;
+                          if (isMerchOrderStatus(status)) void changeStatus(order, status);
+                        }}
+                      >
+                        <option value="pending">Pending confirmation</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="fulfilled">Fulfilled</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                    </td>
+                    <td className="text-white/40 text-xs whitespace-nowrap">
+                      {order.created_at
+                        ? new Date(order.created_at).toLocaleString('en-GB', {
+                            day: 'numeric',
+                            month: 'short',
+                            year: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : '—'}
+                    </td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+      {orders && all.length > 0 && (
+        <p className="text-white/30 text-xs mt-3">
+          New orders are saved as pending; update the status after confirming payment or fulfilment.
+        </p>
+      )}
+    </div>
   );
 }
 

@@ -107,13 +107,13 @@ function ProjectBody({ project }: { project: Project }) {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
       {/* Left: main content */}
       <div className="lg:col-span-2">
-        <div className="relative overflow-hidden rounded-xl mb-8" style={{ height: 'clamp(260px,40vw,480px)', background: '#000' }}>
+        <div className="detail-gallery photo-overlay-container relative overflow-hidden rounded-xl mb-8" style={{ height: 'clamp(260px,40vw,480px)', background: '#000' }}>
           {images.map((img, i) => (
             <img
               key={i}
               src={img}
               alt={project.name}
-              className="gallery-img"
+              className={`gallery-img${i === galIdx ? ' is-active' : ''}`}
               style={{ opacity: i === galIdx ? 1 : 0 }}
               loading={i === 0 ? undefined : 'lazy'}
             />
@@ -122,6 +122,7 @@ function ProjectBody({ project }: { project: Project }) {
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to top,rgba(7,16,26,0.6) 0%,transparent 50%)', pointerEvents: 'none' }}
           />
+          <div className="photo-reveal"><strong>{project.name}</strong><span>{category}</span></div>
           {total > 1 && (
             <>
               <button

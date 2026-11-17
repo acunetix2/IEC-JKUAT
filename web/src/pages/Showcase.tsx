@@ -1,9 +1,11 @@
 // IEC JKUAT — Project showcase. Ported from showcase.html + showcase.js.
-// Fetches projects via getProjects(), renders alternating image/content cards,
-// supports category filters, and shows the incubation CTA.
+// Fetches projects via getProjects(), renders a filterable project-card grid,
+// and links students to the membership form.
 
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { FiArrowRight, FiArrowUpRight } from 'react-icons/fi';
+import PhotoSlideshow from '../components/PhotoSlideshow';
 import { getProjects } from '../lib/supabase';
 import { parseMediaUrls, isPreviewImage, PROJECT_FALLBACK_IMG } from '../lib/media';
 import type { Project } from '../types/db';
@@ -15,13 +17,6 @@ const FILTERS = [
   { category: 'healthtech', label: 'HealthTech' },
   { category: 'social', label: 'Social Impact' },
 ];
-
-type StatusStyle = { color: string; bg: string; border: string; bar: string };
-const STATUS_STYLE: Record<string, StatusStyle> = {
-  Incubating: { color: '#18C8FF', bg: 'rgba(24,200,255,0.12)', border: 'rgba(24,200,255,0.3)', bar: '#18C8FF' },
-  'MVP Live': { color: '#22c55e', bg: 'rgba(34,197,94,0.12)', border: 'rgba(34,197,94,0.3)', bar: '#22c55e' },
-  Ideation: { color: '#FBB03B', bg: 'rgba(251,176,59,0.12)', border: 'rgba(251,176,59,0.3)', bar: '#FBB03B' },
-};
 
 function catKey(category?: string): string {
   return (category || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
@@ -56,22 +51,32 @@ export default function Showcase() {
   );
 
   return (
-    <main style={{ paddingTop: '72px' }}>
-      {/* Header + filters */}
-      <section className="px-6 md:px-16 max-w-screen-xl mx-auto pt-10 pb-8 md:pt-14 md:pb-10 text-center">
-        <p className="section-label mb-4">What We're Building</p>
-        <h1
-          className="font-display font-extrabold text-white mb-4"
-          style={{ fontSize: 'clamp(2.2rem, 5vw, 4rem)', lineHeight: 1.05, letterSpacing: '-0.03em' }}
-        >
-          Project Showcase
-        </h1>
-        <p className="text-white/60 text-base max-w-xl mx-auto leading-relaxed mb-6">
-          Student startups, prototypes and ventures built inside IEC JKUAT. Ideas that started in a lecture hall and
-          grew beyond it.
-        </p>
-        <p className="text-white/30 text-xs mb-4">{filtered.length} projects</p>
-        <div className="flex flex-wrap justify-center gap-2" id="project-filters" role="group" aria-label="Filter projects by category">
+    <main className="catalog-page projects-page">
+      <section className="catalog-hero projects-hero">
+        <div className="catalog-hero-copy">
+          <p className="section-label">Innovations · JKUAT</p>
+          <h1>Student ideas, built into something real.</h1>
+          <p>Meet the teams turning questions into prototypes, ventures and useful work across our community.</p>
+          <div className="catalog-hero-details">
+            <span><strong>{projects.length}</strong> projects shared</span>
+            <Link to="/activities" className="catalog-hero-action">How we build <FiArrowRight aria-hidden="true" /></Link>
+          </div>
+        </div>
+        <figure className="catalog-hero-image photo-overlay-container catalog-hero-slideshow">
+          <PhotoSlideshow images={['/uploads/iec-08.jpg', '/uploads/iec-07.jpg', '/uploads/iec-04.jpg', '/uploads/iec-12.jpg']} />
+          <figcaption className="photo-reveal"><strong>Make it, test it, learn</strong><span>Every project starts somewhere.</span></figcaption>
+        </figure>
+      </section>
+
+      <section className="catalog-section projects-section" aria-labelledby="projects-heading">
+        <div className="catalog-section-heading">
+          <div>
+            <p className="section-label">The showcase</p>
+            <h2 id="projects-heading">Innovations from our community</h2>
+          </div>
+          <p>Filter by area to explore the work taking shape at IEC.</p>
+        </div>
+        <div className="catalog-filter-row" id="project-filters" role="group" aria-label="Filter projects by category">
           {FILTERS.map((f) => (
             <button
               key={f.category}
@@ -83,118 +88,79 @@ export default function Showcase() {
             </button>
           ))}
         </div>
-      </section>
-
-      {/* Project list */}
-      <section className="px-6 md:px-16 max-w-screen-xl mx-auto mb-24">
-        <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.07)', marginBottom: '2rem' }} />
-        <div className="space-y-4">
+        <p className="catalog-result-count">{filtered.length} {filtered.length === 1 ? 'project' : 'projects'}</p>
+        <div className="project-catalog-grid">
           {loading ? (
-            <div className="py-16 text-center text-white/30">
-              <span className="material-symbols-outlined animate-spin inline-block text-3xl mb-3">sync</span>
-              <p className="text-sm">Loading projects...</p>
+            <div className="catalog-empty-state">
+              <span className="material-symbols-outlined animate-spin" aria-hidden="true">sync</span>
+              <p>Loading projects...</p>
             </div>
           ) : error ? (
-            <p className="text-red-500 py-16 text-center">Failed to load projects: {error}</p>
+            <p className="catalog-empty-state" role="alert">Failed to load projects: {error}</p>
           ) : filtered.length === 0 ? (
-            <div className="py-16 text-center" style={{ color: 'rgba(255,255,255,0.25)' }}>
-              <span className="material-symbols-outlined text-4xl mb-4 block">rocket</span>
-              <p className="text-sm mb-4">No projects here yet. Be the first to incubate!</p>
-              <Link to="/#join" className="text-sm text-iec-blue hover:underline">
-                Submit your idea →
-              </Link>
+            <div className="catalog-empty-state">
+              <span className="material-symbols-outlined" aria-hidden="true">rocket_launch</span>
+              <p>No projects in this area yet. Check back as our teams share their work.</p>
+              <Link to="/#join">Bring us your idea <FiArrowRight aria-hidden="true" /></Link>
             </div>
           ) : (
-            filtered.map((project, index) => <ProjectCard key={project.id} project={project} index={index} />)
+            filtered.map((project) => <ProjectCard key={project.id} project={project} />)
           )}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="px-6 md:px-16 max-w-screen-xl mx-auto mb-20">
-        <div
-          className="relative overflow-hidden p-6 sm:p-12 md:p-20 text-center"
-          style={{ background: 'rgba(0,174,239,0.05)', border: '1px solid rgba(0,174,239,0.12)', borderRadius: '12px' }}
-        >
-          <div
-            className="absolute -top-20 -right-20 w-80 h-80 rounded-full pointer-events-none"
-            style={{ background: 'radial-gradient(circle, rgba(0,174,239,0.08), transparent 70%)', filter: 'blur(40px)' }}
-          />
-          <div className="relative z-10">
-            <p className="section-label mb-5">Incubation</p>
-            <h2 className="font-display font-bold text-white mb-6" style={{ fontSize: 'clamp(1.8rem, 3.5vw, 3rem)' }}>
-              Have something you're building?
-            </h2>
-            <p className="text-white/60 text-base max-w-xl mx-auto mb-10 leading-relaxed">
-              Whether you have a scribbled idea or a working prototype, IEC gives you the mentorship, resources and
-              network to scale it.
-            </p>
-            <Link to="/#join" className="btn-primary">
-              Submit for Incubation <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-            </Link>
-          </div>
+      <section className="catalog-cta">
+        <div>
+          <p className="section-label">Have an idea?</p>
+          <h2>Bring your curiosity. We’ll build from there.</h2>
         </div>
+        <Link to="/#join" className="catalog-hero-action">Join the club <FiArrowRight aria-hidden="true" /></Link>
       </section>
     </main>
   );
 }
 
-function ProjectCard({ project, index }: { project: Project; index: number }) {
+function ProjectCard({ project }: { project: Project }) {
   const cat = catKey(project.category);
-  const imageRight = index % 2 !== 0;
   const mediaUrls = parseMediaUrls(project.media_urls);
   const previewImg = mediaUrls.find((u) => isPreviewImage(u)) || PROJECT_FALLBACK_IMG;
   const categoryLabel = project.category || 'Project';
-  // STATUS_STYLE is retained for parity with the source; status accents are
-  // applied on the detail page.
-  void STATUS_STYLE;
-
-  const imageHalf = (
-    <div className={`w-full md:w-1/2 relative ${imageRight ? 'md:order-2' : 'md:order-1'}`} style={{ minHeight: '260px' }}>
-      <img
-        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        src={previewImg}
-        alt={project.name}
-        loading="lazy"
-      />
-    </div>
-  );
-
-  const contentHalf = (
-    <div
-      className={`w-full md:w-1/2 p-5 sm:p-8 md:p-12 flex flex-col justify-center ${imageRight ? 'md:order-1' : 'md:order-2'}`}
-      style={{ background: 'rgba(255,255,255,0.02)' }}
-    >
-      <p className="section-label mb-3">{categoryLabel}</p>
-      <h2 className="project-title font-display font-bold mb-3" style={{ fontSize: 'clamp(1.4rem, 2.5vw, 2rem)' }}>
-        {project.name}
-      </h2>
-      <p className="project-desc text-sm leading-relaxed mb-5 max-w-md line-clamp-3 sm:line-clamp-4">{project.description}</p>
-      <div className="flex items-center gap-3">
-        <span className="text-white/30 text-xs uppercase tracking-wider">Team Lead</span>
-        <span className="text-white/70 text-sm font-medium">{project.team_lead}</span>
-      </div>
-    </div>
-  );
 
   return (
     <Link
       to={`/project?id=${project.id}`}
-      className="project-card group relative overflow-hidden flex flex-col md:flex-row"
+      className="project-card project-catalog-card group"
       data-category={cat}
       aria-label={`View details for ${project.name}`}
-      style={{
-        minHeight: '320px',
-        display: 'flex',
-        background: 'rgba(255,255,255,0.03)',
-        border: '1px solid rgba(255,255,255,0.07)',
-        borderRadius: '8px',
-        textDecoration: 'none',
-        color: 'inherit',
-      }}
     >
-      {imageHalf}
-      {contentHalf}
+      <div className="project-card-flip">
+        <div className="project-card-face project-card-front">
+          <div className="project-catalog-image">
+            <img src={previewImg} alt={project.name} loading="lazy" />
+            <span>{categoryLabel}</span>
+            <div className="catalog-card-reveal" aria-hidden="true">
+              <strong>{project.name}</strong>
+              <p>{project.description}</p>
+              <small>Team lead · {project.team_lead || 'IEC project team'}</small>
+              <span>Learn more <FiArrowUpRight aria-hidden="true" /></span>
+            </div>
+          </div>
+          <div className="project-catalog-copy">
+            <h3>{project.name}</h3>
+            <p>{project.description}</p>
+            <div className="project-catalog-footer">
+              <span><small>Team lead</small><strong>{project.team_lead || 'IEC project team'}</strong></span>
+              <span className="project-card-learn-more">Learn more <FiArrowUpRight aria-hidden="true" /></span>
+            </div>
+          </div>
+        </div>
+        <div className="project-card-face project-card-back" aria-hidden="true">
+          <p className="section-label">Innovation</p>
+          <h3>{project.name}</h3>
+          <p>{project.description}</p>
+          <span className="project-card-back-cta">Learn more <FiArrowUpRight aria-hidden="true" /></span>
+        </div>
+      </div>
     </Link>
   );
 }

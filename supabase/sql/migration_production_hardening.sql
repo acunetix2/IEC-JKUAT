@@ -57,11 +57,36 @@ ALTER TABLE admins ENABLE ROW LEVEL SECURITY;
 -- fail with "function public.is_admin() does not exist".
 CREATE OR REPLACE FUNCTION public.is_admin()
 RETURNS BOOLEAN
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
-SET search_path = public
-AS $$ SELECT EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid()) $$;
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  has_roles BOOLEAN;
+  admin_result BOOLEAN;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1
+    FROM pg_attribute
+    WHERE attrelid = 'public.admins'::regclass
+      AND attname = 'role'
+      AND NOT attisdropped
+  ) INTO has_roles;
+
+  IF has_roles THEN
+    EXECUTE 'SELECT EXISTS (
+      SELECT 1 FROM public.admins
+      WHERE user_id = $1 AND role IN (''owner'', ''manager'')
+    )' INTO admin_result USING auth.uid();
+  ELSE
+    SELECT EXISTS (SELECT 1 FROM public.admins WHERE user_id = auth.uid())
+      INTO admin_result;
+  END IF;
+
+  RETURN COALESCE(admin_result, FALSE);
+END
+$$;
 
 -- Admins can see the admin list; nobody else can.
 -- NOTE: must go through is_admin(), NOT a direct subquery on admins —

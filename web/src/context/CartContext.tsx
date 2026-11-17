@@ -1,5 +1,5 @@
 // IEC JKUAT — merch cart, shared by the Merchandise page and the Nav.
-// On the old merchandise.html the nav carried a "Bag" button with a count
+// On the old merchandise.html the nav carried a "Cart" button with a count
 // badge, so the cart has to live above both. Persisted to localStorage
 // under 'iec-cart', exactly like merchandise.js.
 
@@ -10,8 +10,6 @@ interface CartContextValue {
   cart: CartItem[];
   count: number;
   total: number;
-  cartOpen: boolean;
-  setCartOpen: (open: boolean) => void;
   add: (item: Omit<CartItem, 'quantity'>) => void;
   remove: (index: number) => void;
   updateQuantity: (index: number, delta: number) => void;
@@ -31,7 +29,6 @@ function loadCart(): CartItem[] {
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>(loadCart);
-  const [cartOpen, setCartOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -66,14 +63,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
       cart,
       count: cart.reduce((c, i) => c + i.quantity, 0),
       total: cart.reduce((s, i) => s + i.price * i.quantity, 0),
-      cartOpen,
-      setCartOpen,
       add,
       remove,
       updateQuantity,
       clear,
     }),
-    [cart, cartOpen, add, remove, updateQuantity, clear]
+    [cart, add, remove, updateQuantity, clear]
   );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

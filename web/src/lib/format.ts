@@ -24,3 +24,7 @@ export function getTimeAgo(date: Date): string {
   if (diff < 604800) return `${Math.floor(diff / 86400)}d ago`;
   return date.toLocaleDateString('en-KE', { month: 'short', day: 'numeric' });
 }
+
+export function formatMerchOrderReference(id: string): string {
+  return `IEC-${id.slice(0, 8).toUpperCase()}`;
+}

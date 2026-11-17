@@ -3,10 +3,8 @@
 // verbatim from site/terms.html.
 
 import { Link } from 'react-router-dom';
-import { useTheme } from '../context/ThemeContext';
 
 export default function Terms() {
-  const { theme, toggle } = useTheme();
   return (
     <div className="pp-scope bg-surface text-on-surface font-body-md min-h-screen">
       <nav className="fixed top-0 w-full z-50 bg-surface/70 backdrop-blur-xl border-b border-glass-border shadow-sm">
@@ -15,14 +13,6 @@ export default function Terms() {
             IEC JKUAT
           </Link>
           <div className="flex items-center gap-4">
-            <button
-              onClick={toggle}
-              className="p-2 text-on-surface-variant hover:text-tech-blue transition-colors"
-              title="Toggle dark mode"
-              aria-label="Toggle theme"
-            >
-              <span className="material-symbols-outlined">{theme === 'light' ? 'dark_mode' : 'light_mode'}</span>
-            </button>
             <Link to="/" className="font-label-md text-label-md text-tech-blue hover:underline">
               &larr; Back to Home
             </Link>

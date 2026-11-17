@@ -118,13 +118,13 @@ function EventBody({ event }: { event: EventRow }) {
       {/* Left: main content */}
       <div className="lg:col-span-2">
         {/* Hero gallery */}
-        <div className="relative overflow-hidden rounded-xl mb-8" style={{ height: 'clamp(260px,40vw,480px)', background: '#000' }}>
+        <div className="detail-gallery photo-overlay-container relative overflow-hidden rounded-xl mb-8" style={{ height: 'clamp(260px,40vw,480px)', background: '#000' }}>
           {images.map((img, i) => (
             <img
               key={i}
               src={img}
               alt={event.title}
-              className="gallery-img"
+              className={`gallery-img${i === galIdx ? ' is-active' : ''}`}
               style={{ opacity: i === galIdx ? 1 : 0 }}
               loading={i === 0 ? undefined : 'lazy'}
             />
@@ -133,6 +133,7 @@ function EventBody({ event }: { event: EventRow }) {
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to top,rgba(7,16,26,0.7) 0%,transparent 50%)', pointerEvents: 'none' }}
           />
+          <div className="photo-reveal"><strong>{event.title}</strong><span>{event.category || 'IEC JKUAT event'}</span></div>
           {total > 1 && (
             <>
               <button

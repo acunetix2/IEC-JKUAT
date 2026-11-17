@@ -25,6 +25,18 @@ const DEFAULT_DESCRIPTION =
 
 const PAGES: Record<string, PageMeta> = {
   '/': { page: 'home', title: 'IEC JKUAT — Innovation & Entrepreneurship Club', description: DEFAULT_DESCRIPTION, canonical: true },
+  '/about': {
+    page: 'about',
+    title: 'About IEC JKUAT | Our People and Purpose',
+    description: 'Meet the students and advisors guiding IEC JKUAT and learn how the club helps ideas grow into practical projects.',
+    canonical: true,
+  },
+  '/activities': {
+    page: 'activities',
+    title: 'Activities | IEC JKUAT',
+    description: 'Explore IEC JKUAT workshops, projects and community experiences for students who want to learn by building.',
+    canonical: true,
+  },
   '/events': {
     page: 'events',
     title: 'Events | IEC JKUAT',
@@ -34,16 +46,40 @@ const PAGES: Record<string, PageMeta> = {
   '/event': { page: 'event', title: 'Event | IEC JKUAT' },
   '/showcase': {
     page: 'showcase',
-    title: 'Projects | IEC JKUAT',
-    description: "Explore IEC JKUAT's project showcase — student startups, innovation labs, and ventures from JKUAT.",
+    title: 'Innovations | IEC JKUAT',
+    description: "Explore IEC JKUAT's innovation showcase — student projects, prototypes and ventures from JKUAT.",
+    canonical: true,
+  },
+  '/blog': {
+    page: 'blog',
+    title: 'Blog | IEC JKUAT',
+    description: 'Stories, ideas and lessons from the IEC JKUAT innovation community.',
     canonical: true,
   },
   '/project': { page: 'project', title: 'Project | IEC JKUAT' },
+  '/products': {
+    page: 'merch',
+    title: 'Products | IEC JKUAT',
+    description: 'Browse products from IEC JKUAT and shop available club merchandise.',
+    canonical: true,
+  },
+  '/products/:id': {
+    page: 'product',
+    title: 'Product details | IEC JKUAT',
+    description: 'View product details and available sizes from the IEC JKUAT merchandise collection.',
+    canonical: true,
+  },
+  '/cart': {
+    page: 'cart',
+    title: 'Your Cart | IEC JKUAT',
+    description: 'Review your IEC JKUAT merchandise cart and place an order.',
+    noindex: true,
+  },
   '/merchandise': {
     page: 'merch',
-    title: 'Club Gear | IEC JKUAT',
+    title: 'Products | IEC JKUAT',
     description: 'IEC JKUAT merchandise — exclusive club gear, apparel, and accessories for student founders and innovators.',
-    canonical: true,
+    canonical: false,
   },
   '/contact': {
     page: 'contact',
@@ -74,7 +110,7 @@ function upsert(selector: string, create: () => HTMLElement): HTMLElement {
 export function usePageMeta(): void {
   const { pathname } = useLocation();
   useEffect(() => {
-    const meta = PAGES[pathname] ?? NOT_FOUND;
+    const meta = PAGES[pathname] ?? (pathname.startsWith('/products/') ? PAGES['/products/:id'] : NOT_FOUND);
     document.documentElement.dataset.page = meta.page;
     document.title = meta.title;
 

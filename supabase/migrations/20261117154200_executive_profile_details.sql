@@ -1,0 +1,3 @@
+ALTER TABLE public.executives
+  ADD COLUMN IF NOT EXISTS description TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS responsibilities TEXT NOT NULL DEFAULT '';
