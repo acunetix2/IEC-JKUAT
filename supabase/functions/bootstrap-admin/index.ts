@@ -4,6 +4,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL') || '';
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || '';
 const BOOTSTRAP_SECRET = Deno.env.get('ADMIN_BOOTSTRAP_SECRET') || '';
+const MAX_BOOTSTRAP_ADMINS = 3;
 const ALLOWED_ORIGINS = new Set([
   'https://iecjkuat.com',
   'https://www.iecjkuat.com',
@@ -85,11 +86,11 @@ serve(async (req) => {
       return respond({ error: 'First-administrator setup is not configured.' }, 503, headers);
     }
     const { count, error } = await db.from('admins').select('user_id', { count: 'exact', head: true });
-    if (error) {
-      console.error('Could not check first-admin setup status:', error.message);
+    if (error || count === null) {
+      console.error('Could not check first-admin setup status:', error?.message);
       return respond({ error: 'Could not check first-admin setup status.' }, 503, headers);
     }
-    return respond({ data: { available: count === 0 } }, 200, headers);
+    return respond({ data: { available: count < MAX_BOOTSTRAP_ADMINS } }, 200, headers);
   }
 
   if (body.action !== 'bootstrap') return respond({ error: 'Unknown setup action.' }, 400, headers);
@@ -104,6 +105,15 @@ serve(async (req) => {
   }
   if (password.length < 12 || password.length > 128) {
     return respond({ error: 'Use a password between 12 and 128 characters.' }, 400, headers);
+  }
+
+  const { count, error: countError } = await db.from('admins').select('user_id', { count: 'exact', head: true });
+  if (countError || count === null) {
+    console.error('Could not check bootstrap administrator limit:', countError?.message);
+    return respond({ error: 'Could not check administrator setup capacity.' }, 503, headers);
+  }
+  if (count >= MAX_BOOTSTRAP_ADMINS) {
+    return respond({ error: 'The limit of three bootstrap administrators has been reached.' }, 409, headers);
   }
 
   const { data: created, error: createError } = await db.auth.admin.createUser({
@@ -124,8 +134,11 @@ serve(async (req) => {
     if (cleanupError) {
       console.error('Could not remove unclaimed auth user:', created.user.id, cleanupError.message);
     }
+    if (bootstrapError.message.includes('Initial administrator setup limit reached')) {
+      return respond({ error: 'The limit of three bootstrap administrators has been reached.' }, 409, headers);
+    }
     if (bootstrapError.message.includes('Initial administrator setup is closed')) {
-      return respond({ error: 'First-administrator setup is already complete.' }, 409, headers);
+      return respond({ error: 'The Supabase bootstrap migration must be updated before more administrators can be created.' }, 409, headers);
     }
     console.error('Could not grant first administrator access:', bootstrapError.message);
     return respond({ error: 'Could not complete first-administrator setup.' }, 500, headers);

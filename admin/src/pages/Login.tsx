@@ -94,7 +94,7 @@ export default function Login({ error, onError }: { error: string; onError: (mes
         if (!cancelled) {
           setSetupAvailable(Boolean(import.meta.env.DEV || available));
           if (!import.meta.env.DEV && !available) {
-            setSetupCheckError('The first-admin setup is already complete.');
+            setSetupCheckError('The limit of three bootstrap administrators has been reached.');
           }
         }
       } catch (statusLoadError) {
@@ -192,7 +192,7 @@ export default function Login({ error, onError }: { error: string; onError: (mes
         }
         sileo.success({
           title: 'Super Admin ready',
-          description: 'The first IEC administrator account has been activated.',
+          description: 'The Super Admin account has been activated.',
           duration: 3200,
         });
       } else {
@@ -235,7 +235,7 @@ export default function Login({ error, onError }: { error: string; onError: (mes
         <div className="login-panel-content">
           <header className="login-heading">
             <h1>{mode === 'bootstrap' ? 'Set up admin.' : 'Welcome back.'}</h1>
-            <p>{mode === 'bootstrap' ? 'Create the first Super Admin account for the IEC admin portal.' : 'Sign in to pick up where you left off.'}</p>
+            <p>{mode === 'bootstrap' ? 'Create a Super Admin account. Bootstrap setup allows up to three accounts.' : 'Sign in to pick up where you left off.'}</p>
           </header>
           <form className="login-card" noValidate onSubmit={submit} aria-busy={busy}>
             {error && <div className="login-error" role="alert">{error}</div>}
@@ -305,7 +305,7 @@ export default function Login({ error, onError }: { error: string; onError: (mes
                 required
               />
               {fieldErrors.bootstrapSecret && <span className="login-field-error" id="admin-bootstrap-secret-error">{fieldErrors.bootstrapSecret}</span>}
-              <p className="login-setup-note">This setup closes automatically after the first Super Admin account is created.</p>
+              <p className="login-setup-note">Bootstrap setup closes after three administrator accounts are created.</p>
             </>}
             <button type="submit" className="button-primary login-submit" disabled={busy} aria-busy={busy}>
               {busy && <span className="login-spinner" aria-hidden="true" />}
@@ -321,7 +321,7 @@ export default function Login({ error, onError }: { error: string; onError: (mes
                 setTouched({});
                 setMode('bootstrap');
               }}
-            >Set up the first administrator</button>}
+            >Set up an administrator</button>}
             {mode === 'signin' && setupCheckError && <p className="login-setup-status" role="status">{setupCheckError}</p>}
             {mode === 'bootstrap' && <button
               type="button"
@@ -338,7 +338,7 @@ export default function Login({ error, onError }: { error: string; onError: (mes
           <p className="login-session-note">
             <FiLock aria-hidden="true" />
             {mode === 'bootstrap'
-              ? 'The setup code is required. Never share it; the server will reject setup after the first Super Admin is added.'
+              ? 'The setup code is required. Never share it; the server will reject setup after three Super Admin accounts are added.'
               : 'Use your IEC administrator account and sign out when you’re finished.'}
           </p>
         </div>
