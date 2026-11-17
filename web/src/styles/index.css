@@ -2545,12 +2545,12 @@ html.light .about-hero h1 { color: #fff !important; }
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 250px));
   justify-content: center;
-  align-items: start;
+  align-items: stretch;
   gap: 14px;
   background: transparent;
 }
-.merch-product-card { width: 100%; align-self: start; }
-.product-card-details-link { display: flex; flex: 0 0 auto; flex-direction: column; color: inherit; text-decoration: none; }
+.merch-product-card { width: 100%; }
+.product-card-details-link { display: flex; flex: 1 1 auto; flex-direction: column; color: inherit; text-decoration: none; }
 .product-card-details-link:focus-visible { outline: 3px solid #3b82a0; outline-offset: -3px; }
 .product-card-name {
  display: -webkit-box;
@@ -2572,16 +2572,6 @@ html.light .about-hero h1 { color: #fff !important; }
  -webkit-box-orient: vertical;
  -webkit-line-clamp: 2;
 }
-.product-card-variants { display: flex; min-width: 0; min-height: 27px; align-items: center; gap: 7px; }
-.product-card-size-options { display: flex; min-width: 0; flex: 1 1 auto; align-items: center; gap: 4px; }
-.product-card-variant-label { flex: 0 0 auto; color: #657386; font-size: 8px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
-.merch-product-card .size-group { min-width: 0; flex: 1 1 auto; flex-wrap: nowrap; gap: 3px; overflow-x: auto; scrollbar-width: thin; }
-.merch-product-card .size-btn { min-width: 21px; flex: 0 0 auto; padding: 3px 5px !important; font: 700 9px/1.2 'Plus Jakarta Sans', sans-serif !important; }
-.merch-product-card .product-color-picker-compact { display: flex; min-width: 0; max-width: 40%; flex: 0 1 auto; align-items: center; gap: 4px; margin: 0; }
-.merch-product-card .product-color-options { flex-wrap: nowrap; gap: 4px; overflow-x: auto; scrollbar-width: thin; }
-.merch-product-card .product-color-option { display: grid; width: 19px; min-width: 19px; min-height: 19px; flex: 0 0 19px; place-items: center; gap: 0; padding: 2px; border-radius: 50%; font-size: 0; }
-.merch-product-card .product-color-option > span:last-child { display: none; }
-.merch-product-card .product-color-swatch { width: 13px; height: 13px; flex-basis: 13px; }
 .merch-product-card .add-to-cart-btn { flex: 0 0 auto; min-height: 38px; }
 .product-detail-page { min-height: calc(100vh - 68px); padding: 35px 24px 72px; background: #f3f6f9; color: #10213b; }
 .product-detail-shell { max-width: 1120px; margin: 0 auto; }
@@ -2609,11 +2599,6 @@ html.light .about-hero h1 { color: #fff !important; }
 .product-color-option.is-selected { border-color: #145da0; background: #eef5fb; color: #145da0; }
 .product-color-option:focus-visible { outline: 2px solid #145da0; outline-offset: 2px; }
 .product-color-swatch { width: 13px; height: 13px; flex: 0 0 13px; border: 1px solid rgba(15,35,55,.2); border-radius: 50%; }
-.product-color-picker-compact { margin: 0 0 12px; }
-.product-color-picker-compact legend { margin-bottom: 5px; font-size: 9px; }
-.product-color-picker-compact .product-color-options { gap: 5px; }
-.product-color-picker-compact .product-color-option { min-height: 27px; gap: 5px; padding: 0 7px; font-size: 9px; }
-.product-color-picker-compact .product-color-swatch { width: 11px; height: 11px; flex-basis: 11px; }
 .product-detail-exclusive { display: flex; align-items: center; gap: 7px; margin: 16px 0 0; color: #24804d; font-size: 12px; font-weight: 700; }
 .product-detail-exclusive svg { width: 15px; height: 15px; }
 .product-detail-add { display: flex; width: 100%; min-height: 48px; align-items: center; justify-content: center; gap: 9px; margin-top: 26px; border: 0; border-radius: 8px; background: #0b1f3a; color: #fff; font-size: 13px; font-weight: 750; cursor: pointer; }

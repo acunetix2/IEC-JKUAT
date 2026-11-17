@@ -2,7 +2,7 @@
 # `supabase functions deploy <name>` reads these, so a deploy without the
 # --no-verify-jwt flag can no longer switch JWT checking back on.
 
-project_id = "ccnzdnkvyigrcwpaxqxq"
+project_id = "cutdcvzeteiijxwgmzwcs"
 
 # Called by the public site with the anon key. Abuse protection lives in
 # the function itself (fixed fee, member check, one pending push).

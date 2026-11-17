@@ -20,45 +20,33 @@ interface ProductColorPickerProps {
   colors: string[];
   value: string | null;
   onChange: (color: string) => void;
-  compact?: boolean;
 }
 
-export default function ProductColorPicker({ colors, value, onChange, compact = false }: ProductColorPickerProps) {
+export default function ProductColorPicker({ colors, value, onChange }: ProductColorPickerProps) {
   if (!colors.length) return null;
-
-  const options = colors.map((color) => (
-    <button
-      key={color}
-      type="button"
-      className={`product-color-option${value === color ? ' is-selected' : ''}`}
-      aria-label={`Choose ${color}`}
-      aria-pressed={value === color}
-      title={color}
-      onClick={() => onChange(color)}
-    >
-      <span
-        className="product-color-swatch"
-        aria-hidden="true"
-        style={{ backgroundColor: COLOR_SWATCHES[color.toLowerCase()] ?? '#cbd5e1' }}
-      />
-      <span>{color}</span>
-    </button>
-  ));
-
-  if (compact) {
-    return (
-      <div className="product-color-picker product-color-picker-compact" role="group" aria-label="Choose a color">
-        <span className="product-card-variant-label" aria-hidden="true">Color</span>
-        <div className="product-color-options">{options}</div>
-      </div>
-    );
-  }
 
   return (
     <fieldset className="product-color-picker">
       <legend>Choose a color</legend>
       <div className="product-color-options">
-        {options}
+        {colors.map((color) => (
+          <button
+            key={color}
+            type="button"
+            className={`product-color-option${value === color ? ' is-selected' : ''}`}
+            aria-label={`Choose ${color}`}
+            aria-pressed={value === color}
+            title={color}
+            onClick={() => onChange(color)}
+          >
+            <span
+              className="product-color-swatch"
+              aria-hidden="true"
+              style={{ backgroundColor: COLOR_SWATCHES[color.toLowerCase()] ?? '#cbd5e1' }}
+            />
+            <span>{color}</span>
+          </button>
+        ))}
       </div>
     </fieldset>
   );

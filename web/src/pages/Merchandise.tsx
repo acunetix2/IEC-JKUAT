@@ -10,7 +10,6 @@ import { getProducts } from '../lib/supabase';
 import { parseJsonList } from '../lib/media';
 import type { CartItem, Product } from '../types/db';
 import CustomSelect from '../components/CustomSelect';
-import ProductColorPicker from '../components/ProductColorPicker';
 
 const CART_FALLBACK_IMG = 'https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=80&h=80&fit=crop';
 
@@ -131,22 +130,15 @@ export default function Merchandise() {
   const featuredProduct = products.find((product) => product.image_url) ?? null;
 
   const addToCart = useCallback(
-    (product: UIProduct, size: string | null, color: string | null, source: HTMLButtonElement) => {
-      if (product.sizeList.length > 0 && !size) {
-        toast('Please select a size first', 'error');
-        return false;
-      }
-      if (product.colorList.length > 0 && !color) {
-        toast('Please select a color first', 'error');
+    (product: UIProduct, source: HTMLButtonElement) => {
+      if (product.sizeList.length > 0 || product.colorList.length > 0) {
+        toast('Choose this product’s options on its details page.', 'error');
         return false;
       }
       add({
         id: product.id,
         name: product.name,
         price: product.price || 0,
-        size: size || undefined,
-        color: color || undefined,
-        colorOptions: product.colorList.length ? product.colorList : undefined,
         image_url: product.image_url || undefined,
       });
       requestAnimationFrame(() => animateProductToCart(product.image_url || '', source));
@@ -346,14 +338,12 @@ function ProductCard({
   onAdd,
 }: {
   product: UIProduct;
-  onAdd: (p: UIProduct, size: string | null, color: string | null, source: HTMLButtonElement) => boolean;
+  onAdd: (p: UIProduct, source: HTMLButtonElement) => boolean;
 }) {
-  const [size, setSize] = useState<string | null>(null);
-  const [color, setColor] = useState<string | null>(null);
   const [added, setAdded] = useState(false);
 
   function handleAdd(event: MouseEvent<HTMLButtonElement>) {
-    const ok = onAdd(product, size, color, event.currentTarget);
+    const ok = onAdd(product, event.currentTarget);
     if (ok) {
       setAdded(true);
       setTimeout(() => setAdded(false), 1500);
@@ -396,62 +386,56 @@ function ProductCard({
         </div>
       </Link>
       <div className="product-card-controls" style={{ padding: '0 13px 13px', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {(product.sizeList.length > 0 || product.colorList.length > 0) && (
-          <div className="product-card-variants">
-            {product.sizeList.length > 0 && (
-              <div className="product-card-size-options" role="group" aria-label={`Choose a size for ${product.name}`}>
-                <span className="product-card-variant-label">Size</span>
-                <div className="size-group">
-                  {product.sizeList.map((s) => {
-                    const selected = size === s;
-                    return (
-                      <button
-                        key={s}
-                        className="size-btn"
-                        style={{
-                          border: `1px solid ${selected ? '#0b1f3a' : '#d6dee7'}`,
-                          color: selected ? '#fff' : '#475569',
-                          background: selected ? '#0b1f3a' : '#fff',
-                          borderRadius: '5px',
-                          cursor: 'pointer',
-                        }}
-                        aria-pressed={selected}
-                        onClick={() => setSize(s)}
-                      >
-                        {s}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-            <ProductColorPicker colors={product.colorList} value={color} onChange={setColor} compact />
-          </div>
+        {product.colorList.length > 0 || product.sizeList.length > 0 ? (
+          <Link
+            to={`/products/${encodeURIComponent(product.id)}`}
+            className="add-to-cart-btn"
+            style={{
+              width: '100%',
+              padding: '9px',
+              background: '#0b1f3a',
+              color: '#fff',
+              fontSize: '12px',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '7px',
+              textDecoration: 'none',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>tune</span>
+            Choose options
+          </Link>
+        ) : (
+          <button
+            className="add-to-cart-btn"
+            onClick={handleAdd}
+            style={{
+              width: '100%',
+              padding: '9px',
+              background: added ? '#17653c' : '#0b1f3a',
+              color: '#fff',
+              fontSize: '12px',
+              fontWeight: 700,
+              border: 'none',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '6px',
+              borderRadius: '7px',
+            }}
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
+              {added ? 'check_circle' : 'add_shopping_cart'}
+            </span>
+            {added ? 'Added to Cart' : 'Add to Cart'}
+          </button>
         )}
-        <button
-          className="add-to-cart-btn"
-          onClick={handleAdd}
-          style={{
-            width: '100%',
-            padding: '9px',
-            background: added ? '#17653c' : '#0b1f3a',
-            color: '#fff',
-            fontSize: '12px',
-            fontWeight: 700,
-            border: 'none',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '6px',
-            borderRadius: '7px',
-          }}
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: '16px' }}>
-            {added ? 'check_circle' : 'add_shopping_cart'}
-          </span>
-          {added ? 'Added to Cart' : 'Add to Cart'}
-        </button>
       </div>
     </article>
   );
